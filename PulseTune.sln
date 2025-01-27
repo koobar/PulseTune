@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulseTune", "PulseTune\PulseTune.csproj", "{4C8124B1-1282-4AFD-89B6-5A01A6752D3F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune", "LibPulseTune\LibPulseTune.csproj", "{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{540139AC-9A1E-4442-8158-7B82C718CAF7}"
+	ProjectSection(SolutionItems) = preProject
+		HISTORY.txt = HISTORY.txt
+		LICENSE = LICENSE
+		README.txt = README.txt
+		THIRD-PARTY-NOTICES.txt = THIRD-PARTY-NOTICES.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune.Plugin.Sdk", "LibPulseTune.Plugin.Sdk\LibPulseTune.Plugin.Sdk.csproj", "{5EC3F05F-72D3-4772-AAB2-EB7813E38D5E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C8124B1-1282-4AFD-89B6-5A01A6752D3F}.Debug|x64.ActiveCfg = Debug|x64
+		{4C8124B1-1282-4AFD-89B6-5A01A6752D3F}.Debug|x64.Build.0 = Debug|x64
+		{4C8124B1-1282-4AFD-89B6-5A01A6752D3F}.Release|x64.ActiveCfg = Release|x64
+		{4C8124B1-1282-4AFD-89B6-5A01A6752D3F}.Release|x64.Build.0 = Release|x64
+		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Debug|x64.ActiveCfg = Debug|x64
+		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Debug|x64.Build.0 = Debug|x64
+		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Release|x64.ActiveCfg = Release|x64
+		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Release|x64.Build.0 = Release|x64
+		{5EC3F05F-72D3-4772-AAB2-EB7813E38D5E}.Debug|x64.ActiveCfg = Debug|x64
+		{5EC3F05F-72D3-4772-AAB2-EB7813E38D5E}.Debug|x64.Build.0 = Debug|x64
+		{5EC3F05F-72D3-4772-AAB2-EB7813E38D5E}.Release|x64.ActiveCfg = Release|x64
+		{5EC3F05F-72D3-4772-AAB2-EB7813E38D5E}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F6798ADC-966D-4566-AABE-20E9D832B30C}
+	EndGlobalSection
+EndGlobal
