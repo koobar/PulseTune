@@ -284,7 +284,7 @@ namespace PulseTune
         /// </summary>
         public static void LoadPlugins()
         {
-            var pluginDir = $"{Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName)}\\plug-ins";
+            var pluginDir = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\{Program.APPLICATION_NAME}\\plug-ins";
             var dllFiles = new List<string>();
 
             if (!Directory.Exists(pluginDir))
