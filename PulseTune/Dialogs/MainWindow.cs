@@ -1015,8 +1015,18 @@ namespace PulseTune.Dialogs
         {
             var source = AudioPlayer.GetAudioSource();
             var msec = AudioPlayer.GetTimerInterval();
-            this.LeftChannelVolumeMeter.Amplitude = source.GetAmplitude(0, msec);
-            this.RightChannelVolumeMeter.Amplitude = source.GetAmplitude(1, msec);
+
+            if (source.Channels >= 2)
+            {
+                this.LeftChannelVolumeMeter.Amplitude = source.GetAmplitude(0, msec);
+                this.RightChannelVolumeMeter.Amplitude = source.GetAmplitude(1, msec);
+            }
+            else
+            {
+                var amp = source.GetAmplitude(0, msec);
+                this.LeftChannelVolumeMeter.Amplitude = amp;
+                this.RightChannelVolumeMeter.Amplitude = amp;
+            }
 
             switch (AudioPlayer.GetAudioPlayerState())
             {
