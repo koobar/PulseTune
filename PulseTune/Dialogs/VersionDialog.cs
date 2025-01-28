@@ -25,7 +25,7 @@ namespace PulseTune.Dialogs
         {
             base.OnLoad(e);
 
-            var license_doc = $"{Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName)}\\License.txt";
+            var license_doc = $"{Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName)}\\LICENSE";
 
             var sb = new StringBuilder();
             sb.AppendLine("バージョン：" + Program.ApplicationVersion.ToString());
