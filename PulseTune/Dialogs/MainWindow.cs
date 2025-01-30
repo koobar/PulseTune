@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Windows.Forms;
 
 namespace PulseTune.Dialogs
@@ -28,6 +29,7 @@ namespace PulseTune.Dialogs
         private readonly Command stopCommand;
         private readonly Command backwardCommand;
         private readonly Command forwardCommand;
+        private readonly Command moveToStartCommand;
 
         // 非公開フィールド
         private ClosableTabPage defaultPlaylistTabPage;
@@ -45,6 +47,7 @@ namespace PulseTune.Dialogs
             this.stopCommand = new Command(StopCommandImplementation);
             this.backwardCommand = new Command(BackwardCommandImplementation);
             this.forwardCommand = new Command(ForwardCommandImplementation);
+            this.moveToStartCommand = new Command(MoveToStartCommandImplementation);
 
             // メディアコントロールパネルのコマンドの設定
             this.ControlPanel.PlayCommand = this.playCommand;
@@ -53,6 +56,7 @@ namespace PulseTune.Dialogs
             this.ControlPanel.StopCommand = this.stopCommand;
             this.ControlPanel.BackwardCommand = this.backwardCommand;
             this.ControlPanel.ForwardCommand = this.forwardCommand;
+            this.ControlPanel.MoveToTrackStartCommand = this.moveToStartCommand;
 
             // タスクバーのサムネイルにメディアコントロールボタンを表示する。
             this.ControlPanel.ShowTaskBarThumbnailButtons(this);
@@ -145,6 +149,11 @@ namespace PulseTune.Dialogs
         private void BackwardCommandImplementation(object unused1, object unused2)
         {
             Backward();
+        }
+
+        private void MoveToStartCommandImplementation(object unused1, object unused2)
+        {
+            MoveToTrackStart();
         }
 
         #region プロパティ
@@ -756,6 +765,14 @@ namespace PulseTune.Dialogs
             playlist.SelectNextTrack();
 
             Play(playlist.SelectedTrack);
+        }
+
+        /// <summary>
+        /// 再生中のトラックの最初に戻る。
+        /// </summary>
+        private void MoveToTrackStart()
+        {
+            AudioPlayer.GetAudioSource().SetCurrentTime(TimeSpan.FromSeconds(0));
         }
 
         #endregion

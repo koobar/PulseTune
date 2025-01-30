@@ -2,8 +2,11 @@
 using Microsoft.WindowsAPICodePack.Taskbar;
 using PulseTune.Properties;
 using System;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Windows.Media.TextFormatting;
+using Windows.Web.Http;
 
 namespace PulseTune.Controls
 {
@@ -18,6 +21,7 @@ namespace PulseTune.Controls
         private Command pauseCommand;
         private Command resumeCommand;
         private Command backwardCommand;
+        private Command moveToTrackStartCommand;
         private Command forwardCommand;
         private Command stopCommand;
 
@@ -119,6 +123,21 @@ namespace PulseTune.Controls
             get
             {
                 return this.backwardCommand;
+            }
+        }
+
+        /// <summary>
+        /// トラックの最初に戻るコマンド
+        /// </summary>
+        public Command MoveToTrackStartCommand
+        {
+            set
+            {
+                this.moveToTrackStartCommand = value;
+            }
+            get
+            {
+                return this.moveToTrackStartCommand;
             }
         }
 
@@ -373,7 +392,21 @@ namespace PulseTune.Controls
         /// <param name="e"></param>
         private void BackwardButton_Click(object sender, EventArgs e)
         {
-            this.BackwardCommand?.Execute();
+            if (AudioPlayer.GetAudioPlayerState() == AudioPlayer.AUDIOPLAYER_STATE_PLAY && this.MoveToTrackStartCommand != null)
+            {
+                if (AudioPlayer.GetAudioSource().GetCurrentTime().TotalSeconds >= 3)
+                {
+                    this.MoveToTrackStartCommand.Execute();
+                }
+                else
+                {
+                    this.BackwardCommand?.Execute();
+                }
+            }
+            else
+            {
+                this.BackwardCommand?.Execute();
+            }
         }
 
         /// <summary>

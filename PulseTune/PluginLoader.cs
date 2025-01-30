@@ -3,7 +3,6 @@ using LibPulseTune.Plugin.Sdk;
 using PulseTune.Metadata;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
