@@ -12,7 +12,7 @@
 
 ■動作環境
 　Windows 10 (19H1以降, 64bit), Windows 11
-　.NET Framework 4.7.2 以降が動作する環境
+　.NET Framework 4.8 以降が動作する環境
 
 ■再生可能なフォーマット一覧
 　・AIFF

@@ -15,7 +15,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Management;
 using System.Windows.Forms;
 
 namespace PulseTune.Dialogs
@@ -32,7 +31,8 @@ namespace PulseTune.Dialogs
         private readonly Command moveToStartCommand;
 
         // 非公開フィールド
-        private ClosableTabPage defaultPlaylistTabPage;
+        private readonly ExplorerControl explorerViewer;    // エクスプローラーコントロール
+        private readonly ClosableTabPage explorerTabPage;   // エクスプローラーコントロールが配置されたタブページ
         private AudioTrackBase currentTrack;                // 再生中のトラック
 
         // コンストラクタ
@@ -58,12 +58,16 @@ namespace PulseTune.Dialogs
             this.ControlPanel.ForwardCommand = this.forwardCommand;
             this.ControlPanel.MoveToTrackStartCommand = this.moveToStartCommand;
 
+            // エクスプローラのタブページを作成
+            this.explorerViewer = new ExplorerControl();
+            this.explorerViewer.Dock = DockStyle.Fill;
+            this.explorerViewer.ContextMenu = CreateExplorerControlContextMenu(this.explorerViewer);
+            this.explorerViewer.FileDoubleClick += OnExplorerViewerFileDoubleClick;
+            this.explorerTabPage = new ClosableTabPage("エクスプローラ", false);
+            this.explorerTabPage.Control = this.explorerViewer;
+
             // タスクバーのサムネイルにメディアコントロールボタンを表示する。
             this.ControlPanel.ShowTaskBarThumbnailButtons(this);
-
-            // デフォルトプレイリストのタブを作成
-            this.defaultPlaylistTabPage = new ClosableTabPage("デフォルトプレイリスト", false);
-            this.defaultPlaylistTabPage.Control = CreateNewPlaylistViewer();
 
             // フォントを設定
             this.Font = SystemFonts.CaptionFont;
@@ -211,43 +215,23 @@ namespace PulseTune.Dialogs
         /// </summary>
         public void ProcessCommandLineArgs(string[] commandLineArgs)
         {
-            var tracks = new List<AudioTrackBase>();
-            bool switchPlayLastTrackInPlaylist = false;
+            var tracks = new List<string>();
 
             // コマンドライン引数に与えられたファイルを追加して再生
             if (commandLineArgs.Length > 0)
             {
                 foreach (var argument in commandLineArgs)
                 {
-                    if (argument.StartsWith("/"))
+                    if (File.Exists(argument) && AudioSourceProvider.IsPlaybackSupportedFileFormat(argument))
                     {
-                        switch (argument.ToLower())
-                        {
-                            case "/play-last-track-in-playlist":        // プレイリストに追加されたトラックのうち、最後のトラックを再生する
-                                switchPlayLastTrackInPlaylist = true;
-                                break;
-                        }
-                    }
-                    else if (File.Exists(argument) && AudioSourceProvider.IsPlaybackSupportedFileFormat(argument))
-                    {
-                        tracks.Add(AudioTrackProvider.CreateFile(argument));
-                        switchPlayLastTrackInPlaylist = true;
+                        tracks.Add(argument);
                     }
                 }
 
                 if (tracks.Count > 0)
                 {
-                    this.TabSelectedControl.AddTrackToPlaylist(tracks.ToArray());
-
-                    // プレイリストに追加されたトラックうち、再生するスイッチが有効化されていれば、最後のトラックを選択
-                    if (switchPlayLastTrackInPlaylist)
-                    {
-                        var lastTrack = this.TabSelectedPlaylist.GetTrack(this.TabSelectedPlaylist.Count - 1);
-                        this.TabSelectedPlaylist.SelectedTrack = lastTrack;
-                        this.TabSelectedControl.UpdateView();
-                    }
-
-                    Play(this.TabSelectedPlaylist.SelectedTrack);
+                    this.explorerViewer.Navigate(tracks[0]);
+                    Play(AudioTrackProvider.CreateFile(tracks[0]));
                 }
             }
         }
@@ -370,31 +354,6 @@ namespace PulseTune.Dialogs
             contextMenu.MenuItems.Add(showPropertyMenuItem);
 
             return contextMenu;
-        }
-
-        /// <summary>
-        /// エクスプローラタブを追加する。
-        /// </summary>
-        private void AddExplorerTabPage()
-        {
-            var explorer = new ExplorerControl();
-            explorer.Dock = DockStyle.Fill;
-            explorer.ContextMenu = CreateExplorerControlContextMenu(explorer);
-            explorer.FileDoubleClick += delegate
-            {
-                Play(AudioTrackProvider.CreateFile(explorer.SelectedFileName));
-            };
-
-            // エクスプローラに表示するファイルの拡張子を、対応しているオーディオトラックの拡張子に絞り込む。
-            explorer.SetFileFormatFilter(AudioSourceProvider.GetAllRegisteredFormatExtensions());
-
-            var page = new ClosableTabPage("エクスプローラ", false);
-            page.Control = explorer;
-
-            // ページを追加
-            this.MainTabControl.AddTabPage(page);
-
-            explorer.SelectDrive('C');
         }
 
         /// <summary>
@@ -908,8 +867,12 @@ namespace PulseTune.Dialogs
             // プレイリストブラウザの表示を更新する。
             this.PlaylistBrowser.UpdateView();
 
+            // エクスプローラに表示するファイルの拡張子を、対応しているオーディオトラックの拡張子に絞り込む。
+            this.explorerViewer.SetFileFormatFilter(AudioSourceProvider.GetAllRegisteredFormatExtensions());
+
             // エクスプローラのタブページを追加
-            AddExplorerTabPage();
+            this.MainTabControl.AddTabPage(this.explorerTabPage);
+            this.explorerViewer.SelectDrive('C');
 
             // コマンドライン引数に指定されたファイルを開く。
             ProcessCommandLineArgs(Environment.GetCommandLineArgs());
@@ -979,6 +942,16 @@ namespace PulseTune.Dialogs
             SystemCalls.ClosableTabControl.GetTabPageContent = null;
 
             base.OnHandleDestroyed(e);
+        }
+
+        /// <summary>
+        /// エクスプローラビューでファイルがダブルクリックされた場合の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnExplorerViewerFileDoubleClick(object sender, EventArgs e)
+        {
+            Play(AudioTrackProvider.CreateFile(this.explorerViewer.SelectedFileName));
         }
 
         /// <summary>

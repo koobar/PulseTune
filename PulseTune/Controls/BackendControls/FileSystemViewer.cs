@@ -259,6 +259,23 @@ namespace PulseTune.Controls.BackendControls
         }
 
         /// <summary>
+        /// 現在のディレクトリに存在する、指定された名前のファイルを選択する。
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void SelectFile(string fileName)
+        {
+            fileName = fileName.ToLower();
+
+            for (int i = 0; i < this.Items.Count; ++i)
+            {
+                var item = (FileSystemViewerItem)this.Items[i];
+                item.Selected = item.FileName.ToLower() == fileName;
+            }
+
+            Invalidate();
+        }
+
+        /// <summary>
         /// 表示するファイルの拡張子の一覧を指定する。
         /// </summary>
         /// <param name="extensions"></param>

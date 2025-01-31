@@ -5,6 +5,7 @@ using PulseTune.Controls.BackendControls;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
@@ -282,6 +283,23 @@ namespace PulseTune.Controls
         public void SelectDrive(char driveLetter)
         {
             this.detailsViewer.SelectedLocation = $"{driveLetter}:\\";
+        }
+
+        /// <summary>
+        /// 指定されたパスを開く。
+        /// </summary>
+        /// <param name="path"></param>
+        public void Navigate(string path)
+        {
+            string fileName = Path.GetFileName(path);
+            path = Path.GetDirectoryName(path);
+
+            // ドライブを選択する。
+            SelectDrive(path[0]);
+
+            // ディレクトリを開き、ファイルを選択する。
+            this.viewer.Navigate(path);
+            this.viewer.SelectFile(fileName);
         }
 
         private void OnDetailsViewerLocationSelectionChanged(object sender, EventArgs e)

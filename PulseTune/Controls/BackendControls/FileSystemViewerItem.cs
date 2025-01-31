@@ -27,6 +27,14 @@ namespace PulseTune.Controls.BackendControls
             }
         }
 
+        public string FileName
+        {
+            get
+            {
+                return System.IO.Path.GetFileName(this.Path);
+            }
+        }
+
         public Image Icon
         {
             get
