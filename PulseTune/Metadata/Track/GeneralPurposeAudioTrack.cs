@@ -1,6 +1,8 @@
-﻿using LibPulseTune.Plugin.Sdk.Metadata.Track;
+﻿using LibPulseTune.AudioSource;
+using LibPulseTune.Plugin.Sdk.Metadata.Track;
 using System;
 using System.Drawing;
+using System.Windows.Media.TextFormatting;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
 using static PulseTune.Utils.AsyncUtils;

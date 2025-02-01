@@ -4,7 +4,7 @@ using System;
 
 namespace LibPulseTune.AudioSource
 {
-    internal class VorbisAudioSource : IAudioSource
+    public class VorbisAudioSource : IAudioSource
     {
         // 非公開フィールド
         private readonly VorbisWaveReader vorbisWaveReader;
@@ -44,6 +44,30 @@ namespace LibPulseTune.AudioSource
             get
             {
                 return this.vorbisWaveReader.WaveFormat.Encoding == NAudio.Wave.WaveFormatEncoding.IeeeFloat;
+            }
+        }
+
+        public uint LowerBitrate
+        {
+            get
+            {
+                return (uint)this.vorbisWaveReader.LowerBitrate;
+            }
+        }
+
+        public uint NominalBitrate
+        {
+            get
+            {
+                return (uint)this.vorbisWaveReader.NominalBitrate;
+            }
+        }
+
+        public uint UpperBitrate
+        {
+            get
+            {
+                return (uint)this.vorbisWaveReader.UpperBitrate;
             }
         }
 

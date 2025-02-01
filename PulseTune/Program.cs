@@ -1,6 +1,7 @@
 using LibPulseTune;
 using PulseTune.Metadata;
 using PulseTune.Metadata.Playlist;
+using PulseTune.Metadata.Track;
 using System;
 using System.Windows.Forms;
 
@@ -21,6 +22,8 @@ namespace PulseTune
 
             // オーディオエンジンを初期化
             AudioEngine.Init();
+
+            AudioTrackProvider.RegisterAudioTrackType("Vorbis", typeof(VorbisAudioTrack), ".ogg");
 
             // M3Uプレイリストの読み書きを可能にする。
             PlaylistReaderProvider.RegisterPlaylistReader("M3U", typeof(M3UPlaylistReader), ".m3u", ".m3u8");

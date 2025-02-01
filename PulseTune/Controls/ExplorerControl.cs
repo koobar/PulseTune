@@ -63,7 +63,7 @@ namespace PulseTune.Controls
             this.navigationPanel.Height = 20;
             this.navigationPanel.BackColor = Color.White;
             this.backButton = new VisualStyleIconButton(
-                VisualStyleElement.ScrollBar.ArrowButton.LeftNormal,
+                VisualStyleElement.ScrollBar.ArrowButton.LeftHot,
                 VisualStyleElement.ScrollBar.ArrowButton.LeftHot,
                 VisualStyleElement.ScrollBar.ArrowButton.LeftPressed,
                 VisualStyleElement.ScrollBar.ArrowButton.LeftDisabled);
@@ -71,7 +71,7 @@ namespace PulseTune.Controls
             this.backButton.Width = this.navigationPanel.Height;
             this.backButton.MouseDown += OnBackButtonClick;
             this.forwardButton = new VisualStyleIconButton(
-                VisualStyleElement.ScrollBar.ArrowButton.RightNormal,
+                VisualStyleElement.ScrollBar.ArrowButton.RightHot,
                 VisualStyleElement.ScrollBar.ArrowButton.RightHot,
                 VisualStyleElement.ScrollBar.ArrowButton.RightPressed,
                 VisualStyleElement.ScrollBar.ArrowButton.RightDisabled);

@@ -124,6 +124,7 @@
     <Compile Include="Dialogs\WasapiOptionDialog.Designer.cs">
       <DependentUpon>WasapiOptionDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Metadata\Track\VorbisAudioTrack.cs" />
     <Compile Include="Utils\WindowsFormsControlExtensions.cs" />
     <Compile Include="Utils\DriveStateWatcher.cs" />
     <Compile Include="Metadata\Playlist\M3UPlaylistReader.cs" />

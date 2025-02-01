@@ -32,6 +32,7 @@ namespace PulseTune.Controls.BackendControls
         // 非公開フィールド
         private readonly List<string> fileFormatFilterExtensions;
         private readonly Stack<string> forwardStack;
+        private readonly List<FileSystemViewerItem> itemsSource;
         private string currentPath;
         private Point mousePoint;
 
@@ -44,6 +45,7 @@ namespace PulseTune.Controls.BackendControls
         {
             this.fileFormatFilterExtensions = new List<string>();
             this.forwardStack = new Stack<string>();
+            this.itemsSource = new List<FileSystemViewerItem>();
 
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 
@@ -338,42 +340,54 @@ namespace PulseTune.Controls.BackendControls
             this.Navigated?.Invoke(this, EventArgs.Empty);
         }
 
-        /// <summary>
-        /// アイテムを更新する。
-        /// </summary>
-        private void UpdateView()
+        private void LoadCurrentDirectory()
         {
-            var folders = new List<FileSystemViewerItem>();
-            var files = new List<FileSystemViewerItem>();
-
-            this.Items.Clear();
-            
             if (string.IsNullOrEmpty(this.currentPath))
             {
                 return;
             }
 
-            foreach (var folder in Directory.EnumerateDirectories(this.currentPath))
+            this.itemsSource.Clear();
+
+            var info = new DirectoryInfo(this.currentPath);
+            var folders = info.EnumerateDirectories().GetEnumerator();
+            var files = info.EnumerateFiles().GetEnumerator();
+
+            // フォルダを列挙
+            while (folders.MoveNext())
             {
-                var info = new DirectoryInfo(folder);
-                if (info.Attributes.HasFlag(FileAttributes.Hidden) || info.Attributes.HasFlag(FileAttributes.ReparsePoint))
+                if (folders.Current.Attributes.HasFlag(FileAttributes.Hidden) || folders.Current.Attributes.HasFlag(FileAttributes.ReparsePoint))
                 {
                     continue;
                 }
 
-                folders.Add(new FileSystemViewerItem(folder, FolderIcon, true));
+                this.itemsSource.Add(new FileSystemViewerItem(folders.Current.FullName, FolderIcon, true));
             }
 
-            foreach (var file in Directory.EnumerateFiles(this.currentPath))
+            // ファイルを列挙
+            while (files.MoveNext())
             {
-                if (this.fileFormatFilterExtensions.Count == 0 || this.fileFormatFilterExtensions.Contains(Path.GetExtension(file).ToLower()))
+                if (this.fileFormatFilterExtensions.Count == 0 || this.fileFormatFilterExtensions.Contains(files.Current.Extension.ToLower()))
                 {
-                    files.Add(new FileSystemViewerItem(file, AudioFileIcon, false));
+                    this.itemsSource.Add(new FileSystemViewerItem(files.Current.FullName, AudioFileIcon, false));
                 }
             }
+        }
 
-            this.Items.AddRange(folders.ToArray());
-            this.Items.AddRange(files.ToArray());
+        /// <summary>
+        /// 表示を更新する。
+        /// </summary>
+        private void UpdateView()
+        {
+            this.Items.Clear();
+
+            if (string.IsNullOrEmpty(this.currentPath))
+            {
+                return;
+            }
+
+            LoadCurrentDirectory();
+            this.Items.AddRange(this.itemsSource.ToArray());
         }
 
         /// <summary>
@@ -386,8 +400,13 @@ namespace PulseTune.Controls.BackendControls
 
             using (var g = CreateGraphics())
             {
-                foreach (FileSystemViewerItem item in this.Items)
+                foreach (FileSystemViewerItem item in this.itemsSource)
                 {
+                    if (item == null)
+                    {
+                        continue;
+                    }
+
                     var textSize = TextRenderer.MeasureText(item.Text, this.Font);
                     var width = IconWidth + spacing + textSize.Width;
 
