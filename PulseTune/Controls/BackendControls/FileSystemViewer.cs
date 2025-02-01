@@ -259,6 +259,36 @@ namespace PulseTune.Controls.BackendControls
         }
 
         /// <summary>
+        /// 指定されたインデックスのアイテムを選択状態に設定する。
+        /// </summary>
+        /// <param name="index"></param>
+        public void SelectIndex(IList<int> index)
+        {
+            // すべてのアイテムの選択状態をリセット
+            for (int i = 0; i < this.Items.Count; ++i)
+            {
+                var item = (FileSystemViewerItem)this.Items[i];
+                item.Selected = false;
+            }
+
+            for (int i = 0; i < this.Items.Count; ++i)
+            {
+                var item = (FileSystemViewerItem)this.Items[i];
+
+                foreach (int j in index)
+                {
+                    if (i == j)
+                    {
+                        item.Selected = true;
+                        break;
+                    }
+                }
+            }
+
+            Invalidate();
+        }
+
+        /// <summary>
         /// 現在のディレクトリに存在する、指定された名前のファイルを選択する。
         /// </summary>
         /// <param name="fileName"></param>

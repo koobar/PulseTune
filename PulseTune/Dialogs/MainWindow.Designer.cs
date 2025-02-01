@@ -111,6 +111,8 @@
             System.Windows.Forms.ListViewGroup listViewGroup80 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
             System.Windows.Forms.ListViewGroup listViewGroup81 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup82 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
+            System.Windows.Forms.ListViewGroup listViewGroup83 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup84 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.StatusBar = new System.Windows.Forms.StatusStrip();
             this.StatusText = new System.Windows.Forms.ToolStripStatusLabel();
@@ -151,6 +153,7 @@
             this.Latency128msLatencyMenuItem = new System.Windows.Forms.MenuItem();
             this.Latency256msLatencyMenuItem = new System.Windows.Forms.MenuItem();
             this.Latency512msLatencyMenuItem = new System.Windows.Forms.MenuItem();
+            this.ShowWasaiAndMmcssOptionMenuItem = new System.Windows.Forms.MenuItem();
             this.HelpMenu = new System.Windows.Forms.MenuItem();
             this.ShowReadMeHelpMenuItem = new System.Windows.Forms.MenuItem();
             this.ShowHistoryHelpMenuItem = new System.Windows.Forms.MenuItem();
@@ -158,7 +161,6 @@
             this.ShowVersionDialogHelpMenuItem = new System.Windows.Forms.MenuItem();
             this.MainTabControl = new PulseTune.Controls.ClosableTabControl();
             this.ControlPanel = new PulseTune.Controls.MediaControlPanel();
-            this.ShowWasaiAndMmcssOptionMenuItem = new System.Windows.Forms.MenuItem();
             this.StatusBar.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TrackPictureViewer)).BeginInit();
@@ -447,6 +449,11 @@
             listViewGroup82.Header = "お気に入り";
             listViewGroup82.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
             listViewGroup82.Name = null;
+            listViewGroup83.Header = "最近開いた場所";
+            listViewGroup83.Name = null;
+            listViewGroup84.Header = "お気に入り";
+            listViewGroup84.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
+            listViewGroup84.Name = null;
             this.PlaylistBrowser.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
             listViewGroup1,
             listViewGroup2,
@@ -529,7 +536,9 @@
             listViewGroup79,
             listViewGroup80,
             listViewGroup81,
-            listViewGroup82});
+            listViewGroup82,
+            listViewGroup83,
+            listViewGroup84});
             this.PlaylistBrowser.HideSelection = false;
             this.PlaylistBrowser.Location = new System.Drawing.Point(3, 3);
             this.PlaylistBrowser.MultiSelect = false;
@@ -657,6 +666,7 @@
             // ShowFindDialogFindMenuItem
             // 
             this.ShowFindDialogFindMenuItem.Index = 0;
+            this.ShowFindDialogFindMenuItem.Shortcut = System.Windows.Forms.Shortcut.CtrlF;
             this.ShowFindDialogFindMenuItem.Text = "トラックを検索";
             this.ShowFindDialogFindMenuItem.Click += new System.EventHandler(this.ShowFindDialogFindMenuItem_Click);
             // 
@@ -769,6 +779,12 @@
             this.Latency512msLatencyMenuItem.Text = "512ms";
             this.Latency512msLatencyMenuItem.Click += new System.EventHandler(this.LatencyPlaybackMenuItem_Click);
             // 
+            // ShowWasaiAndMmcssOptionMenuItem
+            // 
+            this.ShowWasaiAndMmcssOptionMenuItem.Index = 2;
+            this.ShowWasaiAndMmcssOptionMenuItem.Text = "WASAPI/MMCSS設定";
+            this.ShowWasaiAndMmcssOptionMenuItem.Click += new System.EventHandler(this.ShowWasaiAndMmcssOptionMenuItem_Click);
+            // 
             // HelpMenu
             // 
             this.HelpMenu.Index = 5;
@@ -819,6 +835,7 @@
             this.ControlPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.ControlPanel.ForwardCommand = null;
             this.ControlPanel.Location = new System.Drawing.Point(0, 569);
+            this.ControlPanel.MoveToTrackStartCommand = null;
             this.ControlPanel.Name = "ControlPanel";
             this.ControlPanel.PauseCommand = null;
             this.ControlPanel.PlayCommand = null;
@@ -828,12 +845,6 @@
             this.ControlPanel.TabIndex = 3;
             this.ControlPanel.Seek += new System.EventHandler(this.ControlPanel_Seek);
             this.ControlPanel.VolumeChanged += new System.EventHandler(this.ControlPanel_VolumeChanged);
-            // 
-            // ShowWasaiAndMmcssOptionMenuItem
-            // 
-            this.ShowWasaiAndMmcssOptionMenuItem.Index = 2;
-            this.ShowWasaiAndMmcssOptionMenuItem.Text = "WASAPI/MMCSS設定";
-            this.ShowWasaiAndMmcssOptionMenuItem.Click += new System.EventHandler(this.ShowWasaiAndMmcssOptionMenuItem_Click);
             // 
             // MainWindow
             // 

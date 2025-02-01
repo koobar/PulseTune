@@ -2,6 +2,7 @@
 using LibPulseTune.Plugin.Sdk.Metadata.Playlist;
 using LibPulseTune.Plugin.Sdk.Metadata.Track;
 using PulseTune.Controls.BackendControls;
+using PulseTune.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -29,6 +30,9 @@ namespace PulseTune.Controls
 
         // 非公開フィールド
         private readonly Playlist playlist;
+        private string lastSearchPrompt;
+        private bool lastSearchIgnoreCase;
+        private int lastFindResultIndex;
 
         // イベント
         public event EventHandler ItemDoubleClick;
@@ -194,6 +198,101 @@ namespace PulseTune.Controls
 
         #endregion
 
+        #region 検索の実装
+
+        /// <summary>
+        /// 指定された検索設定でトラックを検索し、条件に一致するトラックのインデックスを返す。
+        /// </summary>
+        /// <param name="prompt"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        private IList<int> FindTrack(int startIndex, string prompt, bool ignoreCase)
+        {
+            var result = new List<int>();
+
+            if (string.IsNullOrEmpty(prompt))
+            {
+                return result;
+            }
+
+            if (ignoreCase)
+            {
+                prompt = prompt.ToLower();
+            }
+
+            for (int i = startIndex; i < this.viewer.Items.Count; ++i)
+            {
+                var item = (FileSystemViewerItem)this.viewer.Items[i];
+                var track = item.Path;
+                if (ignoreCase)
+                {
+                    track = track.ToLower();
+                }
+
+                if (track.Contains(prompt))
+                {
+                    result.Add(i);
+                    this.lastFindResultIndex = i;
+                }
+            }
+
+            return result;
+        }
+
+        public bool CanShowFindDialog()
+        {
+            return true;
+        }
+
+        public bool CanFindNext()
+        {
+            return !string.IsNullOrEmpty(this.lastSearchPrompt);
+        }
+
+        /// <summary>
+        /// 検索ダイアログを表示して最初から検索
+        /// </summary>
+        public void ShowFindDialog()
+        {
+            if (!CanShowFindDialog())
+            {
+                return;
+            }
+
+            using (var dialog = new FindDialog())
+            {
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    var index = FindTrack(0, dialog.Prompt, dialog.IgnoreCase);
+
+                    if (index.Count > 0)
+                    {
+                        this.viewer.SelectIndex(index);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 次を検索
+        /// </summary>
+        public void FindNext()
+        {
+            if (!CanFindNext())
+            {
+                ShowFindDialog();
+            }
+
+            var index = FindTrack(this.lastFindResultIndex, this.lastSearchPrompt, this.lastSearchIgnoreCase);
+
+            if (index.Count > 0)
+            {
+                this.viewer.SelectIndex(index);
+            }
+        }
+
+        #endregion
+
         public bool CanSelectAddTrack()
         {
             return false;
@@ -207,26 +306,6 @@ namespace PulseTune.Controls
         public bool CanExportPlaylist()
         {
             return false;
-        }
-
-        public bool CanShowFindDialog()
-        {
-            return true;
-        }
-
-        public bool CanFindNext()
-        {
-            return true;
-        }
-
-        public void ShowFindDialog()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void FindNext()
-        {
-            throw new NotImplementedException();
         }
 
         public bool CanAddTrackToPlaylist()
