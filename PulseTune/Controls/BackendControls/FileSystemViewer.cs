@@ -17,10 +17,12 @@ namespace PulseTune.Controls.BackendControls
 
         // 色とブラシの定義
         private static readonly Color SelectedItemBackColor = Color.FromArgb(205, 232, 255);
+        private static readonly Color SelectedItemBorderColor = Color.FromArgb(153, 209, 255);
         private static readonly Color HotItemBackColor = Color.FromArgb(229, 243, 255);
         private static readonly Color TextColor = Color.Black;
         private static readonly Brush SelectedItemBrush = new SolidBrush(SelectedItemBackColor);
         private static readonly Brush HotItemBrush = new SolidBrush(HotItemBackColor);
+        private static readonly Pen SelectedItemBorderPen = new Pen(SelectedItemBorderColor);
 
         // アイコンの定義
         private static readonly Bitmap FolderIcon = GetStockIcon(SIID_FOLDER, SHGSI_SMALLICON).ToBitmap();
@@ -450,11 +452,12 @@ namespace PulseTune.Controls.BackendControls
 
             if (e.Item.Selected)
             {
-                e.Graphics.FillRectangle(SelectedItemBrush, e.Bounds);
+                e.Graphics.DrawRectangle(SelectedItemBorderPen, e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 1, e.Bounds.Height - 1);
+                e.Graphics.FillRectangle(SelectedItemBrush, e.Bounds.X + 1, e.Bounds.Y + 1, e.Bounds.Width - 2, e.Bounds.Height - 2);
             }
             else if (e.Item.GetBounds(ItemBoundsPortion.ItemOnly).Contains(this.mousePoint))
             {
-                e.Graphics.FillRectangle(HotItemBrush, e.Bounds);
+                e.Graphics.FillRectangle(HotItemBrush, e.Bounds.X + 1, e.Bounds.Y + 1, e.Bounds.Width - 1, e.Bounds.Height - 1);
             }
 
             var item = (FileSystemViewerItem)e.Item;
