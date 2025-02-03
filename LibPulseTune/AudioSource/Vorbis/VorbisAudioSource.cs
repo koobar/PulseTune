@@ -2,7 +2,7 @@
 using NAudio.Vorbis;
 using System;
 
-namespace LibPulseTune.AudioSource
+namespace LibPulseTune.AudioSource.Vorbis
 {
     public class VorbisAudioSource : IAudioSource
     {

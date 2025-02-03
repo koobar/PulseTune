@@ -1,4 +1,7 @@
 ﻿using LibPulseTune.AudioSource;
+using LibPulseTune.AudioSource.MediaFoundation;
+using LibPulseTune.AudioSource.Vorbis;
+using LibPulseTune.AudioSource.WavPack;
 using System.Collections.Generic;
 using System.Text;
 

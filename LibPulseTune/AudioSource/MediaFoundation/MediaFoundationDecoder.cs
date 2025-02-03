@@ -2,7 +2,7 @@
 using NAudio.Wave;
 using System;
 
-namespace LibPulseTune
+namespace LibPulseTune.AudioSource.MediaFoundation
 {
     public class MediaFoundationAudioSource : IAudioSource
     {

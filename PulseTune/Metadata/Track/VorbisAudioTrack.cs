@@ -1,4 +1,4 @@
-﻿using LibPulseTune.AudioSource;
+﻿using LibPulseTune.AudioSource.Vorbis;
 using System;
 
 namespace PulseTune.Metadata.Track
