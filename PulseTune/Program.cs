@@ -12,7 +12,7 @@ namespace PulseTune
         // アプリケーション情報の定義
         public const string APPLICATION_NAME = @"PulseTune";
         public static readonly Version ApplicationVersion = new Version(1, 2);
-        public static readonly DateOnly ApplicationBuildDate = new DateOnly(2025, 2, 1);
+        public static readonly DateOnly ApplicationBuildDate = new DateOnly(2025, 2, 3);
 
         [STAThread]
         private static void Main(string[] args)
@@ -23,6 +23,7 @@ namespace PulseTune
             // オーディオエンジンを初期化
             AudioEngine.Init();
 
+            // Vorbis専用のオーディオトラックを登録
             AudioTrackProvider.RegisterAudioTrackType("Vorbis", typeof(VorbisAudioTrack), ".ogg");
 
             // M3Uプレイリストの読み書きを可能にする。
