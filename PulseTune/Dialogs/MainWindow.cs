@@ -1004,6 +1004,11 @@ namespace PulseTune.Dialogs
         private void OnPlaybackPositionChanged(object sender, EventArgs e)
         {
             var source = AudioPlayer.GetAudioSource();
+            if (source == null)
+            {
+                return;
+            }
+
             var msec = AudioPlayer.GetTimerInterval();
 
             if (source.Channels >= 2)
