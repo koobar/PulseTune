@@ -19,7 +19,6 @@ namespace PulseTune.Controls.BackendControls
         private static readonly Color SelectedItemBackColor = Color.FromArgb(205, 232, 255);
         private static readonly Color SelectedItemBorderColor = Color.FromArgb(153, 209, 255);
         private static readonly Color HotItemBackColor = Color.FromArgb(229, 243, 255);
-        private static readonly Color TextColor = Color.Black;
         private static readonly Brush SelectedItemBrush = new SolidBrush(SelectedItemBackColor);
         private static readonly Brush HotItemBrush = new SolidBrush(HotItemBackColor);
         private static readonly Pen SelectedItemBorderPen = new Pen(SelectedItemBorderColor);
@@ -48,11 +47,13 @@ namespace PulseTune.Controls.BackendControls
             this.itemsSource = new List<FileSystemViewerItem>();
 
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.ResizeRedraw, true);
 
             this.OwnerDraw = true;
             this.View = View.Details;
             this.FullRowSelect = true;
-            this.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+            this.HeaderStyle = ColumnHeaderStyle.None;
             this.AutoArrange = false;
             this.AllowColumnReorder = false;
             this.Columns.Add(new ColumnHeader() { Text = "名前" });
@@ -340,6 +341,9 @@ namespace PulseTune.Controls.BackendControls
             this.Navigated?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// 現在のディレクトリを読み込む。
+        /// </summary>
         private void LoadCurrentDirectory()
         {
             if (string.IsNullOrEmpty(this.currentPath))
@@ -407,12 +411,12 @@ namespace PulseTune.Controls.BackendControls
                         continue;
                     }
 
-                    var textSize = TextRenderer.MeasureText(item.Text, this.Font);
+                    var textSize = g.MeasureString(item.Text, this.Font);
                     var width = IconWidth + spacing + textSize.Width;
 
                     if (maxWidth < width)
                     {
-                        maxWidth = width;
+                        maxWidth = (int)Math.Round(width) + spacing;
                     }
                 }
             }
@@ -474,7 +478,7 @@ namespace PulseTune.Controls.BackendControls
                 e.Graphics.DrawRectangle(SelectedItemBorderPen, e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 1, e.Bounds.Height - 1);
                 e.Graphics.FillRectangle(SelectedItemBrush, e.Bounds.X + 1, e.Bounds.Y + 1, e.Bounds.Width - 2, e.Bounds.Height - 2);
             }
-            else if (e.Item.GetBounds(ItemBoundsPortion.ItemOnly).Contains(this.mousePoint))
+            else if (this.mousePoint != Point.Empty && e.Item.GetBounds(ItemBoundsPortion.ItemOnly).Contains(this.mousePoint))
             {
                 e.Graphics.FillRectangle(HotItemBrush, e.Bounds.X + 1, e.Bounds.Y + 1, e.Bounds.Width - 1, e.Bounds.Height - 1);
             }
@@ -489,7 +493,13 @@ namespace PulseTune.Controls.BackendControls
                 e.Graphics.DrawImage(item.Icon, iconX, iconY, iconWidth, iconHeight);
             }
 
-            TextRenderer.DrawText(e.Graphics, item.Text, this.Font, new Rectangle(textX, textY, textWidth, textHeight), TextColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
+            using (var sf = new StringFormat())
+            {
+                sf.LineAlignment = StringAlignment.Center;
+                sf.Alignment = StringAlignment.Near;
+
+                e.Graphics.DrawString(item.Text, this.Font, Brushes.Black, new Rectangle(textX, textY, textWidth, textHeight), sf);
+            }
         }
 
         protected override void OnDrawColumnHeader(DrawListViewColumnHeaderEventArgs e)
@@ -508,6 +518,42 @@ namespace PulseTune.Controls.BackendControls
         {
             base.OnMouseMove(e);
             this.mousePoint = e.Location;
+
+            // 再描画すべきアイテムを取得
+            var items = new List<ListViewItem>();
+            for (int i = 0; i < this.Items.Count; i++)
+            {
+                ListViewItem item = this.Items[i];
+                bool contains = item.GetBounds(ItemBoundsPortion.ItemOnly).Contains(this.mousePoint);
+
+                if (item.Tag == null)
+                {
+                    item.Tag = contains;
+                    items.Add(item);
+                }
+                else if (contains != (bool)item.Tag)
+                {
+                    items.Add(item);
+                }
+
+                item.Tag = contains;
+            }
+
+            // 再描画対象のアイテムをすべて再描画
+            foreach (var item in items)
+            {
+                RedrawItems(item.Index, item.Index, true);
+            }
+
+            // 再描画対象をクリア
+            items.Clear();
+            items.TrimExcess();
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            this.mousePoint = Point.Empty;
 
             Invalidate();
         }
