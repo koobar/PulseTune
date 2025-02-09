@@ -1,5 +1,6 @@
 ﻿using LibPulseTune.Plugin.Sdk.Metadata.Track;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
@@ -13,9 +14,10 @@ namespace PulseTune.Metadata.Track
     public class GeneralPurposeAudioTrack : AudioTrackBase
     {
         // 非公開フィールド
-        private readonly StorageFile file;
-        private readonly MusicProperties musicProperties;
-        private readonly Thumbnail thumbnail;
+        private StorageFile file;
+        private MusicProperties musicProperties;
+        private Thumbnail thumbnail;
+        private bool isTagLoaded;
 
         #region コンストラクタ
 
@@ -25,7 +27,28 @@ namespace PulseTune.Metadata.Track
         /// <param name="path"></param>
         public GeneralPurposeAudioTrack(string path, bool fastMode) : base(path)
         {
-            if (!fastMode)
+            if (fastMode)
+            {
+                var worker = new BackgroundWorker();
+                worker.DoWork += delegate
+                {
+                    this.file = CallAsyncMethod(StorageFile.GetFileFromPathAsync, path);
+
+                    if (this.file == null)
+                    {
+                        return;
+                    }
+
+                    this.musicProperties = CallAsyncMethod(this.file.Properties.GetMusicPropertiesAsync);
+                    this.thumbnail = new Thumbnail(this.file);
+                };
+                worker.RunWorkerCompleted += delegate
+                {
+                    this.isTagLoaded = true;
+                    worker.Dispose();
+                };
+            }
+            else
             {
                 this.file = CallAsyncMethod(StorageFile.GetFileFromPathAsync, path);
 
@@ -36,6 +59,7 @@ namespace PulseTune.Metadata.Track
 
                 this.musicProperties = CallAsyncMethod(this.file.Properties.GetMusicPropertiesAsync);
                 this.thumbnail = new Thumbnail(this.file);
+                this.isTagLoaded = true;
             }
         }
 
@@ -89,7 +113,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -98,7 +122,7 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null || string.IsNullOrEmpty(this.musicProperties.Title))
+                if (!this.isTagLoaded || this.musicProperties == null || string.IsNullOrEmpty(this.musicProperties.Title))
                 {
                     return System.IO.Path.GetFileName(this.Path);
                 }
@@ -114,7 +138,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -123,12 +147,12 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return "不明";
                 }
 
-                if (string.IsNullOrEmpty(this.musicProperties.Subtitle))
+                if (!this.isTagLoaded || string.IsNullOrEmpty(this.musicProperties.Subtitle))
                 {
                     return "不明";
                 }
@@ -144,7 +168,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -153,7 +177,7 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return "不明";
                 }
@@ -174,7 +198,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -183,7 +207,7 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return "不明";
                 }
@@ -204,7 +228,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -213,7 +237,7 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return "不明";
                 }
@@ -229,7 +253,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -242,7 +266,7 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return "不明";
                 }
@@ -263,7 +287,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -276,7 +300,7 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return "不明";
                 }
@@ -297,7 +321,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -309,7 +333,7 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return "不明";
                 }
@@ -330,7 +354,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -339,7 +363,7 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return 0;
                 }
@@ -355,7 +379,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -364,7 +388,7 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return 0;
                 }
@@ -380,7 +404,7 @@ namespace PulseTune.Metadata.Track
         {
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return 0;
                 }
@@ -396,7 +420,7 @@ namespace PulseTune.Metadata.Track
         {
             set
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     throw new NullReferenceException();
                 }
@@ -405,7 +429,7 @@ namespace PulseTune.Metadata.Track
             }
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return 0;
                 }
@@ -421,7 +445,7 @@ namespace PulseTune.Metadata.Track
         {
             get
             {
-                if (this.musicProperties == null)
+                if (!this.isTagLoaded || this.musicProperties == null)
                 {
                     return TimeSpan.FromSeconds(0);
                 }
@@ -437,6 +461,11 @@ namespace PulseTune.Metadata.Track
         {
             get
             {
+                if (!this.isTagLoaded)
+                {
+                    return null;
+                }
+
                 return this.thumbnail.AsImage();
             }
         }

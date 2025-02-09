@@ -1,13 +1,14 @@
 ﻿using LibPulseTune.AudioSource.Vorbis;
 using System;
+using System.ComponentModel;
 
 namespace PulseTune.Metadata.Track
 {
     public class VorbisAudioTrack : GeneralPurposeAudioTrack
     {
         // 非公開フィールド
-        private readonly TimeSpan duration;
-        private readonly uint bitRate;
+        private TimeSpan duration;
+        private uint bitRate;
 
         #region コンストラクタ
 
@@ -17,7 +18,29 @@ namespace PulseTune.Metadata.Track
         /// <param name="path"></param>
         public VorbisAudioTrack(string path, bool fastMode) : base(path, fastMode)
         {
-            if (!fastMode)
+            if (fastMode)
+            {
+                TimeSpan duration = TimeSpan.FromSeconds(0);
+                uint bitRate = 0;
+
+                var worker = new BackgroundWorker();
+                worker.DoWork += delegate
+                {
+                    var vorbis = new VorbisAudioSource(path);
+                    duration = vorbis.GetDuration();
+                    bitRate = vorbis.NominalBitrate / 1000;
+                    vorbis.Dispose();
+                };
+                worker.RunWorkerCompleted += delegate
+                {
+                    this.duration = duration;
+                    this.bitRate = bitRate;
+                    worker.Dispose();
+                };
+
+                worker.RunWorkerAsync();
+            }
+            else
             {
                 var vorbis = new VorbisAudioSource(path);
                 this.duration = vorbis.GetDuration();
