@@ -1,31 +1,17 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Shell;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace PulseTune.Controls.BackendControls
 {
-    internal class FileSystemViewer : ListView
+    internal class FileSystemViewer : ExplorerLikeListView
     {
-        // 非公開定数
-        private const uint SIID_FOLDER = 3;
-        private const uint SIID_AUDIOFILES = 71;
-        private const uint SHGSI_ICON = 0x000000100;
-        private const uint SHGSI_SMALLICON = 0x000000001;
-
-        // 色とブラシの定義
-        private static readonly Color SelectedItemBackColor = Color.FromArgb(205, 232, 255);
-        private static readonly Color SelectedItemBorderColor = Color.FromArgb(153, 209, 255);
-        private static readonly Color HotItemBackColor = Color.FromArgb(229, 243, 255);
-        private static readonly Brush SelectedItemBrush = new SolidBrush(SelectedItemBackColor);
-        private static readonly Brush HotItemBrush = new SolidBrush(HotItemBackColor);
-        private static readonly Pen SelectedItemBorderPen = new Pen(SelectedItemBorderColor);
-
         // アイコンの定義
-        private static readonly Bitmap FolderIcon = GetStockIcon(SIID_FOLDER, SHGSI_SMALLICON).ToBitmap();
-        private static readonly Bitmap AudioFileIcon = GetStockIcon(SIID_AUDIOFILES, SHGSI_SMALLICON).ToBitmap();
+        private static readonly Bitmap FolderIcon = new StockIcon(StockIconIdentifier.Folder, StockIconSize.Small, false, false).Bitmap;
+        private static readonly Bitmap AudioFileIcon = new StockIcon(StockIconIdentifier.AudioFiles, StockIconSize.Small, false, false).Bitmap;
         private static readonly int IconWidth = Math.Max(FolderIcon.Width, AudioFileIcon.Width);
 
         // 非公開フィールド
@@ -33,7 +19,6 @@ namespace PulseTune.Controls.BackendControls
         private readonly Stack<string> forwardStack;
         private readonly List<FileSystemViewerItem> itemsSource;
         private string currentPath;
-        private Point mousePoint;
 
         // イベント
         public event EventHandler Navigated;
@@ -162,40 +147,6 @@ namespace PulseTune.Controls.BackendControls
 
                 return result.ToArray();
             }
-        }
-
-        #endregion
-
-        #region WinAPI
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        struct SHSTOCKICONINFO
-        {
-            public uint cbSize;
-            public IntPtr hIcon;
-            public int iSysIconIndex;
-            public int iIcon;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-            public string szPath;
-        }
-
-        [DllImport("shell32.dll")]
-        private static extern int SHGetStockIconInfo(uint siid, uint uFlags, ref SHSTOCKICONINFO psii);
-
-        [DllImport("user32.dll")]
-        private static extern bool DestroyIcon(IntPtr handle);
-
-        private static Icon GetStockIcon(uint type, uint size)
-        {
-            var info = new SHSTOCKICONINFO();
-            info.cbSize = (uint)Marshal.SizeOf(info);
-
-            SHGetStockIconInfo(type, SHGSI_ICON | size, ref info);
-
-            var icon = (Icon)Icon.FromHandle(info.hIcon).Clone(); // Get a copy that doesn't use the original handle
-            DestroyIcon(info.hIcon); // Clean up native icon to prevent resource leak
-
-            return icon;
         }
 
         #endregion
@@ -460,102 +411,6 @@ namespace PulseTune.Controls.BackendControls
             }
 
             base.OnDoubleClick(e);
-        }
-
-        /// <summary>
-        /// アイテムの描画処理
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnDrawItem(DrawListViewItemEventArgs e)
-        {
-            if (e.Item == null)
-            {
-                return;
-            }
-
-            if (e.Item.Selected)
-            {
-                e.Graphics.DrawRectangle(SelectedItemBorderPen, e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 1, e.Bounds.Height - 1);
-                e.Graphics.FillRectangle(SelectedItemBrush, e.Bounds.X + 1, e.Bounds.Y + 1, e.Bounds.Width - 2, e.Bounds.Height - 2);
-            }
-            else if (this.mousePoint != Point.Empty && e.Item.GetBounds(ItemBoundsPortion.ItemOnly).Contains(this.mousePoint))
-            {
-                e.Graphics.FillRectangle(HotItemBrush, e.Bounds.X + 1, e.Bounds.Y + 1, e.Bounds.Width - 1, e.Bounds.Height - 1);
-            }
-
-            var item = (FileSystemViewerItem)e.Item;
-            var spacing = 3;
-            int iconX = e.Bounds.X + spacing, iconY = e.Bounds.Y + spacing / 2, iconWidth = item.Icon.Width, iconHeight = item.Icon.Height;
-            int textX = iconX + iconWidth + spacing, textY = e.Bounds.Y, textWidth = e.Bounds.Width, textHeight = e.Bounds.Height;
-
-            if (item.Icon != null)
-            {
-                e.Graphics.DrawImage(item.Icon, iconX, iconY, iconWidth, iconHeight);
-            }
-
-            using (var sf = new StringFormat())
-            {
-                sf.LineAlignment = StringAlignment.Center;
-                sf.Alignment = StringAlignment.Near;
-
-                e.Graphics.DrawString(item.Text, this.Font, Brushes.Black, new Rectangle(textX, textY, textWidth, textHeight), sf);
-            }
-        }
-
-        protected override void OnDrawColumnHeader(DrawListViewColumnHeaderEventArgs e)
-        {
-            e.DrawDefault = true;
-            base.OnDrawColumnHeader(e);
-        }
-
-        protected override void OnColumnWidthChanging(ColumnWidthChangingEventArgs e)
-        {
-            e.Cancel = true;
-            base.OnColumnWidthChanging(e);
-        }
-
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            base.OnMouseMove(e);
-            this.mousePoint = e.Location;
-
-            // 再描画すべきアイテムを取得
-            var items = new List<ListViewItem>();
-            for (int i = 0; i < this.Items.Count; i++)
-            {
-                ListViewItem item = this.Items[i];
-                bool contains = item.GetBounds(ItemBoundsPortion.ItemOnly).Contains(this.mousePoint);
-
-                if (item.Tag == null)
-                {
-                    item.Tag = contains;
-                    items.Add(item);
-                }
-                else if (contains != (bool)item.Tag)
-                {
-                    items.Add(item);
-                }
-
-                item.Tag = contains;
-            }
-
-            // 再描画対象のアイテムをすべて再描画
-            foreach (var item in items)
-            {
-                RedrawItems(item.Index, item.Index, true);
-            }
-
-            // 再描画対象をクリア
-            items.Clear();
-            items.TrimExcess();
-        }
-
-        protected override void OnMouseLeave(EventArgs e)
-        {
-            base.OnMouseLeave(e);
-            this.mousePoint = Point.Empty;
-
-            Invalidate();
         }
 
         protected override void OnSizeChanged(EventArgs e)

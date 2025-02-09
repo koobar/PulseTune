@@ -3,6 +3,7 @@ using LibPulseTune.Plugin.Sdk.Metadata.Playlist;
 using LibPulseTune.Plugin.Sdk.Metadata.Track;
 using PulseTune.Controls.BackendControls;
 using PulseTune.Dialogs;
+using PulseTune.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -416,7 +417,7 @@ namespace PulseTune.Controls
                     else
                     {
                         string fileName = $"Track{track.AudioCDTrackNumber.ToString("00")}";
-                        if (System.IO.Path.GetFileNameWithoutExtension(this.SelectedFileNames[0]) == fileName)
+                        if (Path.GetFileNameWithoutExtension(this.SelectedFileNames[0]) == fileName)
                         {
                             audioTrack = track;
                             break;
@@ -456,7 +457,7 @@ namespace PulseTune.Controls
             this.playlist.Clear();
             foreach (var fileName in this.viewer.FileNames)
             {
-                this.playlist.Add((AudioTrackBase)SystemCalls.AudioTrack.CreateFile.Call(fileName));
+                this.playlist.Add(AudioTrackProvider.CreateFileFast(fileName));
             }
 
             this.Navigated?.Invoke(this, e);

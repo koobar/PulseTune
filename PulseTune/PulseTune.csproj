@@ -95,6 +95,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Controls\BackendControls\ExplorerLikeListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\BackendControls\ExplorerLikeListViewItem.cs" />
+    <Compile Include="Controls\BackendControls\OptimizedListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\BackendControls\VerticalTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -142,9 +149,6 @@
     </Compile>
     <Compile Include="Controls\MediaControlPanel.Designer.cs">
       <DependentUpon>MediaControlPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\BackendControls\OptimizedListView.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\PictureViewer.cs">
       <SubType>Component</SubType>

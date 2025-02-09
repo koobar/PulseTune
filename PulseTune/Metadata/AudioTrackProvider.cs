@@ -77,6 +77,20 @@ namespace PulseTune.Metadata
             return new GeneralPurposeAudioTrack(path);
         }
 
+        public static AudioTrackBase CreateFileFast(string path)
+        {
+            var extension = Path.GetExtension(path).ToLower();
+            var type = GetAudioTrackType(extension);
+
+            if (type != null)
+            {
+                return (AudioTrackBase)Activator.CreateInstance(type, new object[] { path, true });
+            }
+
+            // 対応するオーディオトラックの型が見つからなかった場合は、汎用トラックで読み込んで返す。
+            return new GeneralPurposeAudioTrack(path, true);
+        }
+
         public static AudioTrackBase CreateUseCustomConstructor(object type, object[] parameters)
         {
             if (type == null)

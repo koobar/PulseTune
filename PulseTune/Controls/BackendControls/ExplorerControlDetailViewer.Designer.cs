@@ -30,7 +30,7 @@ namespace PulseTune.Controls.BackendControls
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.LocationsList = new System.Windows.Forms.ListView();
+            this.LocationsList = new ExplorerLikeListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label2 = new System.Windows.Forms.Label();
             this.DetailsTextBox = new System.Windows.Forms.TextBox();
@@ -58,6 +58,7 @@ namespace PulseTune.Controls.BackendControls
             this.LocationsList.Location = new System.Drawing.Point(3, 18);
             this.LocationsList.MultiSelect = false;
             this.LocationsList.Name = "LocationsList";
+            this.LocationsList.OwnerDraw = true;
             this.LocationsList.Size = new System.Drawing.Size(194, 160);
             this.LocationsList.TabIndex = 1;
             this.LocationsList.UseCompatibleStateImageBehavior = false;
@@ -110,7 +111,7 @@ namespace PulseTune.Controls.BackendControls
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ListView LocationsList;
+        private ExplorerLikeListView LocationsList;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox DetailsTextBox;
         private System.Windows.Forms.ColumnHeader columnHeader1;

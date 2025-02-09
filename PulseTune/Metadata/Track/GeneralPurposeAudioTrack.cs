@@ -1,8 +1,6 @@
-﻿using LibPulseTune.AudioSource;
-using LibPulseTune.Plugin.Sdk.Metadata.Track;
+﻿using LibPulseTune.Plugin.Sdk.Metadata.Track;
 using System;
 using System.Drawing;
-using System.Windows.Media.TextFormatting;
 using Windows.Storage;
 using Windows.Storage.FileProperties;
 using static PulseTune.Utils.AsyncUtils;
@@ -25,18 +23,27 @@ namespace PulseTune.Metadata.Track
         /// 指定されたパスのファイルを示すよう、Trackのインスタンスを初期化する。
         /// </summary>
         /// <param name="path"></param>
-        public GeneralPurposeAudioTrack(string path) : base(path)
+        public GeneralPurposeAudioTrack(string path, bool fastMode) : base(path)
         {
-            this.file = CallAsyncMethod(StorageFile.GetFileFromPathAsync, path);
-
-            if (this.file == null)
+            if (!fastMode)
             {
-                return;
-            }
+                this.file = CallAsyncMethod(StorageFile.GetFileFromPathAsync, path);
 
-            this.musicProperties = CallAsyncMethod(this.file.Properties.GetMusicPropertiesAsync);
-            this.thumbnail = new Thumbnail(this.file);
+                if (this.file == null)
+                {
+                    return;
+                }
+
+                this.musicProperties = CallAsyncMethod(this.file.Properties.GetMusicPropertiesAsync);
+                this.thumbnail = new Thumbnail(this.file);
+            }
         }
+
+        /// <summary>
+        /// 指定されたパスのファイルを示すよう、Trackのインスタンスを初期化する。
+        /// </summary>
+        /// <param name="path"></param>
+        public GeneralPurposeAudioTrack(string path) : this(path, false) { }
 
         #endregion
 

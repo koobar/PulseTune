@@ -11,8 +11,25 @@ namespace PulseTune
     {
         // アプリケーション情報の定義
         public const string APPLICATION_NAME = @"PulseTune";
-        public static readonly Version ApplicationVersion = new Version(1, 2);
-        public static readonly DateOnly ApplicationBuildDate = new DateOnly(2025, 2, 3);
+        public static readonly DateOnly ApplicationBuildDate = new DateOnly(2025, 2, 8);
+        public static readonly Version ApplicationVersion = new Version(1, 3, ToBuildNumber(ApplicationBuildDate));
+
+        /// <summary>
+        /// ビルド日時からビルド番号を求める。
+        /// </summary>
+        /// <param name="dateOnly"></param>
+        /// <returns></returns>
+        private static int ToBuildNumber(DateOnly dateOnly)
+        {
+            string result = string.Empty;
+
+            result += dateOnly.Year.ToString().Substring(1);        // 西暦の下二桁を取得
+            result += dateOnly.Month;                               // 月を追加
+            result += dateOnly.Day;                                 // 日を追加
+
+            // 整数に変換
+            return int.Parse(result);
+        }
 
         [STAThread]
         private static void Main(string[] args)

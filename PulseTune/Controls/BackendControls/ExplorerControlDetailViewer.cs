@@ -10,6 +10,10 @@ namespace PulseTune.Controls.BackendControls
     internal partial class ExplorerControlDetailViewer : UserControl
     {
         // 非公開フィールド
+        private static readonly Color SelectedItemBackColor = Color.FromArgb(205, 232, 255);
+        private static readonly Color SelectedItemBorderColor = Color.FromArgb(153, 209, 255);
+        private static readonly Brush SelectedItemBrush = new SolidBrush(SelectedItemBackColor);
+        private static readonly Pen SelectedItemBorderPen = new Pen(SelectedItemBorderColor);
         private readonly DriveStateWatcher driveStateWatcher;
 
         // イベント
@@ -168,6 +172,26 @@ namespace PulseTune.Controls.BackendControls
         }
 
         /// <summary>
+        /// 指定されたパスのフォルダのアイコンを取得する。
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        private Bitmap GetFolderIcon(string path, int width, int height)
+        {
+            var result = new Bitmap(width, height);
+            var original = WinApi.ExtractIconFromPath(path, WinApi.ExtractIconSize.Small).ToBitmap();
+            var g = Graphics.FromImage(result);
+
+            g.DrawImage(original, 0, 0, width, height);
+            g.Dispose();
+            original.Dispose();
+
+            return result;
+        }
+
+        /// <summary>
         /// 利用可能なドライブのリストを更新する。
         /// </summary>
         private void UpdateAvailableLocations()
@@ -182,8 +206,9 @@ namespace PulseTune.Controls.BackendControls
             {
                 if (info.IsReady)
                 {
-                    var item = new ListViewItem();
+                    var item = new ExplorerLikeListViewItem();
                     item.Tag = info.RootDirectory;
+                    item.Icon = GetFolderIcon(info.RootDirectory.FullName, 16, 16);
                     item.Text = $"{info.RootDirectory.FullName} ({info.VolumeLabel})";
 
                     driveGroup.Items.Add(item);
@@ -201,8 +226,9 @@ namespace PulseTune.Controls.BackendControls
 
                 foreach (Shell32.FolderItem folderItem in folder.Items())
                 {
-                    var item = new ListViewItem();
+                    var item = new ExplorerLikeListViewItem();
                     item.Tag = folderItem.Path;
+                    item.Icon = GetFolderIcon(folderItem.Path, 16, 16);
                     item.Text = Path.GetFileName(folderItem.Path);
 
                     quickAccessGroup.Items.Add(item);

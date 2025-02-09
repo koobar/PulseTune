@@ -2,13 +2,13 @@
 
 namespace PulseTune.Controls.BackendControls
 {
-    internal class OptimizedListView : ListView
+    public class OptimizedListView : ListView
     {
-        // コンストラクタ
         public OptimizedListView()
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            SetStyle(ControlStyles.ResizeRedraw, true);
         }
     }
 }

@@ -15,12 +15,20 @@ namespace PulseTune.Metadata.Track
         /// 指定されたパスのファイルを示すよう、Trackのインスタンスを初期化する。
         /// </summary>
         /// <param name="path"></param>
-        public VorbisAudioTrack(string path) : base(path)
+        public VorbisAudioTrack(string path, bool fastMode) : base(path, fastMode)
         {
-            var vorbis = new VorbisAudioSource(path);
-            this.duration = vorbis.GetDuration();
-            this.bitRate = vorbis.NominalBitrate / 1000;
-            vorbis.Dispose();
+            if (!fastMode)
+            {
+                var vorbis = new VorbisAudioSource(path);
+                this.duration = vorbis.GetDuration();
+                this.bitRate = vorbis.NominalBitrate / 1000;
+                vorbis.Dispose();
+            }
+        }
+
+        public VorbisAudioTrack(string path) : this(path, false)
+        {
+
         }
 
         #endregion
