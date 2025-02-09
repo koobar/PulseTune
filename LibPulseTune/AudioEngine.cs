@@ -1,4 +1,5 @@
 ﻿using LibPulseTune.AudioSource;
+using LibPulseTune.AudioSource.Cd;
 using LibPulseTune.AudioSource.MediaFoundation;
 using LibPulseTune.AudioSource.Vorbis;
 using LibPulseTune.AudioSource.WavPack;
@@ -45,6 +46,7 @@ namespace LibPulseTune
         {
             AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisAudioSource), ".ogg");
             AudioSourceProvider.RegisterDecoder("WavPack", typeof(WavPackAudioSource), ".wv");
+            AudioSourceProvider.RegisterDecoder("Audio CD Track", typeof(CDAudioSource), ".cda");
 
             AudioSourceProvider.RegisterDecoder("WAV", typeof(MediaFoundationAudioSource), ".wav");
             AudioSourceProvider.RegisterDecoder("AIFF", typeof(MediaFoundationAudioSource), ".aif", ".aiff");
