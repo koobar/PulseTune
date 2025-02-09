@@ -16,7 +16,7 @@ namespace LibPulseTune.Plugin.Sdk
         {
             get
             {
-                return new APILevel(1, 1);
+                return new APILevel(1, 2);
             }
         }
 

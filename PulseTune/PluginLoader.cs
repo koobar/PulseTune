@@ -46,6 +46,10 @@ namespace PulseTune
             {
                 return AudioTrackProvider.CreateFile(path.ToString());
             });
+            SystemCalls.AudioTrack.CreateFileFast = new SystemCall((object path) =>
+            {
+                return AudioTrackProvider.CreateFileFast(path.ToString());
+            });
             SystemCalls.AudioTrack.CreateUseCustomConstructor = new SystemCall((object type, object parameters) =>
             {
                 if (!(type is Type))

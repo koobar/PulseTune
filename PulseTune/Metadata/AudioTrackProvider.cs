@@ -50,6 +50,11 @@ namespace PulseTune.Metadata
             }
         }
 
+        /// <summary>
+        /// 指定された拡張子に対応するオーディオトラックの型を取得する。
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <returns></returns>
         public static Type GetAudioTrackType(string extension)
         {
             extension = extension.ToLower();
@@ -63,6 +68,11 @@ namespace PulseTune.Metadata
             return null;
         }
 
+        /// <summary>
+        /// 指定されたパスのオーディオトラックのインスタンスを作成する。
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static AudioTrackBase CreateFile(string path)
         {
             var extension = Path.GetExtension(path).ToLower();
@@ -77,6 +87,11 @@ namespace PulseTune.Metadata
             return new GeneralPurposeAudioTrack(path);
         }
 
+        /// <summary>
+        /// 指定されたパスのオーディオトラックのインスタンスを高速に作成する。
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static AudioTrackBase CreateFileFast(string path)
         {
             var extension = Path.GetExtension(path).ToLower();
@@ -91,6 +106,14 @@ namespace PulseTune.Metadata
             return new GeneralPurposeAudioTrack(path, true);
         }
 
+        /// <summary>
+        /// カスタムコンストラクタを使用してオーディオトラックのインスタンスを生成する。
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public static AudioTrackBase CreateUseCustomConstructor(object type, object[] parameters)
         {
             if (type == null)

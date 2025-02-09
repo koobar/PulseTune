@@ -17,8 +17,14 @@
             /// </summary>
             public static SystemCall ContainsCustomOptionValue { set; get; }
 
+            /// <summary>
+            /// カスタムオプションの値を設定します。
+            /// </summary>
             public static SystemCall SetCustomOptionValue { set; get; }
 
+            /// <summary>
+            /// カスタムオプションの値を取得します。
+            /// </summary>
             public static SystemCall GetCustomOptionValue { set; get; }
         }
 
@@ -38,6 +44,11 @@
             /// 指定されたファイルを開いてAudioTrackBaseを継承する型の値として返すシステムコールです
             /// </summary>
             public static SystemCall CreateFile { set; get; }
+
+            /// <summary>
+            /// 指定されたファイルを高速モードで開いてAudioTrackBaseを継承する型の値として返すシステムコールです
+            /// </summary>
+            public static SystemCall CreateFileFast { set; get; }
 
             /// <summary>
             /// カスタムコンストラクタを使用してオーディオトラックを開き、AudioTrackBaseを継承する型の値として返すシステムコールです
