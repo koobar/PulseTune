@@ -66,15 +66,12 @@ namespace PulseTune.Controls
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            var brush = new SolidBrush(this.ForeColor);
             float db = ToDecibels(this.amplitude);
-            float a = e.ClipRectangle.Width * MinMaxNorm(db, -30, 0);
+            float a = e.ClipRectangle.Width * MinMaxNorm(db, -40, 0);
             
             // 描画処理
             e.Graphics.Clear(this.BackColor);
-            e.Graphics.FillRectangle(brush, new Rectangle(e.ClipRectangle.X + 1, e.ClipRectangle.Y + 1, (int)(a - 2.0f), e.ClipRectangle.Height - 2));
-            
-            brush.Dispose();
+            e.Graphics.FillRectangle(Brushes.Black, new Rectangle(e.ClipRectangle.X + 1, e.ClipRectangle.Y + 1, (int)(a - 2.0f), e.ClipRectangle.Height - 2));
         }
     }
 }

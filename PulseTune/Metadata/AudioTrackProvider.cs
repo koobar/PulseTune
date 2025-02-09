@@ -3,6 +3,7 @@ using PulseTune.Metadata.Track;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace PulseTune.Metadata
 {
@@ -69,6 +70,33 @@ namespace PulseTune.Metadata
         }
 
         /// <summary>
+        /// オーディオトラックのインスタンスを作成するためのコンストラクタを取得する。
+        /// </summary>
+        /// <param name="typeOfAudioTrack"></param>
+        /// <param name="ctorNormal"></param>
+        /// <param name="ctorFast"></param>
+        private static void GetConstructor(Type typeOfAudioTrack, out ConstructorInfo ctorNormal, out ConstructorInfo ctorFast)
+        {
+            var ctors = typeOfAudioTrack.GetConstructors();
+
+            ctorNormal = null;
+            ctorFast = null;
+
+            foreach (var ctor in ctors)
+            {
+                var parameters = ctor.GetParameters();
+                if (parameters.Length == 1 && parameters[0].ParameterType == typeof(string))
+                {
+                    ctorNormal = ctor;
+                }
+                else if (parameters.Length == 2 && parameters[0].ParameterType == typeof(string) && parameters[1].ParameterType == typeof(bool))
+                {
+                    ctorFast = ctor;
+                }
+            }
+        }
+
+        /// <summary>
         /// 指定されたパスのオーディオトラックのインスタンスを作成する。
         /// </summary>
         /// <param name="path"></param>
@@ -80,6 +108,13 @@ namespace PulseTune.Metadata
 
             if (type != null)
             {
+                GetConstructor(type, out var normalModeConstructor, out _);
+
+                if (normalModeConstructor != null)
+                {
+                    return (AudioTrackBase)normalModeConstructor.Invoke(new object[] { path });
+                }
+
                 return (AudioTrackBase)Activator.CreateInstance(type, new object[] { path });
             }
 
@@ -96,9 +131,21 @@ namespace PulseTune.Metadata
         {
             var extension = Path.GetExtension(path).ToLower();
             var type = GetAudioTrackType(extension);
-
+            
             if (type != null)
             {
+                GetConstructor(type, out var normalModeConstructor, out var fastModeConstructor);
+
+                if (fastModeConstructor != null)
+                {
+                    return (AudioTrackBase)fastModeConstructor.Invoke(new object[] { path, true });
+                }
+
+                if (normalModeConstructor != null)
+                {
+                    return (AudioTrackBase)normalModeConstructor.Invoke(new object[] { path });
+                }
+
                 return (AudioTrackBase)Activator.CreateInstance(type, new object[] { path, true });
             }
 
