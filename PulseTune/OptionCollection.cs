@@ -16,6 +16,10 @@ namespace PulseTune
             this.options = new Dictionary<string, string>();
         }
 
+        /// <summary>
+        /// 指定されたパスのファイルから設定を読み込む。
+        /// </summary>
+        /// <param name="path"></param>
         public void Load(string path)
         {
             if (!File.Exists(path))
@@ -47,6 +51,10 @@ namespace PulseTune
             }
         }
 
+        /// <summary>
+        /// 指定されたパスのファイルに設定を保存する。
+        /// </summary>
+        /// <param name="path"></param>
         public void Save(string path)
         {
             var dir = Path.GetDirectoryName(path);

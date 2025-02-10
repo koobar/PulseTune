@@ -123,11 +123,17 @@ namespace PulseTune.Metadata.Playlist
             this.IsEdited = false;
         }
 
+        /// <summary>
+        /// イベントの実行を一時停止する。
+        /// </summary>
         public void SuspendEvents()
         {
             this.flgSuspendEvent = true;
         }
 
+        /// <summary>
+        /// イベントの実行を再開する。
+        /// </summary>
         public void ResumeEvents()
         {
             this.flgSuspendEvent = false;

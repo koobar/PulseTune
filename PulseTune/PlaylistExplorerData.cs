@@ -103,6 +103,10 @@ namespace PulseTune
             RecentLocationsChanged?.Invoke(null, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// 指定された場所をお気に入りから削除する。
+        /// </summary>
+        /// <param name="location"></param>
         public static void RemoveFromFavorite(string location)
         {
             if (favoriteLocations.Contains(location))
@@ -112,6 +116,10 @@ namespace PulseTune
             }
         }
 
+        /// <summary>
+        /// 指定された場所を最近開いた場所から削除する。
+        /// </summary>
+        /// <param name="location"></param>
         public static void RemoveFromRecent(string location)
         {
             if (recentLocations.Contains(location))

@@ -50,6 +50,12 @@ namespace PulseTune.Metadata
             }
         }
 
+        /// <summary>
+        /// 指定されたパスのプレイリストを読み込むことができるIPlaylistReaderのインスタンスを生成する。
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static IPlaylistReader GetPlaylistReader(string path)
         {
             string extension = Path.GetExtension(path).ToLower();

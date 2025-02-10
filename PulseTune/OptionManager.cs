@@ -8,9 +8,7 @@ namespace PulseTune
     {
         // 非公開フィールド
         private static readonly string ApplicationOptionFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\{Program.APPLICATION_NAME}\\config.conf";
-        private static readonly string CustomOptionFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\{Program.APPLICATION_NAME}\\custom.conf";
         private static readonly OptionCollection applicationOptions = new OptionCollection();
-        private static readonly OptionCollection customOptions = new OptionCollection();
 
         #region オーディオデバイス設定
 
@@ -228,47 +226,19 @@ namespace PulseTune
         }
 
         /// <summary>
-        /// カスタムオプションに指定されたキーの値が存在するかどうか判定する。
+        /// すべての設定を保存する。
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public static bool ContainsCustomOption(string key)
-        {
-            return customOptions.Contains(key);
-        }
-
-        /// <summary>
-        /// カスタムオプションの値を設定する。
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        public static void SetCustomOption(string key, object value)
-        {
-            customOptions.SetValue(key, value);
-        }
-
-        /// <summary>
-        /// カスタムオプションの値を取得する。
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="valueType"></param>
-        /// <returns></returns>
-        public static object GetCustomOption(string key, object defaultValue, Type valueType)
-        {
-            return customOptions.GetValue(key, defaultValue, valueType);
-        }
-
         public static void SaveAllOptions()
         {
             applicationOptions.Save(ApplicationOptionFilePath);
-            customOptions.Save(CustomOptionFilePath);
         }
 
+        /// <summary>
+        /// すべての設定を読み込む。
+        /// </summary>
         public static void LoadAllOptions()
         {
             applicationOptions.Load(ApplicationOptionFilePath);
-            customOptions.Load(CustomOptionFilePath);
         }
     }
 }

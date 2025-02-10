@@ -55,6 +55,9 @@ namespace PulseTune.Utils
             }
         }
 
+        /// <summary>
+        /// 使用可能ドライブの一覧を確認し、変化があればイベントを発生させる。
+        /// </summary>
         protected virtual void CheckDrives()
         {
             var isStateChanged = false;

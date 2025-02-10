@@ -20,6 +20,9 @@ namespace PulseTune
             this.MainForm = this.mainWindow;
         }
 
+        /// <summary>
+        /// 破棄
+        /// </summary>
         public void Dispose()
         {
             if (this.mainWindow != null)
@@ -28,6 +31,10 @@ namespace PulseTune
             }
         }
 
+        /// <summary>
+        /// 後続のアプリケーションのインスタンスが起動された場合の処理
+        /// </summary>
+        /// <param name="eventArgs"></param>
         protected override void OnStartupNextInstance(StartupNextInstanceEventArgs eventArgs)
         {
             base.OnStartupNextInstance(eventArgs);

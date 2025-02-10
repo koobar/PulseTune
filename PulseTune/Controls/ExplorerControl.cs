@@ -269,6 +269,9 @@ namespace PulseTune.Controls
                     {
                         this.viewer.SelectIndex(index);
                     }
+
+                    this.lastSearchPrompt = dialog.Prompt;
+                    this.lastSearchIgnoreCase = dialog.IgnoreCase;
                 }
             }
         }

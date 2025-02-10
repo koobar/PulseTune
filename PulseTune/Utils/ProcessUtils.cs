@@ -4,6 +4,10 @@ namespace PulseTune.Utils
 {
     internal static class ProcessUtils
     {
+        /// <summary>
+        /// 指定されたパスのファイルを選択して、Windowsのエクスプローラを起動する。
+        /// </summary>
+        /// <param name="path"></param>
         public static void OpenInExplorer(string path)
         {
             var process = new ProcessStartInfo();
