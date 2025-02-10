@@ -3,6 +3,7 @@ using LibPulseTune.AudioSource.Cd;
 using LibPulseTune.AudioSource.MediaFoundation;
 using LibPulseTune.AudioSource.Vorbis;
 using LibPulseTune.AudioSource.WavPack;
+using LibPulseTune.AudioSource.ZilophiX;
 using System.Collections.Generic;
 using System.Text;
 
@@ -45,7 +46,6 @@ namespace LibPulseTune
         private static void LoadBuiltinCodecs()
         {
             AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisAudioSource), ".ogg");
-            AudioSourceProvider.RegisterDecoder("WavPack", typeof(WavPackAudioSource), ".wv");
             AudioSourceProvider.RegisterDecoder("Audio CD Track", typeof(CDAudioSource), ".cda");
 
             AudioSourceProvider.RegisterDecoder("WAV", typeof(MediaFoundationAudioSource), ".wav");
@@ -55,6 +55,18 @@ namespace LibPulseTune
             AudioSourceProvider.RegisterDecoder("MPEG-1 Audio Layer-3", typeof(MediaFoundationAudioSource), ".mp3");
             AudioSourceProvider.RegisterDecoder("M4A", typeof(MediaFoundationAudioSource), ".m4a");
             AudioSourceProvider.RegisterDecoder("Windows Media Audio", typeof(MediaFoundationAudioSource), ".wma");
+
+            // WavPackが使用可能なら登録
+            if (WavPackAudioSource.IsAvailable())
+            {
+                AudioSourceProvider.RegisterDecoder("WavPack", typeof(WavPackAudioSource), ".wv");
+            }
+
+            // ZilophiXが使用可能なら登録
+            if (ZilophiXAudioSource.IsAvailable())
+            {
+                AudioSourceProvider.RegisterDecoder("ZilophiX", typeof(ZilophiXAudioSource), ".zpx");
+            }
         }
 
         /// <summary>

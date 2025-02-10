@@ -45,6 +45,7 @@ namespace LibPulseTune.AudioSource.WavPack
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate WavPackMode InternalWavpackGetMode(IntPtr wpc);
 
         // 非公開フィールド
+        private static readonly string WavPackDllPath = $"{Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName)}\\{WAVPACK_DLL_NAME}";
         private readonly IntPtr wavPackModule;
         private readonly InternalWavpackOpenFileInput _wavPackOpenFileInput;
         private readonly InternalWavpackGetSampleRate _wavPackGetSampleRate;
@@ -62,24 +63,29 @@ namespace LibPulseTune.AudioSource.WavPack
         // コンストラクタ
         public WavPackAudioSource(string path)
         {
+            if (!IsAvailable())
+            {
+                throw new DllNotFoundException("wavpack.dll が見つかりません。");
+            }
+
             // WavPackのDLLを読み込む。
-            this.wavPackModule = LoadLibrary($"{Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName)}\\{WAVPACK_DLL_NAME}");
+            this.wavPackModule = WinApi.LoadLibrary(WavPackDllPath);
             if (this.wavPackModule == IntPtr.Zero)
             {
                 throw new InvalidProgramException($"{WAVPACK_DLL_NAME} が見つかりません。");
             }
 
             // DLLから関数を取得し、delegateに変換したものを保持する。
-            this._wavPackOpenFileInput = LoadFunction<InternalWavpackOpenFileInput>("WavpackOpenFileInput");
-            this._wavPackGetSampleRate = LoadFunction<InternalWavpackGetSampleRate>("WavpackGetSampleRate");
-            this._wavPackGetNumSamples = LoadFunction<InternalWavpackGetNumSamples>("WavpackGetNumSamples");
-            this._wavPackGetNumChannels = LoadFunction<InternalWavpackGetNumChannels>("WavpackGetNumChannels");
-            this._wavPackGetBitsPerSample = LoadFunction<InternalWavpackGetBitsPerSample>("WavpackGetBitsPerSample");
-            this._wavPackUnpackSamples = LoadFunction<InternalWavpackUnpackSamples>("WavpackUnpackSamples");
-            this._wavPackSeekSample = LoadFunction<InternalWavpackSeekSample>("WavpackSeekSample");
-            this._wavPackGetSampleIndex = LoadFunction<InternalWavpackGetSampleIndex>("WavpackGetSampleIndex");
-            this._wavPackCloseFile = LoadFunction<InternalWavpackCloseFile>("WavpackCloseFile");
-            this._wavPackGetMode = LoadFunction<InternalWavpackGetMode>("WavpackGetMode");
+            this._wavPackOpenFileInput = WinApiHelper.LoadFunction<InternalWavpackOpenFileInput>(this.wavPackModule, "WavpackOpenFileInput");
+            this._wavPackGetSampleRate = WinApiHelper.LoadFunction<InternalWavpackGetSampleRate>(this.wavPackModule, "WavpackGetSampleRate");
+            this._wavPackGetNumSamples = WinApiHelper.LoadFunction<InternalWavpackGetNumSamples>(this.wavPackModule, "WavpackGetNumSamples");
+            this._wavPackGetNumChannels = WinApiHelper.LoadFunction<InternalWavpackGetNumChannels>(this.wavPackModule, "WavpackGetNumChannels");
+            this._wavPackGetBitsPerSample = WinApiHelper.LoadFunction<InternalWavpackGetBitsPerSample>(this.wavPackModule, "WavpackGetBitsPerSample");
+            this._wavPackUnpackSamples = WinApiHelper.LoadFunction<InternalWavpackUnpackSamples>(this.wavPackModule, "WavpackUnpackSamples");
+            this._wavPackSeekSample = WinApiHelper.LoadFunction<InternalWavpackSeekSample>(this.wavPackModule, "WavpackSeekSample");
+            this._wavPackGetSampleIndex = WinApiHelper.LoadFunction<InternalWavpackGetSampleIndex>(this.wavPackModule, "WavpackGetSampleIndex");
+            this._wavPackCloseFile = WinApiHelper.LoadFunction<InternalWavpackCloseFile>(this.wavPackModule, "WavpackCloseFile");
+            this._wavPackGetMode = WinApiHelper.LoadFunction<InternalWavpackGetMode>(this.wavPackModule, "WavpackGetMode");
 
             // エラーメッセージを格納する領域を確保
             var error = Marshal.AllocHGlobal(1024);
@@ -102,36 +108,20 @@ namespace LibPulseTune.AudioSource.WavPack
         }
 
         /// <summary>
-        /// WavPackのDLLから、指定された名前の関数の関数ポインタを取得し、delegateに変換して返す。
+        /// WavPackのDLLが存在し、WavPackのデコードが可能であるかどうかを確認する。
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="functionName"></param>
         /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        private T LoadFunction<T>(string functionName)
+        public static bool IsAvailable()
         {
-            // 関数ポインタを取得
-            IntPtr functionPtr = GetProcAddress(this.wavPackModule, functionName);
-
-            if (functionPtr == IntPtr.Zero)
+            if (File.Exists(WavPackDllPath))
             {
-                throw new Exception("function not found.");
+                return true;
             }
 
-            // 関数ポインタをdelegateに変換する
-            return (T)(object)Marshal.GetDelegateForFunctionPointer(functionPtr, typeof(T));
+            return false;
         }
 
         #region ラッパー関数
-
-        [DllImport("kernel32")]
-        private static extern IntPtr LoadLibrary(string dllFilePath);
-
-        [DllImport("kernel32")]
-        private static extern IntPtr GetProcAddress(IntPtr module, string functionName);
-
-        [DllImport("kernel32")]
-        private static extern bool FreeLibrary(IntPtr module);
 
         private IntPtr WavpackOpenFileInput(string fileName, IntPtr error, int flags, int norm_offset)
         {
@@ -302,7 +292,7 @@ namespace LibPulseTune.AudioSource.WavPack
         public void Dispose()
         {
             WavpackCloseFile();
-            FreeLibrary(this.wavPackModule);
+            WinApi.FreeLibrary(this.wavPackModule);
         }
 
         public TimeSpan GetCurrentTime()

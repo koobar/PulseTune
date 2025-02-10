@@ -80,6 +80,7 @@
     <Compile Include="AudioSource\Cd\DiskDrive.cs" />
     <Compile Include="AudioSource\Vorbis\VorbisAudioSource.cs" />
     <Compile Include="AudioSource\WavPack\WavPackAudioSource.cs" />
+    <Compile Include="AudioSource\ZilophiX\ZilophiXAudioSource.cs" />
     <Compile Include="Wasapi\AvrtInterop.cs" />
     <Compile Include="Wasapi\AvThreadPriority.cs" />
     <Compile Include="Wasapi\DwmapiInterop.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VolumeController.cs" />
     <Compile Include="WinApi.cs" />
+    <Compile Include="WinApiHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NAudio.Core">
@@ -119,6 +121,9 @@
   <ItemGroup>
     <Content Include="..\..\dll\wavpackdll.dll">
       <Link>wavpackdll.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="zilophixdec.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

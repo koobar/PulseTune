@@ -13,6 +13,7 @@ namespace LibPulseTune
         public const uint CDROM_TRACK_MODE_TYPE_CDDA = 2;
         public const uint SIZE_OF_RAW_READ_INFO = 16;
 
+        // 非公開定数
         private const int MAXIMUM_NUMBER_TRACKS = 100;
 
         // ntddcdrm.hを参考
@@ -65,5 +66,14 @@ namespace LibPulseTune
             out uint lpBytesReturned,
             IntPtr lpOverlapped
         );
+
+        [DllImport("kernel32")]
+        public static extern IntPtr LoadLibrary(string dllFilePath);
+
+        [DllImport("kernel32")]
+        public static extern IntPtr GetProcAddress(IntPtr module, string functionName);
+
+        [DllImport("kernel32")]
+        public static extern bool FreeLibrary(IntPtr module);
     }
 }
