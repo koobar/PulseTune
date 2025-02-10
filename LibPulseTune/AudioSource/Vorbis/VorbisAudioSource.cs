@@ -1,5 +1,4 @@
-﻿using LibPulseTune.Plugin.Sdk.AudioSource;
-using NAudio.Vorbis;
+﻿using NAudio.Vorbis;
 using System;
 
 namespace LibPulseTune.AudioSource.Vorbis

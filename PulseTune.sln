@@ -15,8 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{540139AC-9A1
 		THIRD-PARTY-NOTICES.txt = THIRD-PARTY-NOTICES.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune.Plugin.Sdk", "LibPulseTune.Plugin.Sdk\LibPulseTune.Plugin.Sdk.csproj", "{5EC3F05F-72D3-4772-AAB2-EB7813E38D5E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,10 +29,6 @@ Global
 		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Debug|x64.Build.0 = Debug|x64
 		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Release|x64.ActiveCfg = Release|x64
 		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Release|x64.Build.0 = Release|x64
-		{5EC3F05F-72D3-4772-AAB2-EB7813E38D5E}.Debug|x64.ActiveCfg = Debug|x64
-		{5EC3F05F-72D3-4772-AAB2-EB7813E38D5E}.Debug|x64.Build.0 = Debug|x64
-		{5EC3F05F-72D3-4772-AAB2-EB7813E38D5E}.Release|x64.ActiveCfg = Release|x64
-		{5EC3F05F-72D3-4772-AAB2-EB7813E38D5E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

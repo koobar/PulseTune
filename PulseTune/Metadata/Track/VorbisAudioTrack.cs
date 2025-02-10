@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace PulseTune.Metadata.Track
 {
-    public class VorbisAudioTrack : GeneralPurposeAudioTrack
+    internal class VorbisAudioTrack : GeneralPurposeAudioTrack
     {
         // 非公開フィールド
         private TimeSpan duration;

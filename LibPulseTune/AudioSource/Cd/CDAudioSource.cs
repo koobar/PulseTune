@@ -1,5 +1,4 @@
-﻿using LibPulseTune.Plugin.Sdk.AudioSource;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using static LibPulseTune.AudioSource.Cd.CDDA;

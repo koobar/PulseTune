@@ -1,6 +1,7 @@
-【ソフト名】PulseTune
-【著作権者】koobar
-【連 絡 先】koobar14@gmail.com
+【ソフト名】　PulseTune
+【著作権者】　koobar
+【連 絡 先】　koobar14@gmail.com
+【ライセンス】MITライセンス
 
 ■PulseTuneについて
 　PulseTuneは、シンプルな操作で使用できることを目標に開発された、Windows用のオーディオプレイヤーです。
@@ -24,8 +25,8 @@
 　・WMA
 　・WAV
 　・WavPack
-
-　その他、プラグインを導入することで、上記以外のフォーマットのファイルが再生できるようになります。
+　・ZilophiX
+　・CDAファイル（オーディオCDトラック）
 　
 ■アイコンについて
 PulseTuneのアイコンは、IconKitchenを用いて作成しました。

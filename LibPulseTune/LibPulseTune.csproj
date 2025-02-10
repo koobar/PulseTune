@@ -78,6 +78,7 @@
     <Compile Include="AudioSource\Cd\CDDA.cs" />
     <Compile Include="AudioSource\Cd\CDTrack.cs" />
     <Compile Include="AudioSource\Cd\DiskDrive.cs" />
+    <Compile Include="AudioSource\IAudioSource.cs" />
     <Compile Include="AudioSource\Vorbis\VorbisAudioSource.cs" />
     <Compile Include="AudioSource\WavPack\WavPackAudioSource.cs" />
     <Compile Include="AudioSource\ZilophiX\ZilophiXAudioSource.cs" />
@@ -111,12 +112,6 @@
     <PackageReference Include="NVorbis">
       <Version>0.10.4</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LibPulseTune.Plugin.Sdk\LibPulseTune.Plugin.Sdk.csproj">
-      <Project>{5ec3f05f-72d3-4772-aab2-eb7813e38d5e}</Project>
-      <Name>LibPulseTune.Plugin.Sdk</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\dll\wavpackdll.dll">

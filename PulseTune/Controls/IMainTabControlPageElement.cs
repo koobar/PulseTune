@@ -1,5 +1,5 @@
-﻿using LibPulseTune.Plugin.Sdk.Metadata.Playlist;
-using LibPulseTune.Plugin.Sdk.Metadata.Track;
+﻿using PulseTune.Metadata.Playlist;
+using PulseTune.Metadata.Track;
 
 namespace PulseTune.Controls
 {

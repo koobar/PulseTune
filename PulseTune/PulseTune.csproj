@@ -131,6 +131,10 @@
     <Compile Include="Dialogs\WasapiOptionDialog.Designer.cs">
       <DependentUpon>WasapiOptionDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Metadata\Playlist\IPlaylistReader.cs" />
+    <Compile Include="Metadata\Playlist\IPlaylistWriter.cs" />
+    <Compile Include="Metadata\Playlist\Playlist.cs" />
+    <Compile Include="Metadata\Track\AudioTrackBase.cs" />
     <Compile Include="Metadata\Track\VorbisAudioTrack.cs" />
     <Compile Include="Utils\WindowsFormsControlExtensions.cs" />
     <Compile Include="Utils\DriveStateWatcher.cs" />
@@ -197,7 +201,6 @@
     <Compile Include="Metadata\Track\GeneralPurposeAudioTrack.cs" />
     <Compile Include="OptionCollection.cs" />
     <Compile Include="PlaylistExplorerData.cs" />
-    <Compile Include="PluginLoader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\ProcessUtils.cs" />
@@ -253,10 +256,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LibPulseTune.Plugin.Sdk\LibPulseTune.Plugin.Sdk.csproj">
-      <Project>{5ec3f05f-72d3-4772-aab2-eb7813e38d5e}</Project>
-      <Name>LibPulseTune.Plugin.Sdk</Name>
-    </ProjectReference>
     <ProjectReference Include="..\LibPulseTune\LibPulseTune.csproj">
       <Project>{2d03ec43-d579-4a1f-a6d9-52e92c85d43f}</Project>
       <Name>LibPulseTune</Name>

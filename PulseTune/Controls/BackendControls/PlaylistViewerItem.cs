@@ -1,4 +1,4 @@
-﻿using LibPulseTune.Plugin.Sdk.Metadata.Track;
+﻿using PulseTune.Metadata.Track;
 using System.Drawing;
 using System.Windows.Forms;
 

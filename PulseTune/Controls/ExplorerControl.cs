@@ -1,9 +1,8 @@
-﻿using LibPulseTune.Plugin.Sdk;
-using LibPulseTune.Plugin.Sdk.Metadata.Playlist;
-using LibPulseTune.Plugin.Sdk.Metadata.Track;
-using PulseTune.Controls.BackendControls;
+﻿using PulseTune.Controls.BackendControls;
 using PulseTune.Dialogs;
 using PulseTune.Metadata;
+using PulseTune.Metadata.Playlist;
+using PulseTune.Metadata.Track;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -13,7 +12,7 @@ using System.Windows.Forms.VisualStyles;
 
 namespace PulseTune.Controls
 {
-    public class ExplorerControl : UserControl, IMainTabControlPageElement
+    internal class ExplorerControl : UserControl, IMainTabControlPageElement
     {
         // パネル
         private readonly Panel leftPanel;

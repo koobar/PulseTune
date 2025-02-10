@@ -1,5 +1,4 @@
-﻿using LibPulseTune.Plugin.Sdk.AudioSource;
-using System;
+﻿using System;
 
 namespace LibPulseTune.AudioSource
 {

@@ -1,5 +1,4 @@
-﻿using LibPulseTune.Plugin.Sdk.Metadata.Track;
-using PulseTune.Metadata.Track;
+﻿using PulseTune.Metadata.Track;
 using System;
 using System.Collections.Generic;
 using System.IO;

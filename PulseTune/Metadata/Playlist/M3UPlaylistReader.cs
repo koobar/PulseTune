@@ -1,6 +1,5 @@
-﻿using LibPulseTune.Plugin.Sdk;
-using LibPulseTune.Plugin.Sdk.Metadata.Playlist;
-using LibPulseTune.Plugin.Sdk.Metadata.Track;
+﻿using LibPulseTune.AudioSource;
+using PulseTune.Metadata.Track;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -28,7 +27,7 @@ namespace PulseTune.Metadata.Playlist
             }
         }
 
-        public void OpenFile(string path, LibPulseTune.Plugin.Sdk.Metadata.Playlist.Playlist playlist)
+        public void OpenFile(string path, Playlist playlist)
         {
             var tracks = new List<AudioTrackBase>();
 
@@ -45,21 +44,21 @@ namespace PulseTune.Metadata.Playlist
 
                     if (!line.StartsWith("#"))
                     {
-                        if ((bool)SystemCalls.AudioTrack.IsPlaybackSupportedFileFormat.Call(line))
+                        if (AudioSourceProvider.IsPlaybackSupportedFileFormat(line))
                         {
-                            tracks.Add((AudioTrackBase)SystemCalls.AudioTrack.CreateFile.Call(line));
+                            tracks.Add(AudioTrackProvider.CreateFileFast(line));
                         }
                         else if (Directory.Exists(line))
                         {
                             foreach (string fileName in Directory.GetFiles(line))
                             {
-                                if ((bool)SystemCalls.AudioTrack.IsPlaybackSupportedFileFormat.Call(fileName))
+                                if (AudioSourceProvider.IsPlaybackSupportedFileFormat(fileName))
                                 {
-                                    var track = SystemCalls.AudioTrack.CreateFile.Call(fileName);
+                                    var track = AudioTrackProvider.CreateFile(fileName);
 
                                     if (track != null)
                                     {
-                                        tracks.Add((AudioTrackBase)track);
+                                        tracks.Add(track);
                                     }
                                 }
                             }
@@ -68,13 +67,13 @@ namespace PulseTune.Metadata.Playlist
                         {
                             string fullPath = $"{Path.GetDirectoryName(path)}\\{line}";
 
-                            if ((bool)SystemCalls.AudioTrack.IsPlaybackSupportedFileFormat.Call(fullPath))
+                            if (AudioSourceProvider.IsPlaybackSupportedFileFormat(fullPath))
                             {
-                                var track = SystemCalls.AudioTrack.CreateFile.Call(fullPath);
+                                var track = AudioTrackProvider.CreateFile(fullPath);
 
                                 if (track != null)
                                 {
-                                    tracks.Add((AudioTrackBase)track);
+                                    tracks.Add(track);
                                 }
                             }
                         }

@@ -1,12 +1,11 @@
 using LibPulseTune;
 using LibPulseTune.AudioDevice;
 using LibPulseTune.AudioSource;
-using LibPulseTune.Plugin.Sdk;
-using LibPulseTune.Plugin.Sdk.Metadata.Playlist;
-using LibPulseTune.Plugin.Sdk.Metadata.Track;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using PulseTune.Controls;
 using PulseTune.Metadata;
+using PulseTune.Metadata.Playlist;
+using PulseTune.Metadata.Track;
 using PulseTune.Properties;
 using PulseTune.Utils;
 using System;
@@ -19,7 +18,7 @@ using System.Windows.Forms;
 
 namespace PulseTune.Dialogs
 {
-    public partial class MainWindow : Form
+    internal partial class MainWindow : Form
     {
         // 非公開コマンド
         private readonly Command playCommand;
@@ -630,7 +629,7 @@ namespace PulseTune.Dialogs
             }
 
             // ファイルを開く
-            var source = track.CreateAudioSource();
+            var source = AudioSourceProvider.CreateAudioSource(track.Path);
             AudioPlayer.SetAudioSource(source);
 
             // 出力デバイスの準備
@@ -736,112 +735,6 @@ namespace PulseTune.Dialogs
 
         #endregion
 
-        #region プラグインのシステムコールの実装
-
-        private object SysCallGetMainWindow()
-        {
-            return this;
-        }
-
-        private object SysCallGetFileMenu()
-        {
-            return this.FileMenu;
-        }
-
-        private object SysCallGetViewMenu()
-        {
-            return this.ViewMenu;
-        }
-
-        private object SysCallGetFindMenu()
-        {
-            return this.FindMenu;
-        }
-
-        private object SysCallGetPlaybackMenu()
-        {
-            return this.PlayMenu;
-        }
-
-        private object SysCallGetOptionMenu()
-        {
-            return this.OptionMenu;
-        }
-
-        private object SysCallGetHelpMenu()
-        {
-            return this.HelpMenu;
-        }
-
-        private void SysCallAddMainTabPage(object page)
-        {
-            if (page is ClosableTabPage)
-            {
-                this.MainTabControl.AddTabPage((ClosableTabPage)page);
-                return;
-            }
-
-            throw new ArgumentException("このシステムコールの第1引数には、ClosableTabPage型の値が必要ですが、それとは異なる型の値が与えられました。");
-        }
-
-        private object SysCallCreateNewTabPage(object text, object isClosable)
-        {
-            return new ClosableTabPage(Convert.ToString(text), Convert.ToBoolean(isClosable));
-        }
-
-        private object SysCallCreateNewPlaylistTabPage(object text)
-        {
-            return CreateNewPlaylistPage(Convert.ToString(text));
-        }
-
-        private void SysCallSetTabPageContent(object page, object ctrl)
-        {
-            if (page is ClosableTabPage)
-            {
-                ((ClosableTabPage)page).Control = (Control)ctrl;
-            }
-        }
-
-        private object SysCallGetTabPageContent(object page)
-        {
-            if (page is ClosableTabPage)
-            {
-                return ((ClosableTabPage)page).Control;
-            }
-
-            throw new ArgumentException("このシステムコールの第1引数には、ClosableTabPage型の値が必要ですが、それとは異なる型の値が与えられました。");
-        }
-
-        private void SysCallSetSelectedMainTabIndex(object index)
-        {
-            this.MainTabControl.SelectedIndex = Convert.ToInt32(index);
-        }
-
-        private void SysCallSetSelectedMainTabPage(object page)
-        {
-            this.MainTabControl.SelectedTab = (ClosableTabPage)page;
-        }
-
-        private object SysCallGetSelectedMainTabIndex()
-        {
-            return this.MainTabControl.SelectedIndex;
-        }
-
-        private object SysCallGetSelectedMainTabPage()
-        {
-            return this.MainTabControl.SelectedTab;
-        }
-
-        private void SysCallAddTracksToCurrentPlaylist(object tracks)
-        {
-            var lstTracks = (IList<AudioTrackBase>)tracks;
-            var viewer = this.TabSelectedControl;
-
-            viewer.AddTrackToPlaylist(lstTracks.ToArray());
-        }
-
-        #endregion
-
         /// <summary>
         /// フォームが読み込まれた場合の処理
         /// </summary>
@@ -886,62 +779,6 @@ namespace PulseTune.Dialogs
         {
             Stop();
             base.OnClosed(e);
-        }
-
-        /// <summary>
-        /// フォームのハンドルが作成された場合の処理
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            SystemCalls.MainWindow.GetMainWindow = new SystemCall(SysCallGetMainWindow);
-            SystemCalls.MainWindow.GetFileMenu = new SystemCall(SysCallGetFileMenu);
-            SystemCalls.MainWindow.GetViewMenu = new SystemCall(SysCallGetViewMenu);
-            SystemCalls.MainWindow.GetFindMenu = new SystemCall(SysCallGetFindMenu);
-            SystemCalls.MainWindow.GetPlaybackMenu = new SystemCall(SysCallGetPlaybackMenu);
-            SystemCalls.MainWindow.GetOptionMenu = new SystemCall(SysCallGetOptionMenu);
-            SystemCalls.MainWindow.GetHelpMenu = new SystemCall(SysCallGetHelpMenu);
-            SystemCalls.MainWindow.AddMainTabPage = new SystemCall(SysCallAddMainTabPage);
-            SystemCalls.MainWindow.SetSelectedMainTabIndex = new SystemCall(SysCallSetSelectedMainTabIndex);
-            SystemCalls.MainWindow.GetSelectedMainTabIndex = new SystemCall(SysCallGetSelectedMainTabIndex);
-            SystemCalls.MainWindow.SetSelectedMainTabPage = new SystemCall(SysCallSetSelectedMainTabPage);
-            SystemCalls.MainWindow.GetSelectedMainTabPage = new SystemCall(SysCallGetSelectedMainTabPage);
-            SystemCalls.MainWindow.AddTracksToCurrentPlaylist = new SystemCall(SysCallAddTracksToCurrentPlaylist);
-
-            SystemCalls.ClosableTabControl.CreateNewTabPage = new SystemCall(SysCallCreateNewTabPage);
-            SystemCalls.ClosableTabControl.CreateNewPlaylistTabPage = new SystemCall(SysCallCreateNewPlaylistTabPage);
-            SystemCalls.ClosableTabControl.SetTabPageContent = new SystemCall(SysCallSetTabPageContent);
-            SystemCalls.ClosableTabControl.GetTabPageContent = new SystemCall(SysCallGetTabPageContent);
-
-            base.OnHandleCreated(e);
-        }
-
-        /// <summary>
-        /// フォームのハンドルが破壊された場合の処理
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnHandleDestroyed(EventArgs e)
-        {
-            SystemCalls.MainWindow.GetMainWindow = null;
-            SystemCalls.MainWindow.GetFileMenu = null;
-            SystemCalls.MainWindow.GetViewMenu = null;
-            SystemCalls.MainWindow.GetFindMenu = null;
-            SystemCalls.MainWindow.GetPlaybackMenu = null;
-            SystemCalls.MainWindow.GetOptionMenu = null;
-            SystemCalls.MainWindow.GetHelpMenu = null;
-            SystemCalls.MainWindow.AddMainTabPage = null;
-            SystemCalls.MainWindow.SetSelectedMainTabIndex = null;
-            SystemCalls.MainWindow.GetSelectedMainTabIndex = null;
-            SystemCalls.MainWindow.SetSelectedMainTabPage = null;
-            SystemCalls.MainWindow.GetSelectedMainTabPage = null;
-            SystemCalls.MainWindow.AddTracksToCurrentPlaylist = null;
-
-            SystemCalls.ClosableTabControl.CreateNewTabPage = null;
-            SystemCalls.ClosableTabControl.CreateNewPlaylistTabPage = null;
-            SystemCalls.ClosableTabControl.SetTabPageContent = null;
-            SystemCalls.ClosableTabControl.GetTabPageContent = null;
-
-            base.OnHandleDestroyed(e);
         }
 
         /// <summary>

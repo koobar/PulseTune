@@ -1,4 +1,4 @@
-﻿using LibPulseTune.Plugin.Sdk.Metadata.Playlist;
+﻿using PulseTune.Metadata.Playlist;
 using System;
 using System.Collections.Generic;
 using System.IO;

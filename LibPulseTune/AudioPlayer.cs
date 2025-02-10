@@ -1,6 +1,5 @@
 ﻿using LibPulseTune.AudioDevice;
 using LibPulseTune.AudioSource;
-using LibPulseTune.Plugin.Sdk.AudioSource;
 using LibPulseTune.Wasapi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;

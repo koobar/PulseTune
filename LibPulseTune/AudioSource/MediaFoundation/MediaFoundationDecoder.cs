@@ -1,5 +1,4 @@
-﻿using LibPulseTune.Plugin.Sdk.AudioSource;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 using System;
 
 namespace LibPulseTune.AudioSource.MediaFoundation

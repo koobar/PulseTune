@@ -1,5 +1,4 @@
-﻿using LibPulseTune.Plugin.Sdk.Metadata.Track;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing;
 using Windows.Storage;
@@ -11,7 +10,7 @@ namespace PulseTune.Metadata.Track
     /// <summary>
     /// WinRT APIを使用してタグが読み込まれたトラック
     /// </summary>
-    public class GeneralPurposeAudioTrack : AudioTrackBase
+    internal class GeneralPurposeAudioTrack : AudioTrackBase
     {
         // 非公開フィールド
         private StorageFile file;

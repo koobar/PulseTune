@@ -1,15 +1,14 @@
 ﻿using LibPulseTune;
 using LibPulseTune.AudioSource;
-using LibPulseTune.Plugin.Sdk.Metadata.Playlist;
-using LibPulseTune.Plugin.Sdk.Metadata.Track;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using PulseTune.Controls.BackendControls;
 using PulseTune.Dialogs;
 using PulseTune.Metadata;
+using PulseTune.Metadata.Playlist;
+using PulseTune.Metadata.Track;
 using PulseTune.Utils;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -17,7 +16,7 @@ using System.Windows.Forms;
 
 namespace PulseTune.Controls
 {
-    public partial class PlaylistViewer : UserControl, IMainTabControlPageElement
+    internal partial class PlaylistViewer : UserControl, IMainTabControlPageElement
     {
         // 非公開定数
         internal const string COLUMN_HEADER_CAPTION_TITLE = @"タイトル";
@@ -30,7 +29,6 @@ namespace PulseTune.Controls
         internal const string COLUMN_HEADER_CAPTION_FORMAT = @"種類";
 
         // 非公開フィールド
-        
         private readonly ColumnHeader TitleColumnHeader;
         private readonly ColumnHeader AlbumColumnHeader;
         private readonly ColumnHeader ArtistColumnHeader;

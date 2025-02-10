@@ -55,8 +55,6 @@ namespace PulseTune
             // メインウィンドウを表示し、メッセージループを開始
             using (var app = new App())
             {
-                PluginLoader.LoadPlugins();
-
                 app.Run(args);
 
                 // アプリケーション設定を保存する。
