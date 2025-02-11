@@ -20,6 +20,7 @@ namespace LibPulseTune
         private static CustomWasapiOut currentDeviceInstance;
         private static AmplitudeMonitor currentAudioSource;
         private static VolumeController volumeController;
+        private static int volume;
         private static int audioPlayerState;
         private static PlaybackTimer timer;
 
@@ -35,8 +36,6 @@ namespace LibPulseTune
         {
             timer = new PlaybackTimer(16);
             timer.Tick += OnTimerElapsed;
-
-            volumeController = new VolumeController();
         }
 
         /// <summary>
@@ -54,7 +53,12 @@ namespace LibPulseTune
         /// <param name="volume"></param>
         public static void SetVolume(int volume)
         {
-            volumeController.Volume = volume;
+            AudioPlayer.volume = volume;
+
+            if (volumeController != null)
+            {
+                volumeController.Volume = volume;
+            }
         }
 
         /// <summary>
@@ -63,7 +67,7 @@ namespace LibPulseTune
         /// <returns></returns>
         public static int GetVolume()
         {
-            return volumeController.Volume;
+            return volume;
         }
 
         /// <summary>
@@ -144,17 +148,27 @@ namespace LibPulseTune
             {
                 currentDeviceInstance = outputDevice.CreateDeviceInstance();
 
-                var source = new AudioSourceToWaveProviderConverter(currentAudioSource);
-                volumeController.Source = source.ToSampleProvider();
-
-                // 浮動小数点数か？
-                if (source.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat)
+                // 古い音量コントローラがあれば削除
+                if (volumeController != null)
                 {
-                    currentDeviceInstance.Init(volumeController.ToWaveProvider());
+                    volumeController.Dispose();
+                    volumeController = null;
+                }
+
+                // 音量コントローラを作成
+                volumeController = new VolumeController(currentAudioSource);
+                volumeController.Volume = volume;
+
+                currentDeviceInstance.Init(volumeController);
+
+                /*// 浮動小数点数か？
+                if (currentAudioSource.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat)
+                {
+                    currentDeviceInstance.Init(volumeController);
                 }
                 else
                 {
-                    switch (source.WaveFormat.BitsPerSample)
+                    switch (currentAudioSource.WaveFormat.BitsPerSample)
                     {
                         case 16:
                             currentDeviceInstance.Init(new SampleToWaveProvider16(volumeController));
@@ -166,7 +180,7 @@ namespace LibPulseTune
                             currentDeviceInstance.Init(new SampleToWaveProvider(volumeController));
                             break;
                     }
-                }
+                }*/
             }
 
             SetAudioPlayerState(AUDIOPLAYER_STATE_STOP);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace LibPulseTune
+namespace LibPulseTune.Helpers
 {
     internal static class WinApiHelper
     {

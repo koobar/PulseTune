@@ -1,7 +1,9 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using LibPulseTune.Helpers;
 
 namespace LibPulseTune.AudioSource.ZilophiX
 {
@@ -35,11 +37,11 @@ namespace LibPulseTune.AudioSource.ZilophiX
         private readonly DZpXSeekTo _ZpXSeekTo;
         private readonly DZpXGetDurationMsec _ZpXGetDurationMsec;
         private readonly IntPtr decoder;
+        private readonly WaveFormat waveFormat;
         private readonly uint numTotalSamples;
-        private readonly uint sampleRate;
-        private readonly uint bitsPerSample;
-        private readonly uint channels;
+        private readonly int bytesPerSample;
         private bool isSeeking;
+        private bool isDisposed;
 
         // コンストラクタ
         public ZilophiXAudioSource(string path)
@@ -64,52 +66,19 @@ namespace LibPulseTune.AudioSource.ZilophiX
 
             this.decoder = ZpXCreateDecoder(path);
             this.numTotalSamples = ZpXGetNumTotalSamples(this.decoder);
-            this.sampleRate = ZpXGetSampleRate(this.decoder);
-            this.bitsPerSample = ZpXGetBitsPerSample(this.decoder);
-            this.channels = ZpXGetChannels(this.decoder);
-
+            this.waveFormat = new WaveFormat((int)ZpXGetSampleRate(this.decoder), (int)ZpXGetBitsPerSample(this.decoder), (int)ZpXGetChannels(this.decoder));
+            this.bytesPerSample = this.waveFormat.BitsPerSample >> 3;
             this.isSeeking = false;
         }
 
-        #region プロパティ
-
-        public uint SampleRate
+        /// <summary>
+        /// フォーマット
+        /// </summary>
+        public WaveFormat WaveFormat
         {
             get
             {
-                return this.sampleRate;
-            }
-        }
-
-        public uint BitsPerSample
-        {
-            get
-            {
-                return this.bitsPerSample;
-            }
-        }
-
-        public uint Channels
-        {
-            get
-            {
-                return this.channels;
-            }
-        }
-
-        public bool IsFloat
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        private int SampleSize
-        {
-            get
-            {
-                return (int)this.BitsPerSample / 8;
+                return this.waveFormat;
             }
         }
 
@@ -117,11 +86,9 @@ namespace LibPulseTune.AudioSource.ZilophiX
         {
             get
             {
-                return (this.SampleRate * this.Channels) / 1000.0;
+                return (this.waveFormat.SampleRate * this.waveFormat.Channels) / 1000.0;
             }
         }
-
-        #endregion
 
         #region ラッパー関数
 
@@ -220,14 +187,30 @@ namespace LibPulseTune.AudioSource.ZilophiX
             this.isSeeking = false;
         }
 
+        /// <summary>
+        /// 破棄
+        /// </summary>
         public void Dispose()
         {
+            if (this.isDisposed)
+            {
+                return;
+            }
+
             ZpXCloseFile(this.decoder);
             ZpXFreeDecoder(this.decoder);
             WinApi.FreeLibrary(this.pDll);
+            this.isDisposed = true;
         }
 
-        public int Decode(byte[] buffer, int offset, int count)
+        /// <summary>
+        /// オーディオデータを読み込む。
+        /// </summary>
+        /// <param name="buffer">デコード結果出力用バッファ</param>
+        /// <param name="offset">デコード結果出力用バッファの書き込み開始オフセット</param>
+        /// <param name="count">デコード結果出力用バッファに読み込むデータのバイト数</param>
+        /// <returns></returns>
+        public int Read(byte[] buffer, int offset, int count)
         {
             // シーク中にデータの読み込みを行うと、保護されたメモリ領域からPCMデータを
             // 読み込もうとして例外が発生するため、シーク中は無音データを返すこととする。
@@ -253,23 +236,17 @@ namespace LibPulseTune.AudioSource.ZilophiX
 
                 int sample = ZpXReadSample(this.decoder);
 
-                if (this.BitsPerSample >= 8)
+                unsafe
                 {
-                    buffer[offset++] = (byte)(sample & 0xFF);
-                }
-
-                if (this.BitsPerSample >= 16)
-                {
-                    buffer[offset++] = (byte)((sample >> 8) & 0xFF);
-                }
-
-                if (this.BitsPerSample >= 24)
-                {
-                    buffer[offset++] = (byte)((sample >> 16) & 0xFF);
+                    fixed(void* pBuffer = &buffer[offset])
+                    {
+                        Buffer.MemoryCopy(&sample, pBuffer, buffer.Length, this.bytesPerSample);
+                    }
                 }
 
                 // 後始末
-                result += this.SampleSize;
+                offset += this.bytesPerSample;
+                result += this.bytesPerSample;
             }
 
             return result;

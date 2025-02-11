@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LibPulseTune.Helpers;
+using NAudio.Wave;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -31,13 +33,14 @@ namespace LibPulseTune.AudioSource.WavPack
         private const int OPEN_WVC = 1;
         private const int OPEN_2CH_MAX = 0x08;
         private const int OPEN_NORMALIZE = 0x10;
+        private const int SAMPLES_TO_READ = 16;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)] private delegate IntPtr InternalWavpackOpenFileInput(string fileName, IntPtr error, int flags, int norm_offset);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint InternalWavpackGetSampleRate(IntPtr wpc);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint InternalWavpackGetNumSamples(IntPtr wpc);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int InternalWavpackGetNumChannels(IntPtr wpc);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int InternalWavpackGetBitsPerSample(IntPtr wpc);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint InternalWavpackUnpackSamples(IntPtr wpc, byte[] buffer, uint samples);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint InternalWavpackUnpackSamples(IntPtr wpc, IntPtr buffer, uint samples);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int InternalWavpackSeekSample(IntPtr wpc, uint sample);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint InternalWavpackGetSampleIndex(IntPtr wpc);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate IntPtr InternalWavpackCloseFile(IntPtr wpc);
@@ -57,7 +60,11 @@ namespace LibPulseTune.AudioSource.WavPack
         private readonly InternalWavpackCloseFile _wavPackCloseFile;
         private readonly InternalWavpackGetMode _wavPackGetMode;
         private readonly IntPtr wavPackContext;
-        private byte[] readBuffer;
+        private readonly WaveFormat waveFormat;
+        private readonly int bytesPerSample;
+        private readonly IntPtr readBuffer;
+        private readonly int readBufferSize;
+        private bool isDisposed;
 
         // コンストラクタ
         public WavPackAudioSource(string path)
@@ -101,9 +108,23 @@ namespace LibPulseTune.AudioSource.WavPack
             // エラーメッセージ領域を解放
             Marshal.FreeHGlobal(error);
 
+            // フォーマットを取得
+            if (WavpackGetMode(context).HasFlag(WavPackMode.Float))
+            {
+                this.waveFormat = WaveFormat.CreateIeeeFloatWaveFormat((int)WavpackGetSampleRate(context), WavpackGetBitsPerSample(context));
+            }
+            else
+            {
+                this.waveFormat = new WaveFormat((int)WavpackGetSampleRate(context), WavpackGetBitsPerSample(context), WavpackGetNumChannels(context));
+            }
+            this.bytesPerSample = this.waveFormat.BitsPerSample >> 3;
+
+            // デコード用バッファを確保
+            this.readBufferSize = WAVPACK_BYTES_PER_SAMPLE * SAMPLES_TO_READ * this.waveFormat.Channels;
+            this.readBuffer = Marshal.AllocHGlobal(this.readBufferSize);
+
             // 後始末
             this.wavPackContext = context;
-            this.readBuffer = null;
         }
 
         /// <summary>
@@ -127,44 +148,44 @@ namespace LibPulseTune.AudioSource.WavPack
             return this._wavPackOpenFileInput(fileName, error, flags, norm_offset);
         }
 
-        private uint WavpackGetSampleRate()
+        private uint WavpackGetSampleRate(IntPtr context)
         {
-            return this._wavPackGetSampleRate(this.wavPackContext);
+            return this._wavPackGetSampleRate(context);
         }
 
-        private uint WavpackGetNumSamples()
+        private uint WavpackGetNumSamples(IntPtr context)
         {
-            return this._wavPackGetNumSamples(this.wavPackContext);
+            return this._wavPackGetNumSamples(context);
         }
 
-        private int WavpackGetNumChannels()
+        private int WavpackGetNumChannels(IntPtr context)
         {
-            return this._wavPackGetNumChannels(this.wavPackContext);
+            return this._wavPackGetNumChannels(context);
         }
 
-        private int WavpackGetBitsPerSample()
+        private int WavpackGetBitsPerSample(IntPtr context)
         {
-            return this._wavPackGetBitsPerSample(this.wavPackContext);
+            return this._wavPackGetBitsPerSample(context);
         }
 
-        private uint WavpackUnpackSamples(byte[] buffer, uint samples)
+        private uint WavpackUnpackSamples(IntPtr context, IntPtr buffer, uint samples)
         {
-            return this._wavPackUnpackSamples(this.wavPackContext, buffer, samples);
+            return this._wavPackUnpackSamples(context, buffer, samples);
         }
 
-        private int WavpackSeekSample(uint sample)
+        private int WavpackSeekSample(IntPtr context, uint sample)
         {
-            return this._wavPackSeekSample(this.wavPackContext, sample);
+            return this._wavPackSeekSample(context, sample);
         }
 
-        private uint WavpackGetSampleIndex()
+        private uint WavpackGetSampleIndex(IntPtr context)
         {
-            return this._wavPackGetSampleIndex(this.wavPackContext);
+            return this._wavPackGetSampleIndex(context);
         }
 
-        private IntPtr WavpackCloseFile()
+        private IntPtr WavpackCloseFile(IntPtr context)
         {
-            return this._wavPackCloseFile(this.wavPackContext);
+            return this._wavPackCloseFile(context);
         }
 
         private WavPackMode WavpackGetMode(IntPtr wpc)
@@ -174,143 +195,96 @@ namespace LibPulseTune.AudioSource.WavPack
 
         #endregion
 
-        public uint SampleRate
+        /// <summary>
+        /// フォーマット
+        /// </summary>
+        public WaveFormat WaveFormat
         {
             get
             {
-                return WavpackGetSampleRate();
+                return this.waveFormat;
             }
         }
 
-        public uint BitsPerSample
+        /// <summary>
+        /// オーディオデータを読み込む。
+        /// </summary>
+        /// <param name="buffer">デコード結果出力用バッファ</param>
+        /// <param name="offset">デコード結果出力用バッファの書き込み開始オフセット</param>
+        /// <param name="count">デコード結果出力用バッファに読み込むデータのバイト数</param>
+        /// <returns></returns>
+        public int Read(byte[] buffer, int offset, int count)
         {
-            get
-            {
-                return (uint)WavpackGetBitsPerSample();
-            }
-        }
-
-        public uint Channels
-        {
-            get
-            {
-                return (uint)WavpackGetNumChannels();
-            }
-        }
-
-        public bool IsFloat
-        {
-            get
-            {
-                return WavpackGetMode(this.wavPackContext).HasFlag(WavPackMode.Float);
-            }
-        }
-
-        public int Decode(byte[] buffer, int offset, int length)
-        {
-            if (this.readBuffer == null)
-            {
-                // バッファがnullなら、各チャンネルのサンプルを1つ格納できるだけのバッファを確保する。
-                //
-                // WavPackでは、サンプルの量子化ビット数にかかわらず、常に4バイトでデコードされた
-                // サンプルが返されるため、必要とされるバッファのバイト数は次の式で計算できる：
-                //    4 × 各チャンネルからデコードするサンプル数 × チャンネル数
-                //
-                // ここでは、各チャンネルから1サンプルだけをデコードすることとする。
-                this.readBuffer = new byte[WAVPACK_BYTES_PER_SAMPLE * 1 * this.Channels];
-            }
-
             int totalBytesRead = 0;
-            uint bytesPerSample = this.BitsPerSample / 8;
-            uint sampleCount = (uint)(length / bytesPerSample);
+            int sampleCount = count / this.bytesPerSample;
+            int samplesPerLoop = this.waveFormat.Channels * SAMPLES_TO_READ;
 
-            for (uint i = 0; i < sampleCount; i += this.Channels)
+            for (int i = 0; i < sampleCount; i += samplesPerLoop)
             {
-                // 各チャンネルから1サンプルデコード
-                uint read = WavpackUnpackSamples(this.readBuffer, 1);
+                IntPtr pReadBuffer = this.readBuffer;
 
-                // デコードされたサンプル数が0サンプルであるか、または、デコード結果用バッファのオフセットが境界外ならループを抜ける。
-                if (read == 0 || offset >= buffer.Length)
+                // 各チャンネルからサンプルをデコード
+                uint read = WavpackUnpackSamples(this.wavPackContext, this.readBuffer, SAMPLES_TO_READ);
+
+                // デコードされたサンプル数が0サンプルであれば読み込み終了。
+                if (read == 0)
                 {
                     break;
                 }
 
-                switch (bytesPerSample)
+                for (int src = 0; src < this.readBufferSize; src += WAVPACK_BYTES_PER_SAMPLE)
                 {
-                    case 1:
-                        {
-                            // 各チャンネルのサンプル（4バイトで返されている）から、下位1バイトを取得してデコード結果用バッファに格納
-                            for (int src = 0; src < this.readBuffer.Length; src += WAVPACK_BYTES_PER_SAMPLE)
-                            {
-                                buffer[offset++] = this.readBuffer[src];
-                            }
-                        }
+                    // デコード結果出力用バッファのオフセットが境界外なら読み込み終了。
+                    if (offset >= buffer.Length)
+                    {
                         break;
-                    case 2:
-                        {
-                            // 各チャンネルのサンプル（4バイトで返されている）から、下位2バイトを取得してデコード結果用バッファに格納
-                            for (int src = 0; src < this.readBuffer.Length; src += WAVPACK_BYTES_PER_SAMPLE)
-                            {
-                                buffer[offset++] = this.readBuffer[src];
-                                buffer[offset++] = this.readBuffer[src + 1];
-                            }
-                        }
-                        break;
-                    case 3:
-                        {
-                            // 各チャンネルのサンプル（4バイトで返されている）から、下位3バイトを取得してデコード結果用バッファに格納
-                            for (int src = 0; src < this.readBuffer.Length; src += WAVPACK_BYTES_PER_SAMPLE)
-                            {
-                                buffer[offset++] = this.readBuffer[src];
-                                buffer[offset++] = this.readBuffer[src + 1];
-                                buffer[offset++] = this.readBuffer[src + 2];
-                            }
-                        }
-                        break;
-                    case 4:
-                        {
-                            // 各チャンネルのサンプルを取得してデコード結果用バッファに格納
-                            // 返されたサンプルのバイト数と求められるサンプルのバイト数が一致するため、そのままコピーでOK
-                            for (int src = 0; src < this.readBuffer.Length; src += WAVPACK_BYTES_PER_SAMPLE)
-                            {
-                                buffer[offset++] = this.readBuffer[src];
-                                buffer[offset++] = this.readBuffer[src + 1];
-                                buffer[offset++] = this.readBuffer[src + 2];
-                                buffer[offset++] = this.readBuffer[src + 3];
-                            }
-                        }
-                        break;
-                }
+                    }
 
-                totalBytesRead += (int)(bytesPerSample * this.Channels);
+                    // 読み込み用バッファからデコード結果出力用バッファにデータを転送
+                    Marshal.Copy(pReadBuffer, buffer, offset, bytesPerSample);
+                    
+                    // 各種更新
+                    pReadBuffer += WAVPACK_BYTES_PER_SAMPLE;
+                    offset += bytesPerSample;
+                    totalBytesRead += bytesPerSample;
+                }
             }
 
             return totalBytesRead;
         }
 
+        /// <summary>
+        /// 破棄
+        /// </summary>
         public void Dispose()
         {
-            WavpackCloseFile();
+            if (this.isDisposed)
+            {
+                return;
+            }
+
+            WavpackCloseFile(this.wavPackContext);
             WinApi.FreeLibrary(this.wavPackModule);
+            Marshal.FreeHGlobal(this.readBuffer);
+
+            this.isDisposed = true;
         }
 
         public TimeSpan GetCurrentTime()
         {
-            var sampleIndex = WavpackGetSampleIndex();
-
-            return TimeSpan.FromSeconds(sampleIndex / (this.SampleRate * this.Channels));
+            return TimeSpan.FromMilliseconds(WavpackGetSampleIndex(this.wavPackContext) / ((this.waveFormat.SampleRate / 1000.0) * this.waveFormat.Channels));
         }
 
         public TimeSpan GetDuration()
         {
-            return TimeSpan.FromSeconds(WavpackGetNumSamples() / (this.SampleRate * this.Channels));
+            return TimeSpan.FromMilliseconds(WavpackGetNumSamples(this.wavPackContext) / ((this.waveFormat.SampleRate / 1000.0) * this.waveFormat.Channels));
         }
 
         public void SetCurrentTime(TimeSpan time)
         {
-            var sampleIndex = time.TotalSeconds * (this.SampleRate * this.Channels);
+            var sampleIndex = time.TotalMilliseconds * ((this.waveFormat.SampleRate / 1000.0) * this.waveFormat.Channels);
 
-            WavpackSeekSample((uint)sampleIndex);
+            WavpackSeekSample(this.wavPackContext, (uint)Math.Round(sampleIndex));
         }
     }
 }

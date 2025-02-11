@@ -69,7 +69,7 @@ namespace LibPulseTune.Wasapi
         #region プロパティ
 
         /// <summary>
-        /// 自動変換時のリサンプラーの品質（１～６０）
+        /// 自動変換時のリサンプラーの品質(1～60)
         /// </summary>
         public int AutoResamplerQuality { set; get; } = 60;
 
@@ -163,7 +163,7 @@ namespace LibPulseTune.Wasapi
 
                 // バッファに初回分のデータを格納する。
                 this.bufferFrameCount = this.audioClient.BufferSize;
-                this.bytesPerFrame = this.OutputWaveFormat.Channels * this.OutputWaveFormat.BitsPerSample / 8;
+                this.bytesPerFrame = this.OutputWaveFormat.Channels * (this.OutputWaveFormat.BitsPerSample >> 3);
                 this.readBuffer = BufferHelpers.Ensure(this.readBuffer, this.bufferFrameCount * this.bytesPerFrame);
                 if (FillBuffer(playbackProvider, this.bufferFrameCount))
                 {
@@ -332,7 +332,6 @@ namespace LibPulseTune.Wasapi
             else
             {
                 int actualFrameCount = read / this.bytesPerFrame;
-
                 this.renderClient.ReleaseBuffer(actualFrameCount, AudioClientBufferFlags.None);
             }
 
@@ -490,7 +489,6 @@ namespace LibPulseTune.Wasapi
             
             if (this.isUsingEventSync)
             {
-                // Init Shared or Exclusive
                 if (this.shareMode == AudioClientShareMode.Shared)
                 {
                     this.audioClient.Initialize(this.shareMode, AudioClientStreamFlags.EventCallback | flags, latencyRefTimes, 0, this.OutputWaveFormat, Guid.Empty);

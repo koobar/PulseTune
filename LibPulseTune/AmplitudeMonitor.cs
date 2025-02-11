@@ -1,6 +1,9 @@
-﻿using System;
+﻿using LibPulseTune.AudioSource;
+using NAudio.Wave;
+using System;
+using static LibPulseTune.Helpers.BufferHelper;
 
-namespace LibPulseTune.AudioSource
+namespace LibPulseTune
 {
     public class AmplitudeMonitor : IAudioSource
     {
@@ -10,17 +13,19 @@ namespace LibPulseTune.AudioSource
         private readonly float[][] buffers;             // チャンネルごとの振幅バッファ
         private readonly int[] bufferIndexes;           // チャンネルごとの振幅バッファのアクセスインデックス
         private readonly object lockObj;                // 共有オブジェクトのロック用オブジェクト
+        private readonly int bytesPerSample;
 
         // コンストラクタ
         public AmplitudeMonitor(IAudioSource source)
         {
             this.source = source;
-            this.samplesPerMillisecond = (int)Math.Round(this.source.SampleRate / 1000.0);
-            this.buffers = new float[source.Channels][];
-            this.bufferIndexes = new int[source.Channels];
+            this.samplesPerMillisecond = (int)Math.Round(this.source.WaveFormat.SampleRate / 1000.0);
+            this.buffers = new float[source.WaveFormat.Channels][];
+            this.bufferIndexes = new int[source.WaveFormat.Channels];
             this.lockObj = new object();
+            this.bytesPerSample = this.WaveFormat.BitsPerSample >> 3;
 
-            for (int ch = 0; ch < source.Channels; ++ch)
+            for (int ch = 0; ch < source.WaveFormat.Channels; ++ch)
             {
                 this.buffers[ch] = new float[128];
             }
@@ -28,50 +33,36 @@ namespace LibPulseTune.AudioSource
 
         #region IAudioSourceの実装
 
-        public uint SampleRate
+        /// <summary>
+        /// フォーマット
+        /// </summary>
+        public WaveFormat WaveFormat
         {
             get
             {
-                return this.source.SampleRate;
+                return this.source.WaveFormat;
             }
         }
 
-        public uint BitsPerSample
-        {
-            get
-            {
-                return this.source.BitsPerSample;
-            }
-        }
-
-        public uint Channels
-        {
-            get
-            {
-                return this.source.Channels;
-            }
-        }
-
-        public bool IsFloat
-        {
-            get
-            {
-                return this.source.IsFloat;
-            }
-        }
-
-        public int Decode(byte[] buffer, int offset, int length)
+        /// <summary>
+        /// 読み込み
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public int Read(byte[] buffer, int offset, int count)
         {
             lock (this.lockObj)
             {
-                int read = this.source.Decode(buffer, offset, length);
-                var readSapmles = read / (this.BitsPerSample / 8);
-                int samplesPerCh = (int)(readSapmles / this.Channels);
+                int read = this.source.Read(buffer, offset, count);
+                var readSamples = read / this.bytesPerSample;
+                int samplesPerCh = readSamples / this.WaveFormat.Channels;
 
                 // バッファのサイズとチャンネルごとのサンプル数が不一致ならバッファをリサイズ
                 if (samplesPerCh != this.buffers[0].Length)
                 {
-                    for (int ch = 0; ch < this.Channels; ++ch)
+                    for (int ch = 0; ch < this.WaveFormat.Channels; ++ch)
                     {
                         Array.Resize(ref this.buffers[ch], samplesPerCh);
                         Array.Clear(this.buffers[ch], 0, samplesPerCh);
@@ -81,14 +72,14 @@ namespace LibPulseTune.AudioSource
                 int index = offset;
                 for (int i = 0; i < samplesPerCh; ++i)
                 {
-                    for (int ch = 0; ch < this.Channels; ++ch)
+                    for (int ch = 0; ch < this.WaveFormat.Channels; ++ch)
                     {
-                        this.buffers[ch][i] = Math.Abs(ReadSampleFromBuffer(buffer, ref index));
+                        this.buffers[ch][i] = Math.Abs(ReadSampleFromBuffer(buffer, ref index, this.WaveFormat));
                     }
                 }
 
                 // 各チャンネルのバッファへのアクセスインデックスを初期化
-                for (int ch = 0; ch < this.Channels; ++ch)
+                for (int ch = 0; ch < this.WaveFormat.Channels; ++ch)
                 {
                     this.bufferIndexes[ch] = 0;
                 }
@@ -97,71 +88,42 @@ namespace LibPulseTune.AudioSource
             }
         }
 
+        /// <summary>
+        /// 破棄
+        /// </summary>
         public void Dispose()
         {
             this.source.Dispose();
         }
 
+        /// <summary>
+        /// 再生位置を取得する。
+        /// </summary>
+        /// <returns></returns>
         public TimeSpan GetCurrentTime()
         {
             return this.source.GetCurrentTime();
         }
 
+        /// <summary>
+        /// 曲の長さを取得する。
+        /// </summary>
+        /// <returns></returns>
         public TimeSpan GetDuration()
         {
             return this.source.GetDuration();
         }
 
+        /// <summary>
+        /// 再生位置を設定する。
+        /// </summary>
+        /// <param name="time"></param>
         public void SetCurrentTime(TimeSpan time)
         {
             this.source.SetCurrentTime(time);
         }
 
         #endregion
-
-        /// <summary>
-        /// 指定されたバッファの指定されたオフセット以降から次の1サンプルを読み込む。
-        /// </summary>
-        /// <param name="buffer"></param>
-        /// <param name="offset"></param>
-        /// <returns></returns>
-        private float ReadSampleFromBuffer(byte[] buffer, ref int offset)
-        {
-            int sample = 0;
-            int m = 0;
-
-            switch (this.BitsPerSample)
-            {
-                case 8:
-                    m = 128;
-                    sample = buffer[offset++] - 128;
-                    break;
-                case 16:
-                    m = 32767;
-                    sample = (sbyte)buffer[offset + 1] << 8 | buffer[offset];
-                    offset += 2;
-                    break;
-                case 24:
-                    m = 8388607;
-                    sample = (sbyte)buffer[offset + 2] << 16 | (buffer[offset + 1] << 8) | buffer[offset];
-                    offset += 3;
-                    break;
-                case 32:
-                    if (this.IsFloat)
-                    {
-                        return BitConverter.ToSingle(new byte[] { buffer[offset++], buffer[offset++], buffer[offset++], buffer[offset++] }, 0);
-                    }
-                    else
-                    {
-                        m = int.MaxValue;
-                        sample = BitConverter.ToInt32(new byte[] { buffer[offset++], buffer[offset++], buffer[offset++], buffer[offset++] }, 0);
-                        offset += 4;
-                    }
-                    break;
-            }
-
-            return sample / (float)m;
-        }
 
         /// <summary>
         /// 指定されたチャンネルのバッファ済みサンプルデータのうち、指定されたミリ秒だけ進んだ時間までの最大振幅を取得する。
@@ -206,7 +168,7 @@ namespace LibPulseTune.AudioSource
         /// </summary>
         public void Reset()
         {
-            for (int ch = 0; ch < this.source.Channels; ++ch)
+            for (int ch = 0; ch < this.source.WaveFormat.Channels; ++ch)
             {
                 Array.Clear(this.buffers[ch], 0, this.buffers[ch].Length);
             }

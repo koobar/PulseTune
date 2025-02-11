@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace PulseTune.Dialogs
@@ -848,7 +847,7 @@ namespace PulseTune.Dialogs
 
             var msec = AudioPlayer.GetTimerInterval();
 
-            if (source.Channels >= 2)
+            if (source.WaveFormat.Channels >= 2)
             {
                 this.LeftChannelVolumeMeter.Amplitude = source.GetAmplitude(0, msec);
                 this.RightChannelVolumeMeter.Amplitude = source.GetAmplitude(1, msec);

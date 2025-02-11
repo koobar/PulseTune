@@ -45,9 +45,7 @@ namespace LibPulseTune
         /// </summary>
         private static void LoadBuiltinCodecs()
         {
-            AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisAudioSource), ".ogg");
-            AudioSourceProvider.RegisterDecoder("Audio CD Track", typeof(CDAudioSource), ".cda");
-
+            // MediaFoundation（OS組み込みデコーダ）でデコードするフォーマットを登録
             AudioSourceProvider.RegisterDecoder("WAV", typeof(MediaFoundationAudioSource), ".wav");
             AudioSourceProvider.RegisterDecoder("AIFF", typeof(MediaFoundationAudioSource), ".aif", ".aiff");
             AudioSourceProvider.RegisterDecoder("Free Lossless Audio Codec", typeof(MediaFoundationAudioSource), ".flac");
@@ -55,6 +53,12 @@ namespace LibPulseTune
             AudioSourceProvider.RegisterDecoder("MPEG-1 Audio Layer-3", typeof(MediaFoundationAudioSource), ".mp3");
             AudioSourceProvider.RegisterDecoder("M4A", typeof(MediaFoundationAudioSource), ".m4a");
             AudioSourceProvider.RegisterDecoder("Windows Media Audio", typeof(MediaFoundationAudioSource), ".wma");
+
+            // Vorbisを登録
+            AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisAudioSource), ".ogg");
+            
+            // オーディオCDデコーダを登録
+            AudioSourceProvider.RegisterDecoder("Audio CD Track", typeof(CDAudioSource), ".cda");
 
             // WavPackが使用可能なら登録
             if (WavPackAudioSource.IsAvailable())

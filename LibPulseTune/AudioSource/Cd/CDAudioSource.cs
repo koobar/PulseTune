@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using static LibPulseTune.AudioSource.Cd.CDDA;
@@ -11,6 +12,7 @@ namespace LibPulseTune.AudioSource.Cd
         // 非公開フィールド
         private readonly object lockObject = new object();
         private readonly CDTrack track;
+        private readonly WaveFormat waveFormat;
         private readonly IntPtr pRawReadInfo;
         private DiskDrive diskDrive;
         private uint sectorIndex;
@@ -22,6 +24,7 @@ namespace LibPulseTune.AudioSource.Cd
         {
             this.diskDrive = drive;
             this.track = track;
+            this.waveFormat = new WaveFormat((int)PCM_SAMPLE_RATE, (int)PCM_BITS_PER_SAMPLE, (int)PCM_CHANNELS);
             this.sectorIndex = track.GetStartSector();
             this.isDisposed = false;
 
@@ -79,82 +82,69 @@ namespace LibPulseTune.AudioSource.Cd
 
         #endregion
 
-        #region プロパティ
-
-        public uint SampleRate
+        /// <summary>
+        /// フォーマット
+        /// </summary>
+        public WaveFormat WaveFormat
         {
             get
             {
-                return PCM_SAMPLE_RATE;
+                return this.waveFormat;
             }
         }
-
-        public uint BitsPerSample
-        {
-            get
-            {
-                return PCM_BITS_PER_SAMPLE;
-            }
-        }
-
-        public uint Channels
-        {
-            get
-            {
-                return PCM_CHANNELS;
-            }
-        }
-
-        public bool IsFloat
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        #endregion
 
         /// <summary>
-        /// CD-DAからPCMデータを読み込む。
+        /// ディスクから次のセクタを読み込み、指定されたバッファに格納する。
         /// </summary>
         /// <param name="buffer"></param>
         /// <param name="offset"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public int Decode(byte[] buffer, int offset, int count)
+        private int ReadNextSector(byte[] buffer, int offset, int count)
+        {
+            var sectorCount = Math.Min(DiskDrive.SECTORS_TO_READ, this.sectorIndex - this.track.GetEndSector());
+
+            // RAW_READ_INFO構造体領域にディスクオフセット、読み込むセクタ数、トラックのモードの指定を書き込む。
+            // 当然ながら、この書き込み順は変更してはならない。
+            Marshal.WriteInt64(this.pRawReadInfo, this.sectorIndex * CB_CDROM_SECTOR);
+            Marshal.WriteInt32(this.pRawReadInfo, 8, (int)sectorCount);
+            Marshal.WriteInt32(this.pRawReadInfo, 12, (int)CDROM_TRACK_MODE_TYPE_CDDA);
+
+            // セクタからオーディオデータを読み込み、bufferに格納する。
+            var bufferHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);                     // buffer[0] のアドレスが取得される。Cの &buffer[0] と同じ。
+            var bufferPtr = bufferHandle.AddrOfPinnedObject() + (sizeof(byte) * offset);        // buffer[offset] のアドレスを計算。buffer[0]のアドレスに、データのサイズ × offsetを足せばよい。
+            if (!DeviceIoControl(
+                    this.diskDrive.GetHandle(),
+                    IOCTL_CDROM_RAW_READ,
+                    this.pRawReadInfo,
+                    SIZE_OF_RAW_READ_INFO,
+                    bufferPtr,
+                    (uint)count,
+                    out var read,
+                    IntPtr.Zero))
+            {
+                Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+            }
+
+            // 後始末
+            bufferHandle.Free();                    // セクタの読み込みに使用したbufferがGCで解放されるように、GCHandleを解放する。
+            this.sectorIndex += sectorCount;        // 読み込んだセクタ数を加算する。
+
+            return (int)read;
+        }
+
+        /// <summary>
+        /// オーディオデータを読み込む。
+        /// </summary>
+        /// <param name="buffer">デコード結果出力用バッファ</param>
+        /// <param name="offset">デコード結果出力用バッファの書き込み開始オフセット</param>
+        /// <param name="count">デコード結果出力用バッファに読み込むデータのバイト数</param>
+        /// <returns></returns>
+        public int Read(byte[] buffer, int offset, int count)
         {
             lock (this.lockObject)
             {
-                var sectorCount = Math.Min(DiskDrive.SECTORS_TO_READ, this.sectorIndex - this.track.GetEndSector());
-
-                // RAW_READ_INFO構造体領域にディスクオフセット、読み込むセクタ数、トラックのモードの指定を書き込む。
-                // 当然ながら、この書き込み順は変更してはならない。
-                Marshal.WriteInt64(this.pRawReadInfo, this.sectorIndex * CB_CDROM_SECTOR);
-                Marshal.WriteInt32(this.pRawReadInfo, 8, (int)sectorCount);
-                Marshal.WriteInt32(this.pRawReadInfo, 12, (int)CDROM_TRACK_MODE_TYPE_CDDA);
-
-                // セクタからオーディオデータを読み込み、bufferに格納する。
-                var bufferHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);                     // buffer[0] のアドレスが取得される。Cの &buffer[0] と同じ。
-                var bufferPtr = bufferHandle.AddrOfPinnedObject() + (sizeof(byte) * offset);        // buffer[offset] のアドレスを計算。buffer[0]のアドレスに、データのサイズ × offsetを足せばよい。
-                if (!DeviceIoControl(
-                        this.diskDrive.GetHandle(),
-                        IOCTL_CDROM_RAW_READ,
-                        this.pRawReadInfo,
-                        SIZE_OF_RAW_READ_INFO,
-                        bufferPtr,
-                        (uint)count,
-                        out var read,
-                        IntPtr.Zero))
-                {
-                    Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
-                }
-
-                // 後始末
-                bufferHandle.Free();                    // セクタの読み込みに使用したbufferがGCで解放されるように、GCHandleを解放する。
-                this.sectorIndex += sectorCount;        // 読み込んだセクタ数を加算する。
-
-                return (int)read;
+                return ReadNextSector(buffer, offset, count);
             }
         }
 
