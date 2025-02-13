@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using PulseTune.Utils;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -8,8 +9,8 @@ namespace PulseTune.Controls
     internal class PlaylistExplorer : ListView
     {
         // 非公開フィールド
-        private readonly ListViewGroup favoritesGroup;
-        private readonly ListViewGroup recentsGroup;
+        private ListViewGroup favoritesGroup;
+        private ListViewGroup recentsGroup;
         private readonly ContextMenu contextMenu;
         private readonly MenuItem addPlaylistToFavoriteMenuItem;
         private readonly MenuItem addFolderToFavoriteMenuItem;
@@ -41,12 +42,6 @@ namespace PulseTune.Controls
             this.contextMenu.MenuItems.Add(this.deleteItemMenuItem);
 
             this.ContextMenu = this.contextMenu;
-            this.favoritesGroup = new ListViewGroup();
-            this.favoritesGroup.Header = "お気に入り";
-            this.favoritesGroup.HeaderAlignment = HorizontalAlignment.Center;
-            this.recentsGroup = new ListViewGroup();
-            this.recentsGroup.Header = "最近開いた場所";
-            this.favoritesGroup.HeaderAlignment = HorizontalAlignment.Center;
 
             PlaylistExplorerData.FavoriteLocationsChanged += delegate
             {
@@ -191,6 +186,16 @@ namespace PulseTune.Controls
             this.FullRowSelect = true;
             this.MultiSelect = false;
             this.ShowGroups = true;
+
+            if (!this.IsDesignMode())
+            {
+                this.favoritesGroup = new ListViewGroup();
+                this.favoritesGroup.Header = "お気に入り";
+                this.favoritesGroup.HeaderAlignment = HorizontalAlignment.Center;
+                this.recentsGroup = new ListViewGroup();
+                this.recentsGroup.Header = "最近開いた場所";
+                this.favoritesGroup.HeaderAlignment = HorizontalAlignment.Center;
+            }
 
             this.Columns.Add(new ColumnHeader() { Text = "名前" });
             this.Columns.Add(new ColumnHeader() { Text = "種類" });

@@ -37,87 +37,12 @@
             System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
             System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup22 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup23 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup24 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup25 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup26 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup27 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup28 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup29 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup30 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup31 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup32 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup33 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup34 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup35 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup36 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup37 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup38 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup39 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup40 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup41 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup42 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup43 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup44 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup45 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup46 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup47 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup48 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup49 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup50 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup51 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup52 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup53 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup54 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup55 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup56 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup57 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup58 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup59 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup60 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup61 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup62 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup63 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup64 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup65 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup66 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup67 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup68 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup69 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup70 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup71 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup72 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup73 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup74 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup75 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup76 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup77 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup78 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup79 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup80 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup81 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup82 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup83 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup84 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.StatusBar = new System.Windows.Forms.StatusStrip();
             this.StatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.PlaybackTimeStatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.waveformRenderer1 = new PulseTune.Controls.WaveformRenderer();
             this.LeftChannelVolumeMeter = new PulseTune.Controls.VolumeMeterControl();
             this.RightChannelVolumeMeter = new PulseTune.Controls.VolumeMeterControl();
             this.TrackPictureViewer = new PulseTune.Controls.PictureViewer();
@@ -193,6 +118,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.waveformRenderer1);
             this.panel1.Controls.Add(this.LeftChannelVolumeMeter);
             this.panel1.Controls.Add(this.RightChannelVolumeMeter);
             this.panel1.Controls.Add(this.TrackPictureViewer);
@@ -202,6 +128,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(150, 569);
             this.panel1.TabIndex = 5;
+            // 
+            // waveformRenderer1
+            // 
+            this.waveformRenderer1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.waveformRenderer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.waveformRenderer1.Location = new System.Drawing.Point(3, 336);
+            this.waveformRenderer1.Name = "waveformRenderer1";
+            this.waveformRenderer1.Size = new System.Drawing.Size(144, 43);
+            this.waveformRenderer1.TabIndex = 12;
             // 
             // LeftChannelVolumeMeter
             // 
@@ -264,196 +200,6 @@
             listViewGroup8.Header = "お気に入り";
             listViewGroup8.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
             listViewGroup8.Name = null;
-            listViewGroup9.Header = "最近開いた場所";
-            listViewGroup9.Name = null;
-            listViewGroup10.Header = "お気に入り";
-            listViewGroup10.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup10.Name = null;
-            listViewGroup11.Header = "最近開いた場所";
-            listViewGroup11.Name = null;
-            listViewGroup12.Header = "お気に入り";
-            listViewGroup12.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup12.Name = null;
-            listViewGroup13.Header = "最近開いた場所";
-            listViewGroup13.Name = null;
-            listViewGroup14.Header = "お気に入り";
-            listViewGroup14.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup14.Name = null;
-            listViewGroup15.Header = "最近開いた場所";
-            listViewGroup15.Name = null;
-            listViewGroup16.Header = "お気に入り";
-            listViewGroup16.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup16.Name = null;
-            listViewGroup17.Header = "最近開いた場所";
-            listViewGroup17.Name = null;
-            listViewGroup18.Header = "お気に入り";
-            listViewGroup18.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup18.Name = null;
-            listViewGroup19.Header = "最近開いた場所";
-            listViewGroup19.Name = null;
-            listViewGroup20.Header = "お気に入り";
-            listViewGroup20.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup20.Name = null;
-            listViewGroup21.Header = "最近開いた場所";
-            listViewGroup21.Name = null;
-            listViewGroup22.Header = "お気に入り";
-            listViewGroup22.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup22.Name = null;
-            listViewGroup23.Header = "最近開いた場所";
-            listViewGroup23.Name = null;
-            listViewGroup24.Header = "お気に入り";
-            listViewGroup24.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup24.Name = null;
-            listViewGroup25.Header = "最近開いた場所";
-            listViewGroup25.Name = null;
-            listViewGroup26.Header = "お気に入り";
-            listViewGroup26.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup26.Name = null;
-            listViewGroup27.Header = "最近開いた場所";
-            listViewGroup27.Name = null;
-            listViewGroup28.Header = "お気に入り";
-            listViewGroup28.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup28.Name = null;
-            listViewGroup29.Header = "最近開いた場所";
-            listViewGroup29.Name = null;
-            listViewGroup30.Header = "お気に入り";
-            listViewGroup30.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup30.Name = null;
-            listViewGroup31.Header = "最近開いた場所";
-            listViewGroup31.Name = null;
-            listViewGroup32.Header = "お気に入り";
-            listViewGroup32.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup32.Name = null;
-            listViewGroup33.Header = "最近開いた場所";
-            listViewGroup33.Name = null;
-            listViewGroup34.Header = "お気に入り";
-            listViewGroup34.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup34.Name = null;
-            listViewGroup35.Header = "最近開いた場所";
-            listViewGroup35.Name = null;
-            listViewGroup36.Header = "お気に入り";
-            listViewGroup36.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup36.Name = null;
-            listViewGroup37.Header = "最近開いた場所";
-            listViewGroup37.Name = null;
-            listViewGroup38.Header = "お気に入り";
-            listViewGroup38.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup38.Name = null;
-            listViewGroup39.Header = "最近開いた場所";
-            listViewGroup39.Name = null;
-            listViewGroup40.Header = "お気に入り";
-            listViewGroup40.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup40.Name = null;
-            listViewGroup41.Header = "最近開いた場所";
-            listViewGroup41.Name = null;
-            listViewGroup42.Header = "お気に入り";
-            listViewGroup42.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup42.Name = null;
-            listViewGroup43.Header = "最近開いた場所";
-            listViewGroup43.Name = null;
-            listViewGroup44.Header = "お気に入り";
-            listViewGroup44.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup44.Name = null;
-            listViewGroup45.Header = "最近開いた場所";
-            listViewGroup45.Name = null;
-            listViewGroup46.Header = "お気に入り";
-            listViewGroup46.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup46.Name = null;
-            listViewGroup47.Header = "最近開いた場所";
-            listViewGroup47.Name = null;
-            listViewGroup48.Header = "お気に入り";
-            listViewGroup48.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup48.Name = null;
-            listViewGroup49.Header = "最近開いた場所";
-            listViewGroup49.Name = null;
-            listViewGroup50.Header = "お気に入り";
-            listViewGroup50.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup50.Name = null;
-            listViewGroup51.Header = "最近開いた場所";
-            listViewGroup51.Name = null;
-            listViewGroup52.Header = "お気に入り";
-            listViewGroup52.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup52.Name = null;
-            listViewGroup53.Header = "最近開いた場所";
-            listViewGroup53.Name = null;
-            listViewGroup54.Header = "お気に入り";
-            listViewGroup54.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup54.Name = null;
-            listViewGroup55.Header = "最近開いた場所";
-            listViewGroup55.Name = null;
-            listViewGroup56.Header = "お気に入り";
-            listViewGroup56.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup56.Name = null;
-            listViewGroup57.Header = "最近開いた場所";
-            listViewGroup57.Name = null;
-            listViewGroup58.Header = "お気に入り";
-            listViewGroup58.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup58.Name = null;
-            listViewGroup59.Header = "最近開いた場所";
-            listViewGroup59.Name = null;
-            listViewGroup60.Header = "お気に入り";
-            listViewGroup60.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup60.Name = null;
-            listViewGroup61.Header = "最近開いた場所";
-            listViewGroup61.Name = null;
-            listViewGroup62.Header = "お気に入り";
-            listViewGroup62.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup62.Name = null;
-            listViewGroup63.Header = "最近開いた場所";
-            listViewGroup63.Name = null;
-            listViewGroup64.Header = "お気に入り";
-            listViewGroup64.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup64.Name = null;
-            listViewGroup65.Header = "最近開いた場所";
-            listViewGroup65.Name = null;
-            listViewGroup66.Header = "お気に入り";
-            listViewGroup66.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup66.Name = null;
-            listViewGroup67.Header = "最近開いた場所";
-            listViewGroup67.Name = null;
-            listViewGroup68.Header = "お気に入り";
-            listViewGroup68.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup68.Name = null;
-            listViewGroup69.Header = "最近開いた場所";
-            listViewGroup69.Name = null;
-            listViewGroup70.Header = "お気に入り";
-            listViewGroup70.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup70.Name = null;
-            listViewGroup71.Header = "最近開いた場所";
-            listViewGroup71.Name = null;
-            listViewGroup72.Header = "お気に入り";
-            listViewGroup72.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup72.Name = null;
-            listViewGroup73.Header = "最近開いた場所";
-            listViewGroup73.Name = null;
-            listViewGroup74.Header = "お気に入り";
-            listViewGroup74.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup74.Name = null;
-            listViewGroup75.Header = "最近開いた場所";
-            listViewGroup75.Name = null;
-            listViewGroup76.Header = "お気に入り";
-            listViewGroup76.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup76.Name = null;
-            listViewGroup77.Header = "最近開いた場所";
-            listViewGroup77.Name = null;
-            listViewGroup78.Header = "お気に入り";
-            listViewGroup78.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup78.Name = null;
-            listViewGroup79.Header = "最近開いた場所";
-            listViewGroup79.Name = null;
-            listViewGroup80.Header = "お気に入り";
-            listViewGroup80.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup80.Name = null;
-            listViewGroup81.Header = "最近開いた場所";
-            listViewGroup81.Name = null;
-            listViewGroup82.Header = "お気に入り";
-            listViewGroup82.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup82.Name = null;
-            listViewGroup83.Header = "最近開いた場所";
-            listViewGroup83.Name = null;
-            listViewGroup84.Header = "お気に入り";
-            listViewGroup84.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup84.Name = null;
             this.PlaylistBrowser.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
             listViewGroup1,
             listViewGroup2,
@@ -462,89 +208,13 @@
             listViewGroup5,
             listViewGroup6,
             listViewGroup7,
-            listViewGroup8,
-            listViewGroup9,
-            listViewGroup10,
-            listViewGroup11,
-            listViewGroup12,
-            listViewGroup13,
-            listViewGroup14,
-            listViewGroup15,
-            listViewGroup16,
-            listViewGroup17,
-            listViewGroup18,
-            listViewGroup19,
-            listViewGroup20,
-            listViewGroup21,
-            listViewGroup22,
-            listViewGroup23,
-            listViewGroup24,
-            listViewGroup25,
-            listViewGroup26,
-            listViewGroup27,
-            listViewGroup28,
-            listViewGroup29,
-            listViewGroup30,
-            listViewGroup31,
-            listViewGroup32,
-            listViewGroup33,
-            listViewGroup34,
-            listViewGroup35,
-            listViewGroup36,
-            listViewGroup37,
-            listViewGroup38,
-            listViewGroup39,
-            listViewGroup40,
-            listViewGroup41,
-            listViewGroup42,
-            listViewGroup43,
-            listViewGroup44,
-            listViewGroup45,
-            listViewGroup46,
-            listViewGroup47,
-            listViewGroup48,
-            listViewGroup49,
-            listViewGroup50,
-            listViewGroup51,
-            listViewGroup52,
-            listViewGroup53,
-            listViewGroup54,
-            listViewGroup55,
-            listViewGroup56,
-            listViewGroup57,
-            listViewGroup58,
-            listViewGroup59,
-            listViewGroup60,
-            listViewGroup61,
-            listViewGroup62,
-            listViewGroup63,
-            listViewGroup64,
-            listViewGroup65,
-            listViewGroup66,
-            listViewGroup67,
-            listViewGroup68,
-            listViewGroup69,
-            listViewGroup70,
-            listViewGroup71,
-            listViewGroup72,
-            listViewGroup73,
-            listViewGroup74,
-            listViewGroup75,
-            listViewGroup76,
-            listViewGroup77,
-            listViewGroup78,
-            listViewGroup79,
-            listViewGroup80,
-            listViewGroup81,
-            listViewGroup82,
-            listViewGroup83,
-            listViewGroup84});
+            listViewGroup8});
             this.PlaylistBrowser.HideSelection = false;
             this.PlaylistBrowser.Location = new System.Drawing.Point(3, 3);
             this.PlaylistBrowser.MultiSelect = false;
             this.PlaylistBrowser.Name = "PlaylistBrowser";
             this.PlaylistBrowser.ShowItemToolTips = true;
-            this.PlaylistBrowser.Size = new System.Drawing.Size(144, 376);
+            this.PlaylistBrowser.Size = new System.Drawing.Size(144, 327);
             this.PlaylistBrowser.TabIndex = 8;
             this.PlaylistBrowser.UseCompatibleStateImageBehavior = false;
             this.PlaylistBrowser.View = System.Windows.Forms.View.Details;
@@ -916,5 +586,6 @@
         private Controls.VolumeMeterControl LeftChannelVolumeMeter;
         private Controls.VolumeMeterControl RightChannelVolumeMeter;
         private System.Windows.Forms.MenuItem ShowWasaiAndMmcssOptionMenuItem;
+        private Controls.WaveformRenderer waveformRenderer1;
     }
 }

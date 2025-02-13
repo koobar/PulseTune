@@ -10,6 +10,7 @@ using PulseTune.Properties;
 using PulseTune.Utils;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -663,10 +664,6 @@ namespace PulseTune.Dialogs
 
             // ウィンドウのタイトルを更新する。
             UpdateWindowTitle(null);
-
-            // レベルメーターをリセット
-            this.LeftChannelVolumeMeter.Reset();
-            this.RightChannelVolumeMeter.Reset();
         }
 
         /// <summary>
@@ -770,14 +767,10 @@ namespace PulseTune.Dialogs
             ProcessCommandLineArgs(Environment.GetCommandLineArgs());
         }
 
-        /// <summary>
-        /// フォームが閉じられた場合の処理
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnClosed(EventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
             Stop();
-            base.OnClosed(e);
+            base.OnClosing(e);
         }
 
         /// <summary>
@@ -839,22 +832,26 @@ namespace PulseTune.Dialogs
         /// <param name="e"></param>
         private void OnPlaybackPositionChanged(object sender, EventArgs e)
         {
-            var source = AudioPlayer.GetAudioSource();
+            var source = AudioPlayer.GetWaveformMonitor();
             if (source == null)
             {
                 return;
             }
 
             var msec = AudioPlayer.GetTimerInterval();
+            source.LoadData(msec);
 
             if (source.WaveFormat.Channels >= 2)
             {
-                this.LeftChannelVolumeMeter.Amplitude = source.GetAmplitude(0, msec);
-                this.RightChannelVolumeMeter.Amplitude = source.GetAmplitude(1, msec);
+                this.waveformRenderer1.PaintWaveform(source.GetWaveform(0), source.GetWaveform(1));
+                this.LeftChannelVolumeMeter.Amplitude = source.GetAmplitude(0);
+                this.RightChannelVolumeMeter.Amplitude = source.GetAmplitude(1);
             }
             else
             {
-                var amp = source.GetAmplitude(0, msec);
+                this.waveformRenderer1.PaintWaveform(source.GetWaveform(0));
+
+                var amp = source.GetAmplitude(0);
                 this.LeftChannelVolumeMeter.Amplitude = amp;
                 this.RightChannelVolumeMeter.Amplitude = amp;
             }

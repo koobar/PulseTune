@@ -46,7 +46,8 @@ namespace PulseTune.Controls
         /// </summary>
         public void Reset()
         {
-            this.Amplitude = 0;
+            this.amplitude = 0;
+            Invalidate();
         }
 
         private float ToDecibels(float amplitude)

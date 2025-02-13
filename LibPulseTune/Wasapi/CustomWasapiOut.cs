@@ -69,6 +69,17 @@ namespace LibPulseTune.Wasapi
         #region プロパティ
 
         /// <summary>
+        /// 再生状況
+        /// </summary>
+        public PlaybackState PlaybackState
+        {
+            get
+            {
+                return this.playbackState;
+            }
+        }
+
+        /// <summary>
         /// 自動変換時のリサンプラーの品質(1～60)
         /// </summary>
         public int AutoResamplerQuality { set; get; } = 60;
@@ -530,18 +541,7 @@ namespace LibPulseTune.Wasapi
         }
 
         /// <summary>
-        /// 再生状況
-        /// </summary>
-        public PlaybackState PlaybackState
-        {
-            get 
-            { 
-                return this.playbackState; 
-            }
-        }
-
-        /// <summary>
-        /// Dispose
+        /// 破棄
         /// </summary>
         public void Dispose()
         {

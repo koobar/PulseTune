@@ -18,8 +18,9 @@ namespace LibPulseTune
         // 非公開フィールド
         private static AudioOutputDevice outputDevice;
         private static CustomWasapiOut currentDeviceInstance;
-        private static AmplitudeMonitor currentAudioSource;
-        private static VolumeController volumeController;
+        private static IAudioSource currentAudioSource;
+        private static WaveformMonitor waveformMonitor;
+        private static VolumeSampleProvider volumeController;
         private static int volume;
         private static int audioPlayerState;
         private static PlaybackTimer timer;
@@ -57,7 +58,7 @@ namespace LibPulseTune
 
             if (volumeController != null)
             {
-                volumeController.Volume = volume;
+                volumeController.Volume = volume / 100.0f;
             }
         }
 
@@ -127,16 +128,41 @@ namespace LibPulseTune
                     break;
             }
 
-            currentAudioSource = new AmplitudeMonitor(source);
+            currentAudioSource = source;
         }
 
         /// <summary>
         /// オーディオソースを取得する。
         /// </summary>
         /// <returns></returns>
-        public static AmplitudeMonitor GetAudioSource()
+        public static IAudioSource GetAudioSource()
         {
             return currentAudioSource;
+        }
+
+        public static WaveformMonitor GetWaveformMonitor()
+        {
+            return waveformMonitor;
+        }
+
+        private static IWaveProvider CreateWaveProvider(ISampleProvider sampleProvider, WaveFormat originalWaveformat)
+        {
+            if (originalWaveformat.Encoding == WaveFormatEncoding.IeeeFloat)
+            {
+                return new SampleToWaveProvider(sampleProvider);
+            }
+            else if (originalWaveformat.Encoding == WaveFormatEncoding.Pcm)
+            {
+                switch (originalWaveformat.BitsPerSample)
+                {
+                    case 16:
+                        return new SampleToWaveProvider16(sampleProvider);
+                    case 24:
+                        return new SampleToWaveProvider24(sampleProvider);
+                }
+            }
+
+            return new SampleToWaveProvider(sampleProvider);
         }
 
         /// <summary>
@@ -146,41 +172,30 @@ namespace LibPulseTune
         {
             if (outputDevice != null && currentAudioSource != null)
             {
-                currentDeviceInstance = outputDevice.CreateDeviceInstance();
+                // 古い波形モニタがあれば削除
+                if (waveformMonitor != null)
+                {
+                    waveformMonitor = null;
+                }
 
                 // 古い音量コントローラがあれば削除
                 if (volumeController != null)
                 {
-                    volumeController.Dispose();
                     volumeController = null;
                 }
 
+                // 波形モニタを生成
+                waveformMonitor = new WaveformMonitor(currentAudioSource);
+
                 // 音量コントローラを作成
-                volumeController = new VolumeController(currentAudioSource);
-                volumeController.Volume = volume;
+                volumeController = new VolumeSampleProvider(waveformMonitor);
+                volumeController.Volume = volume / 100.0f;
 
-                currentDeviceInstance.Init(volumeController);
+                // デバイスを初期化
+                currentDeviceInstance = outputDevice.CreateDeviceInstance();
+                currentDeviceInstance.Init(CreateWaveProvider(volumeController, currentAudioSource.WaveFormat));
 
-                /*// 浮動小数点数か？
-                if (currentAudioSource.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat)
-                {
-                    currentDeviceInstance.Init(volumeController);
-                }
-                else
-                {
-                    switch (currentAudioSource.WaveFormat.BitsPerSample)
-                    {
-                        case 16:
-                            currentDeviceInstance.Init(new SampleToWaveProvider16(volumeController));
-                            break;
-                        case 24:
-                            currentDeviceInstance.Init(new SampleToWaveProvider24(volumeController));
-                            break;
-                        default:
-                            currentDeviceInstance.Init(new SampleToWaveProvider(volumeController));
-                            break;
-                    }
-                }*/
+                GC.Collect();
             }
 
             SetAudioPlayerState(AUDIOPLAYER_STATE_STOP);

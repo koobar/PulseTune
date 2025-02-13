@@ -82,7 +82,6 @@
     <Compile Include="AudioSource\Vorbis\VorbisAudioSource.cs" />
     <Compile Include="AudioSource\WavPack\WavPackAudioSource.cs" />
     <Compile Include="AudioSource\ZilophiX\ZilophiXAudioSource.cs" />
-    <Compile Include="Helpers\BufferHelper.cs" />
     <Compile Include="Wasapi\AvrtInterop.cs" />
     <Compile Include="Wasapi\AvThreadPriority.cs" />
     <Compile Include="Wasapi\DwmapiInterop.cs" />
@@ -90,12 +89,11 @@
     <Compile Include="Wasapi\CustomWasapiOut.cs" />
     <Compile Include="AudioEngine.cs" />
     <Compile Include="AudioPlayer.cs" />
-    <Compile Include="AmplitudeMonitor.cs" />
+    <Compile Include="WaveformMonitor.cs" />
     <Compile Include="AudioSource\AudioSourceProvider.cs" />
     <Compile Include="AudioSource\MediaFoundation\MediaFoundationDecoder.cs" />
     <Compile Include="PlaybackTimer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VolumeController.cs" />
     <Compile Include="WinApi.cs" />
     <Compile Include="Helpers\WinApiHelper.cs" />
   </ItemGroup>
