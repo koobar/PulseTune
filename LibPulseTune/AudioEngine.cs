@@ -46,19 +46,18 @@ namespace LibPulseTune
         private static void LoadBuiltinCodecs()
         {
             // MediaFoundation（OS組み込みデコーダ）でデコードするフォーマットを登録
-            AudioSourceProvider.RegisterDecoder("WAV", typeof(MediaFoundationAudioSource), ".wav");
+            AudioSourceProvider.RegisterDecoder("AAC", typeof(MediaFoundationAudioSource), ".aac");
             AudioSourceProvider.RegisterDecoder("AIFF", typeof(MediaFoundationAudioSource), ".aif", ".aiff");
-            AudioSourceProvider.RegisterDecoder("Free Lossless Audio Codec", typeof(MediaFoundationAudioSource), ".flac");
-            AudioSourceProvider.RegisterDecoder("MPEG-1 Audio Layer-2", typeof(MediaFoundationAudioSource), ".mp2");
-            AudioSourceProvider.RegisterDecoder("MPEG-1 Audio Layer-3", typeof(MediaFoundationAudioSource), ".mp3");
+            AudioSourceProvider.RegisterDecoder("FLAC", typeof(MediaFoundationAudioSource), ".flac");
+            AudioSourceProvider.RegisterDecoder("MP2", typeof(MediaFoundationAudioSource), ".mp2");
+            AudioSourceProvider.RegisterDecoder("MP3", typeof(MediaFoundationAudioSource), ".mp3");
+            AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisAudioSource), ".ogg");
             AudioSourceProvider.RegisterDecoder("M4A", typeof(MediaFoundationAudioSource), ".m4a");
+            AudioSourceProvider.RegisterDecoder("WAV", typeof(MediaFoundationAudioSource), ".wav");
             AudioSourceProvider.RegisterDecoder("Windows Media Audio", typeof(MediaFoundationAudioSource), ".wma");
 
-            // Vorbisを登録
-            AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisAudioSource), ".ogg");
-            
             // オーディオCDデコーダを登録
-            AudioSourceProvider.RegisterDecoder("Audio CD Track", typeof(CDAudioSource), ".cda");
+            AudioSourceProvider.RegisterDecoder("オーディオCDトラック", typeof(CDAudioSource), ".cda");
 
             // WavPackが使用可能なら登録
             if (WavPackAudioSource.IsAvailable())
