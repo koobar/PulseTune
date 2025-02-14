@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibPulseTune.UIControls.Utils;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -85,7 +86,11 @@ namespace LibPulseTune.UIControls.BackendControls
         protected override void OnMouseWheel(MouseEventArgs e)
         {
             base.OnMouseWheel(e);
-            Invalidate();
+
+            if (this.GetVScrollBarVisible())
+            {
+                Invalidate();
+            }
         }
 
         /// <summary>

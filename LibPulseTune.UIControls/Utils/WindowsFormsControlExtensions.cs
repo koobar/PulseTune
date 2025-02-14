@@ -79,6 +79,26 @@ namespace LibPulseTune.UIControls.Utils
         }
 
         /// <summary>
+        /// このコントロールの垂直方向のスクロールバーが表示されているかどうかを判定する。
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
+        public static bool GetVScrollBarVisible(this Control control)
+        {
+            return WinApi.GetVScrollBarVisible(control.Handle);
+        }
+
+        /// <summary>
+        /// このコントロールの水平方向のスクロールバーが表示されているかどうかを判定する。
+        /// </summary>
+        /// <param name="control"></param>
+        /// <returns></returns>
+        public static bool GetHScrollBarVisible(this Control control)
+        {
+            return WinApi.GetHScrollBarVisible(control.Handle);
+        }
+
+        /// <summary>
         /// フォームがVisual Studioのデザイナで表示されているかどうかを判定する。
         /// </summary>
         /// <returns></returns>
