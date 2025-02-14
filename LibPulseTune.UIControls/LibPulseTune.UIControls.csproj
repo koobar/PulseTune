@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E2D09210-0968-40B0-8478-9AF6735404F5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>LibPulseTune.UIControls</RootNamespace>
+    <AssemblyName>LibPulseTune.UIControls</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CustomMarshalers" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BackendControls\ExplorerControlDetailViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BackendControls\ExplorerControlDetailViewer.Designer.cs">
+      <DependentUpon>ExplorerControlDetailViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BackendControls\ExplorerLikeListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BackendControls\ExplorerLikeListViewItem.cs" />
+    <Compile Include="BackendControls\FileSystemViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BackendControls\FileSystemViewerItem.cs" />
+    <Compile Include="BackendControls\ListViewColumnSorter.cs" />
+    <Compile Include="BackendControls\OptimizedListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BackendControls\PlaylistViewerItem.cs" />
+    <Compile Include="BackendControls\SeekBarSlidePanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BackendControls\VerticalTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BackendControls\VisualStyleIconButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ClosableTabControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ClosableTabPage.cs" />
+    <Compile Include="Command.cs" />
+    <Compile Include="Dialogs\FindDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\FindDialog.Designer.cs">
+      <DependentUpon>FindDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\VersionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\VersionDialog.Designer.cs">
+      <DependentUpon>VersionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WasapiOptionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WasapiOptionDialog.Designer.cs">
+      <DependentUpon>WasapiOptionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExplorerControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="IMainTabControlPageElement.cs" />
+    <Compile Include="MediaControlPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MediaControlPanel.Designer.cs">
+      <DependentUpon>MediaControlPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PictureViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="PlaylistExplorer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="PlaylistViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PlaylistViewer.Designer.cs">
+      <DependentUpon>PlaylistViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SeekBar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TabPageEventArgs.cs" />
+    <Compile Include="Utils\DriveStateWatcher.cs" />
+    <Compile Include="Utils\ProcessUtils.cs" />
+    <Compile Include="Utils\WindowsFormsControlExtensions.cs" />
+    <Compile Include="VolumeMeterControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WaveformRenderer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WinApi.cs" />
+    <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BackendControls\ExplorerControlDetailViewer.resx">
+      <DependentUpon>ExplorerControlDetailViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\FindDialog.resx">
+      <DependentUpon>FindDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\VersionDialog.resx">
+      <DependentUpon>VersionDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WasapiOptionDialog.resx">
+      <DependentUpon>WasapiOptionDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MediaControlPanel.resx">
+      <DependentUpon>MediaControlPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PictureViewer.resx">
+      <DependentUpon>PictureViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlaylistViewer.resx">
+      <DependentUpon>PlaylistViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LibPulseTune.Codecs\LibPulseTune.Codecs.csproj">
+      <Project>{a1be451c-aa38-4990-b4d0-31c6be2c1c57}</Project>
+      <Name>LibPulseTune.Codecs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LibPulseTune.CoreAudio\LibPulseTune.CoreAudio.csproj">
+      <Project>{06d92894-97b3-4c6a-84d8-b3de81c20714}</Project>
+      <Name>LibPulseTune.CoreAudio</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LibPulseTune.Database\LibPulseTune.Database.csproj">
+      <Project>{34d8ae88-2ab2-4616-960a-97a3ea538eee}</Project>
+      <Name>LibPulseTune.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LibPulseTune.Engine\LibPulseTune.Engine.csproj">
+      <Project>{3c4f7fc2-2ea1-4fc5-b42e-8752efb38452}</Project>
+      <Name>LibPulseTune.Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LibPulseTune.Metadata\LibPulseTune.Metadata.csproj">
+      <Project>{b27d785c-b39e-40a9-9481-119847ff248c}</Project>
+      <Name>LibPulseTune.Metadata</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LibPulseTune.Options\LibPulseTune.Options.csproj">
+      <Project>{c7c30bb7-f10f-4d56-8d05-97c6ed9f7d88}</Project>
+      <Name>LibPulseTune.Options</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Core">
+      <Version>1.1.5</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell">
+      <Version>1.1.5</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\backward.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\forward.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\note.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pause.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\play.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\playlist-music.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\repeat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\repeat-off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\repeat-once.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shuffle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Shell32">
+      <Guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\appicon.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

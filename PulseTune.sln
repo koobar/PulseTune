@@ -5,8 +5,6 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PulseTune", "PulseTune\PulseTune.csproj", "{4C8124B1-1282-4AFD-89B6-5A01A6752D3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune", "LibPulseTune\LibPulseTune.csproj", "{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{540139AC-9A1E-4442-8158-7B82C718CAF7}"
 	ProjectSection(SolutionItems) = preProject
 		HISTORY.txt = HISTORY.txt
@@ -16,6 +14,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{540139AC-9A1
 		THIRD-PARTY-NOTICES.txt = THIRD-PARTY-NOTICES.txt
 		ビルド方法.txt = ビルド方法.txt
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune.UIControls", "LibPulseTune.UIControls\LibPulseTune.UIControls.csproj", "{E2D09210-0968-40B0-8478-9AF6735404F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune.Metadata", "LibPulseTune.Metadata\LibPulseTune.Metadata.csproj", "{B27D785C-B39E-40A9-9481-119847FF248C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune.Database", "LibPulseTune.Database\LibPulseTune.Database.csproj", "{34D8AE88-2AB2-4616-960A-97A3EA538EEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune.Options", "LibPulseTune.Options\LibPulseTune.Options.csproj", "{C7C30BB7-F10F-4D56-8D05-97C6ED9F7D88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune.CoreAudio", "LibPulseTune.CoreAudio\LibPulseTune.CoreAudio.csproj", "{06D92894-97B3-4C6A-84D8-B3DE81C20714}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune.Codecs", "LibPulseTune.Codecs\LibPulseTune.Codecs.csproj", "{A1BE451C-AA38-4990-B4D0-31C6BE2C1C57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPulseTune.Engine", "LibPulseTune.Engine\LibPulseTune.Engine.csproj", "{3C4F7FC2-2EA1-4FC5-B42E-8752EFB38452}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,10 +39,34 @@ Global
 		{4C8124B1-1282-4AFD-89B6-5A01A6752D3F}.Debug|x64.Build.0 = Debug|x64
 		{4C8124B1-1282-4AFD-89B6-5A01A6752D3F}.Release|x64.ActiveCfg = Release|x64
 		{4C8124B1-1282-4AFD-89B6-5A01A6752D3F}.Release|x64.Build.0 = Release|x64
-		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Debug|x64.ActiveCfg = Debug|x64
-		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Debug|x64.Build.0 = Debug|x64
-		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Release|x64.ActiveCfg = Release|x64
-		{2D03EC43-D579-4A1F-A6D9-52E92C85D43F}.Release|x64.Build.0 = Release|x64
+		{E2D09210-0968-40B0-8478-9AF6735404F5}.Debug|x64.ActiveCfg = Debug|x64
+		{E2D09210-0968-40B0-8478-9AF6735404F5}.Debug|x64.Build.0 = Debug|x64
+		{E2D09210-0968-40B0-8478-9AF6735404F5}.Release|x64.ActiveCfg = Release|x64
+		{E2D09210-0968-40B0-8478-9AF6735404F5}.Release|x64.Build.0 = Release|x64
+		{B27D785C-B39E-40A9-9481-119847FF248C}.Debug|x64.ActiveCfg = Debug|x64
+		{B27D785C-B39E-40A9-9481-119847FF248C}.Debug|x64.Build.0 = Debug|x64
+		{B27D785C-B39E-40A9-9481-119847FF248C}.Release|x64.ActiveCfg = Release|x64
+		{B27D785C-B39E-40A9-9481-119847FF248C}.Release|x64.Build.0 = Release|x64
+		{34D8AE88-2AB2-4616-960A-97A3EA538EEE}.Debug|x64.ActiveCfg = Debug|x64
+		{34D8AE88-2AB2-4616-960A-97A3EA538EEE}.Debug|x64.Build.0 = Debug|x64
+		{34D8AE88-2AB2-4616-960A-97A3EA538EEE}.Release|x64.ActiveCfg = Release|x64
+		{34D8AE88-2AB2-4616-960A-97A3EA538EEE}.Release|x64.Build.0 = Release|x64
+		{C7C30BB7-F10F-4D56-8D05-97C6ED9F7D88}.Debug|x64.ActiveCfg = Debug|x64
+		{C7C30BB7-F10F-4D56-8D05-97C6ED9F7D88}.Debug|x64.Build.0 = Debug|x64
+		{C7C30BB7-F10F-4D56-8D05-97C6ED9F7D88}.Release|x64.ActiveCfg = Release|x64
+		{C7C30BB7-F10F-4D56-8D05-97C6ED9F7D88}.Release|x64.Build.0 = Release|x64
+		{06D92894-97B3-4C6A-84D8-B3DE81C20714}.Debug|x64.ActiveCfg = Debug|x64
+		{06D92894-97B3-4C6A-84D8-B3DE81C20714}.Debug|x64.Build.0 = Debug|x64
+		{06D92894-97B3-4C6A-84D8-B3DE81C20714}.Release|x64.ActiveCfg = Release|x64
+		{06D92894-97B3-4C6A-84D8-B3DE81C20714}.Release|x64.Build.0 = Release|x64
+		{A1BE451C-AA38-4990-B4D0-31C6BE2C1C57}.Debug|x64.ActiveCfg = Debug|x64
+		{A1BE451C-AA38-4990-B4D0-31C6BE2C1C57}.Debug|x64.Build.0 = Debug|x64
+		{A1BE451C-AA38-4990-B4D0-31C6BE2C1C57}.Release|x64.ActiveCfg = Release|x64
+		{A1BE451C-AA38-4990-B4D0-31C6BE2C1C57}.Release|x64.Build.0 = Release|x64
+		{3C4F7FC2-2EA1-4FC5-B42E-8752EFB38452}.Debug|x64.ActiveCfg = Debug|x64
+		{3C4F7FC2-2EA1-4FC5-B42E-8752EFB38452}.Debug|x64.Build.0 = Debug|x64
+		{3C4F7FC2-2EA1-4FC5-B42E-8752EFB38452}.Release|x64.ActiveCfg = Release|x64
+		{3C4F7FC2-2EA1-4FC5-B42E-8752EFB38452}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
