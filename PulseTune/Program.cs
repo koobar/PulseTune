@@ -9,9 +9,15 @@ namespace PulseTune
 {
     internal static class Program
     {
+#if DEBUG
+        public const string BUILD_TYPE = @"DEBUG";
+#else
+        public const string BUILD_TYPE = @"RELEASE";
+#endif
+
         // アプリケーション情報の定義
         public const string APPLICATION_NAME = @"PulseTune";
-        public static readonly DateOnly ApplicationBuildDate = new DateOnly(2025, 2, 13);
+        public static readonly DateOnly ApplicationBuildDate = new DateOnly(2025, 2, 15);
         public static readonly Version ApplicationVersion = new Version(1, 3, ToBuildNumber(ApplicationBuildDate));
 
         /// <summary>

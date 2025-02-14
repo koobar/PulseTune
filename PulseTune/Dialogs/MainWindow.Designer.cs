@@ -29,20 +29,16 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
-            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("最近開いた場所", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("お気に入り", System.Windows.Forms.HorizontalAlignment.Center);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.StatusBar = new System.Windows.Forms.StatusStrip();
             this.StatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.PlaybackTimeStatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.waveformRenderer1 = new PulseTune.Controls.WaveformRenderer();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.WaveformRendererControl = new PulseTune.Controls.WaveformRenderer();
             this.LeftChannelVolumeMeter = new PulseTune.Controls.VolumeMeterControl();
             this.RightChannelVolumeMeter = new PulseTune.Controls.VolumeMeterControl();
             this.TrackPictureViewer = new PulseTune.Controls.PictureViewer();
@@ -61,6 +57,10 @@
             this.AddFolderToPlaylistFileMenuItem = new System.Windows.Forms.MenuItem();
             this.ViewMenu = new System.Windows.Forms.MenuItem();
             this.AlwaysTopMostViewMenuItem = new System.Windows.Forms.MenuItem();
+            this.ViewMenuSeparator1 = new System.Windows.Forms.MenuItem();
+            this.WaveformRendererViewModesMenuItem = new System.Windows.Forms.MenuItem();
+            this.SeparateByChannelsWaveformRendererViewModeMenuItem = new System.Windows.Forms.MenuItem();
+            this.MixedWaveformRendererViewModeMenuItem = new System.Windows.Forms.MenuItem();
             this.FindMenu = new System.Windows.Forms.MenuItem();
             this.ShowFindDialogFindMenuItem = new System.Windows.Forms.MenuItem();
             this.FindNextFindMenuItem = new System.Windows.Forms.MenuItem();
@@ -78,7 +78,7 @@
             this.Latency128msLatencyMenuItem = new System.Windows.Forms.MenuItem();
             this.Latency256msLatencyMenuItem = new System.Windows.Forms.MenuItem();
             this.Latency512msLatencyMenuItem = new System.Windows.Forms.MenuItem();
-            this.ShowWasaiAndMmcssOptionMenuItem = new System.Windows.Forms.MenuItem();
+            this.ShowWasapiAndMmcssOptionMenuItem = new System.Windows.Forms.MenuItem();
             this.HelpMenu = new System.Windows.Forms.MenuItem();
             this.ShowReadMeHelpMenuItem = new System.Windows.Forms.MenuItem();
             this.ShowHistoryHelpMenuItem = new System.Windows.Forms.MenuItem();
@@ -96,7 +96,7 @@
             this.StatusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.StatusText,
             this.PlaybackTimeStatusText});
-            this.StatusBar.Location = new System.Drawing.Point(0, 639);
+            this.StatusBar.Location = new System.Drawing.Point(0, 618);
             this.StatusBar.Name = "StatusBar";
             this.StatusBar.Size = new System.Drawing.Size(984, 22);
             this.StatusBar.TabIndex = 4;
@@ -118,7 +118,11 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.waveformRenderer1);
+            this.panel1.Controls.Add(this.label4);
+            this.panel1.Controls.Add(this.label3);
+            this.panel1.Controls.Add(this.label2);
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Controls.Add(this.WaveformRendererControl);
             this.panel1.Controls.Add(this.LeftChannelVolumeMeter);
             this.panel1.Controls.Add(this.RightChannelVolumeMeter);
             this.panel1.Controls.Add(this.TrackPictureViewer);
@@ -126,18 +130,68 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(150, 569);
+            this.panel1.Size = new System.Drawing.Size(180, 548);
             this.panel1.TabIndex = 5;
             // 
-            // waveformRenderer1
+            // label4
             // 
-            this.waveformRenderer1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.label4.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label4.Location = new System.Drawing.Point(159, 316);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(18, 12);
+            this.label4.TabIndex = 16;
+            this.label4.Text = "0db";
+            // 
+            // label3
+            // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.waveformRenderer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.waveformRenderer1.Location = new System.Drawing.Point(3, 336);
-            this.waveformRenderer1.Name = "waveformRenderer1";
-            this.waveformRenderer1.Size = new System.Drawing.Size(144, 43);
-            this.waveformRenderer1.TabIndex = 12;
+            this.label3.AutoSize = true;
+            this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.label3.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label3.Location = new System.Drawing.Point(3, 316);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(35, 12);
+            this.label3.TabIndex = 15;
+            this.label3.Text = "-40db";
+            // 
+            // label2
+            // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label2.AutoSize = true;
+            this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.label2.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label2.Location = new System.Drawing.Point(49, 255);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(77, 12);
+            this.label2.TabIndex = 14;
+            this.label2.Text = "WAVEFORM";
+            // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.label1.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label1.Location = new System.Drawing.Point(49, 316);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(96, 12);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "LEVEL METER";
+            // 
+            // WaveformRendererControl
+            // 
+            this.WaveformRendererControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.WaveformRendererControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.WaveformRendererControl.EnableWaveformAntiAlias = true;
+            this.WaveformRendererControl.Location = new System.Drawing.Point(3, 270);
+            this.WaveformRendererControl.Name = "WaveformRendererControl";
+            this.WaveformRendererControl.Size = new System.Drawing.Size(174, 43);
+            this.WaveformRendererControl.StereoViewMode = PulseTune.Controls.WaveformRendererStereoViewMode.Separated;
+            this.WaveformRendererControl.TabIndex = 12;
             // 
             // LeftChannelVolumeMeter
             // 
@@ -146,9 +200,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.LeftChannelVolumeMeter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.LeftChannelVolumeMeter.EnableAttenuationEmulation = false;
-            this.LeftChannelVolumeMeter.Location = new System.Drawing.Point(3, 382);
+            this.LeftChannelVolumeMeter.Location = new System.Drawing.Point(3, 331);
             this.LeftChannelVolumeMeter.Name = "LeftChannelVolumeMeter";
-            this.LeftChannelVolumeMeter.Size = new System.Drawing.Size(144, 17);
+            this.LeftChannelVolumeMeter.Size = new System.Drawing.Size(174, 17);
             this.LeftChannelVolumeMeter.TabIndex = 11;
             // 
             // RightChannelVolumeMeter
@@ -158,19 +212,19 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.RightChannelVolumeMeter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.RightChannelVolumeMeter.EnableAttenuationEmulation = false;
-            this.RightChannelVolumeMeter.Location = new System.Drawing.Point(3, 402);
+            this.RightChannelVolumeMeter.Location = new System.Drawing.Point(3, 351);
             this.RightChannelVolumeMeter.Name = "RightChannelVolumeMeter";
-            this.RightChannelVolumeMeter.Size = new System.Drawing.Size(144, 17);
+            this.RightChannelVolumeMeter.Size = new System.Drawing.Size(174, 17);
             this.RightChannelVolumeMeter.TabIndex = 10;
             // 
             // TrackPictureViewer
             // 
             this.TrackPictureViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.TrackPictureViewer.Location = new System.Drawing.Point(3, 422);
+            this.TrackPictureViewer.Location = new System.Drawing.Point(3, 371);
             this.TrackPictureViewer.Name = "TrackPictureViewer";
             this.TrackPictureViewer.Picture = null;
-            this.TrackPictureViewer.Size = new System.Drawing.Size(144, 144);
+            this.TrackPictureViewer.Size = new System.Drawing.Size(174, 174);
             this.TrackPictureViewer.TabIndex = 9;
             this.TrackPictureViewer.TabStop = false;
             // 
@@ -180,41 +234,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PlaylistBrowser.FullRowSelect = true;
-            listViewGroup1.Header = "最近開いた場所";
-            listViewGroup1.Name = null;
-            listViewGroup2.Header = "お気に入り";
-            listViewGroup2.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup2.Name = null;
-            listViewGroup3.Header = "最近開いた場所";
-            listViewGroup3.Name = null;
-            listViewGroup4.Header = "お気に入り";
-            listViewGroup4.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup4.Name = null;
-            listViewGroup5.Header = "最近開いた場所";
-            listViewGroup5.Name = null;
-            listViewGroup6.Header = "お気に入り";
-            listViewGroup6.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup6.Name = null;
-            listViewGroup7.Header = "最近開いた場所";
-            listViewGroup7.Name = null;
-            listViewGroup8.Header = "お気に入り";
-            listViewGroup8.HeaderAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-            listViewGroup8.Name = null;
-            this.PlaylistBrowser.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3,
-            listViewGroup4,
-            listViewGroup5,
-            listViewGroup6,
-            listViewGroup7,
-            listViewGroup8});
             this.PlaylistBrowser.HideSelection = false;
             this.PlaylistBrowser.Location = new System.Drawing.Point(3, 3);
             this.PlaylistBrowser.MultiSelect = false;
             this.PlaylistBrowser.Name = "PlaylistBrowser";
             this.PlaylistBrowser.ShowItemToolTips = true;
-            this.PlaylistBrowser.Size = new System.Drawing.Size(144, 327);
+            this.PlaylistBrowser.Size = new System.Drawing.Size(174, 249);
             this.PlaylistBrowser.TabIndex = 8;
             this.PlaylistBrowser.UseCompatibleStateImageBehavior = false;
             this.PlaylistBrowser.View = System.Windows.Forms.View.Details;
@@ -222,9 +247,9 @@
             // 
             // splitter1
             // 
-            this.splitter1.Location = new System.Drawing.Point(150, 0);
+            this.splitter1.Location = new System.Drawing.Point(180, 0);
             this.splitter1.Name = "splitter1";
-            this.splitter1.Size = new System.Drawing.Size(3, 569);
+            this.splitter1.Size = new System.Drawing.Size(3, 548);
             this.splitter1.TabIndex = 6;
             this.splitter1.TabStop = false;
             // 
@@ -315,7 +340,9 @@
             // 
             this.ViewMenu.Index = 1;
             this.ViewMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.AlwaysTopMostViewMenuItem});
+            this.AlwaysTopMostViewMenuItem,
+            this.ViewMenuSeparator1,
+            this.WaveformRendererViewModesMenuItem});
             this.ViewMenu.Text = "表示(&V)";
             // 
             // AlwaysTopMostViewMenuItem
@@ -323,6 +350,31 @@
             this.AlwaysTopMostViewMenuItem.Index = 0;
             this.AlwaysTopMostViewMenuItem.Text = "常に最前面に表示";
             this.AlwaysTopMostViewMenuItem.Click += new System.EventHandler(this.AlwaysTopMostViewMenuItem_Click);
+            // 
+            // ViewMenuSeparator1
+            // 
+            this.ViewMenuSeparator1.Index = 1;
+            this.ViewMenuSeparator1.Text = "-";
+            // 
+            // WaveformRendererViewModesMenuItem
+            // 
+            this.WaveformRendererViewModesMenuItem.Index = 2;
+            this.WaveformRendererViewModesMenuItem.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.SeparateByChannelsWaveformRendererViewModeMenuItem,
+            this.MixedWaveformRendererViewModeMenuItem});
+            this.WaveformRendererViewModesMenuItem.Text = "波形表示モード";
+            // 
+            // SeparateByChannelsWaveformRendererViewModeMenuItem
+            // 
+            this.SeparateByChannelsWaveformRendererViewModeMenuItem.Index = 0;
+            this.SeparateByChannelsWaveformRendererViewModeMenuItem.Text = "チャンネル毎に分離して表示";
+            this.SeparateByChannelsWaveformRendererViewModeMenuItem.Click += new System.EventHandler(this.WaveformRendererViewModesMenuItem_Clicked);
+            // 
+            // MixedWaveformRendererViewModeMenuItem
+            // 
+            this.MixedWaveformRendererViewModeMenuItem.Index = 1;
+            this.MixedWaveformRendererViewModeMenuItem.Text = "チャンネルをミックスして表示";
+            this.MixedWaveformRendererViewModeMenuItem.Click += new System.EventHandler(this.WaveformRendererViewModesMenuItem_Clicked);
             // 
             // FindMenu
             // 
@@ -386,7 +438,7 @@
             this.OptionMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.AvailableOutputDevicesPlaybackMenuItem,
             this.OutputLatencyPlaybackMenuItem,
-            this.ShowWasaiAndMmcssOptionMenuItem});
+            this.ShowWasapiAndMmcssOptionMenuItem});
             this.OptionMenu.Text = "設定(&O)";
             // 
             // AvailableOutputDevicesPlaybackMenuItem
@@ -449,11 +501,11 @@
             this.Latency512msLatencyMenuItem.Text = "512ms";
             this.Latency512msLatencyMenuItem.Click += new System.EventHandler(this.LatencyPlaybackMenuItem_Click);
             // 
-            // ShowWasaiAndMmcssOptionMenuItem
+            // ShowWasapiAndMmcssOptionMenuItem
             // 
-            this.ShowWasaiAndMmcssOptionMenuItem.Index = 2;
-            this.ShowWasaiAndMmcssOptionMenuItem.Text = "WASAPI/MMCSS設定";
-            this.ShowWasaiAndMmcssOptionMenuItem.Click += new System.EventHandler(this.ShowWasaiAndMmcssOptionMenuItem_Click);
+            this.ShowWasapiAndMmcssOptionMenuItem.Index = 2;
+            this.ShowWasapiAndMmcssOptionMenuItem.Text = "WASAPI/MMCSS設定";
+            this.ShowWasapiAndMmcssOptionMenuItem.Click += new System.EventHandler(this.ShowWasapiAndMmcssOptionMenuItem_Click);
             // 
             // HelpMenu
             // 
@@ -491,12 +543,12 @@
             // MainTabControl
             // 
             this.MainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainTabControl.Location = new System.Drawing.Point(153, 0);
+            this.MainTabControl.Location = new System.Drawing.Point(183, 0);
             this.MainTabControl.Name = "MainTabControl";
             this.MainTabControl.Padding = new System.Windows.Forms.Padding(0, 3, 0, 0);
             this.MainTabControl.SelectedIndex = -1;
             this.MainTabControl.SelectedTab = null;
-            this.MainTabControl.Size = new System.Drawing.Size(831, 569);
+            this.MainTabControl.Size = new System.Drawing.Size(801, 548);
             this.MainTabControl.TabIndex = 7;
             // 
             // ControlPanel
@@ -504,7 +556,7 @@
             this.ControlPanel.BackwardCommand = null;
             this.ControlPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.ControlPanel.ForwardCommand = null;
-            this.ControlPanel.Location = new System.Drawing.Point(0, 569);
+            this.ControlPanel.Location = new System.Drawing.Point(0, 548);
             this.ControlPanel.MoveToTrackStartCommand = null;
             this.ControlPanel.Name = "ControlPanel";
             this.ControlPanel.PauseCommand = null;
@@ -520,7 +572,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(984, 661);
+            this.ClientSize = new System.Drawing.Size(984, 640);
             this.Controls.Add(this.MainTabControl);
             this.Controls.Add(this.splitter1);
             this.Controls.Add(this.panel1);
@@ -532,6 +584,7 @@
             this.StatusBar.ResumeLayout(false);
             this.StatusBar.PerformLayout();
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TrackPictureViewer)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -585,7 +638,15 @@
         private System.Windows.Forms.MenuItem Latency512msLatencyMenuItem;
         private Controls.VolumeMeterControl LeftChannelVolumeMeter;
         private Controls.VolumeMeterControl RightChannelVolumeMeter;
-        private System.Windows.Forms.MenuItem ShowWasaiAndMmcssOptionMenuItem;
-        private Controls.WaveformRenderer waveformRenderer1;
+        private System.Windows.Forms.MenuItem ShowWasapiAndMmcssOptionMenuItem;
+        private Controls.WaveformRenderer WaveformRendererControl;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.MenuItem ViewMenuSeparator1;
+        private System.Windows.Forms.MenuItem WaveformRendererViewModesMenuItem;
+        private System.Windows.Forms.MenuItem SeparateByChannelsWaveformRendererViewModeMenuItem;
+        private System.Windows.Forms.MenuItem MixedWaveformRendererViewModeMenuItem;
     }
 }

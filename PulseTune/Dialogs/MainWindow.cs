@@ -154,6 +154,11 @@ namespace PulseTune.Dialogs
             Backward();
         }
 
+        /// <summary>
+        /// トラックの開始位置に移動するコマンドの実装
+        /// </summary>
+        /// <param name="unused1"></param>
+        /// <param name="unused2"></param>
         private void MoveToStartCommandImplementation(object unused1, object unused2)
         {
             MoveToTrackStart();
@@ -207,6 +212,18 @@ namespace PulseTune.Dialogs
             UpdateAudioOutputDeviceMenuItems();
 
             this.TopMost =  this.AlwaysTopMostViewMenuItem.Checked = OptionManager.MainWindowAlwaysTopMost;
+
+            switch (OptionManager.WaveformRendererViewMode)
+            {
+                case WaveformRendererStereoViewMode.Separated:
+                    this.SeparateByChannelsWaveformRendererViewModeMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Separated;
+                    break;
+                case WaveformRendererStereoViewMode.Mixed:
+                    this.MixedWaveformRendererViewModeMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Mixed;
+                    break;
+            }
         }
 
         /// <summary>
@@ -767,6 +784,10 @@ namespace PulseTune.Dialogs
             ProcessCommandLineArgs(Environment.GetCommandLineArgs());
         }
 
+        /// <summary>
+        /// フォームが閉じられる場合の処理
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnClosing(CancelEventArgs e)
         {
             Stop();
@@ -843,13 +864,13 @@ namespace PulseTune.Dialogs
 
             if (source.WaveFormat.Channels >= 2)
             {
-                this.waveformRenderer1.PaintWaveform(source.GetWaveform(0), source.GetWaveform(1));
+                this.WaveformRendererControl.PaintWaveform(source.GetWaveform(0), source.GetWaveform(1));
                 this.LeftChannelVolumeMeter.Amplitude = source.GetAmplitude(0);
                 this.RightChannelVolumeMeter.Amplitude = source.GetAmplitude(1);
             }
             else
             {
-                this.waveformRenderer1.PaintWaveform(source.GetWaveform(0));
+                this.WaveformRendererControl.PaintWaveform(source.GetWaveform(0));
 
                 var amp = source.GetAmplitude(0);
                 this.LeftChannelVolumeMeter.Amplitude = amp;
@@ -1145,7 +1166,7 @@ namespace PulseTune.Dialogs
             }
         }
 
-        private void ShowWasaiAndMmcssOptionMenuItem_Click(object sender, EventArgs e)
+        private void ShowWasapiAndMmcssOptionMenuItem_Click(object sender, EventArgs e)
         {
             var dialog = new WasapiOptionDialog();
 
@@ -1155,6 +1176,27 @@ namespace PulseTune.Dialogs
             }
 
             dialog.Dispose();
+        }
+
+        private void WaveformRendererViewModesMenuItem_Clicked(object sender, EventArgs e)
+        {
+            if (sender != null && sender is MenuItem)
+            {
+                // クリックされたメニューの親が持つメニューアイテムのうち、クリックされたメニューだけを選択状態にする。
+                var clicked = sender as MenuItem;
+                clicked.CheckOnlyThisMenuItem();
+
+                if (clicked == this.SeparateByChannelsWaveformRendererViewModeMenuItem)
+                {
+                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Separated;
+                    OptionManager.WaveformRendererViewMode = WaveformRendererStereoViewMode.Separated;
+                }
+                else if (clicked == this.MixedWaveformRendererViewModeMenuItem)
+                {
+                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Mixed;
+                    OptionManager.WaveformRendererViewMode = WaveformRendererStereoViewMode.Mixed;
+                }
+            }
         }
     }
 }

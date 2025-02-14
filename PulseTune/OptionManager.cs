@@ -1,5 +1,6 @@
 ﻿using LibPulseTune.AudioDevice;
 using LibPulseTune.Wasapi;
+using PulseTune.Controls;
 using System;
 
 namespace PulseTune
@@ -148,6 +149,21 @@ namespace PulseTune
             get
             {
                 return applicationOptions.GetValue<bool>(nameof(MainWindowAlwaysTopMost), false);
+            }
+        }
+
+        /// <summary>
+        /// 波形レンダラの描画モード
+        /// </summary>
+        public static WaveformRendererStereoViewMode WaveformRendererViewMode
+        {
+            set
+            {
+                applicationOptions.SetValue(nameof(WaveformRendererViewMode), value);
+            }
+            get
+            {
+                return applicationOptions.GetValue(nameof(WaveformRendererViewMode), WaveformRendererStereoViewMode.Separated);
             }
         }
 

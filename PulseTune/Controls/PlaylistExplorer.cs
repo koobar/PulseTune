@@ -114,41 +114,7 @@ namespace PulseTune.Controls
             }
         }
 
-        /// <summary>
-        /// 指定されたパスをお気に入りに追加する。
-        /// </summary>
-        /// <param name="path"></param>
-        private void AddToFavorite(string path)
-        {
-            var name = Path.GetFileName(path);
-            if (!string.IsNullOrEmpty(Path.GetDirectoryName(path)))
-            {
-                name = $"{Path.GetFileName(Path.GetDirectoryName(path))}\\{name}";
-            }
-
-            var item = new ListViewItem();
-            item.Text = name;
-            item.Tag = path;
-            item.ToolTipText = path;
-
-            if (File.Exists(path))
-            {
-                item.SubItems.Add("プレイリスト");
-            }
-            else if (Directory.Exists(path))
-            {
-                item.SubItems.Add("フォルダ");
-            }
-
-            this.Items.Add(item);
-            this.favoritesGroup.Items.Add(item);
-        }
-
-        /// <summary>
-        /// 指定されたパスを最近開いた場所に追加する。
-        /// </summary>
-        /// <param name="path"></param>
-        private void AddToRecent(string path)
+        private ListViewItem CreateItem(string path)
         {
             var name = Path.GetFileName(path);
             if (!string.IsNullOrEmpty(Path.GetDirectoryName(path)))
@@ -170,6 +136,49 @@ namespace PulseTune.Controls
                 item.SubItems.Add("フォルダ");
             }
 
+            return item;
+        }
+
+        /// <summary>
+        /// 指定されたパスをお気に入りに追加する。
+        /// </summary>
+        /// <param name="path"></param>
+        private void AddToFavorite(string path)
+        {
+            var item = CreateItem(path);
+            
+            // 「お気に入り」グループがなければ作成
+            if (this.favoritesGroup == null)
+            {
+                this.favoritesGroup = new ListViewGroup();
+                this.favoritesGroup.Header = "お気に入り";
+                this.favoritesGroup.HeaderAlignment = HorizontalAlignment.Left;
+                this.Groups.Add(this.favoritesGroup);
+            }
+
+            // アイテムを追加
+            this.Items.Add(item);
+            this.favoritesGroup.Items.Add(item);
+        }
+
+        /// <summary>
+        /// 指定されたパスを最近開いた場所に追加する。
+        /// </summary>
+        /// <param name="path"></param>
+        private void AddToRecent(string path)
+        {
+            var item = CreateItem(path);
+
+            // 「最近開いた場所」グループがなければ作成
+            if (this.recentsGroup == null)
+            {
+                this.recentsGroup = new ListViewGroup();
+                this.recentsGroup.Header = "最近開いた場所";
+                this.recentsGroup.HeaderAlignment = HorizontalAlignment.Left;
+                this.Groups.Add(this.recentsGroup);
+            }
+
+            // アイテムを追加
             this.Items.Add(item);
             this.recentsGroup.Items.Add(item);
         }
@@ -189,18 +198,9 @@ namespace PulseTune.Controls
 
             if (!this.IsDesignMode())
             {
-                this.favoritesGroup = new ListViewGroup();
-                this.favoritesGroup.Header = "お気に入り";
-                this.favoritesGroup.HeaderAlignment = HorizontalAlignment.Center;
-                this.recentsGroup = new ListViewGroup();
-                this.recentsGroup.Header = "最近開いた場所";
-                this.favoritesGroup.HeaderAlignment = HorizontalAlignment.Center;
+                this.Columns.Add(new ColumnHeader() { Text = "名前" });
+                this.Columns.Add(new ColumnHeader() { Text = "種類" });
             }
-
-            this.Columns.Add(new ColumnHeader() { Text = "名前" });
-            this.Columns.Add(new ColumnHeader() { Text = "種類" });
-            this.Groups.Add(this.recentsGroup);
-            this.Groups.Add(this.favoritesGroup);
         }
 
         /// <summary>

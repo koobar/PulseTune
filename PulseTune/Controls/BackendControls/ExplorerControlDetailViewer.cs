@@ -250,8 +250,11 @@ namespace PulseTune.Controls.BackendControls
         {
             base.OnLoad(e);
 
-            this.driveStateWatcher.Start();
-            UpdateAvailableLocations();
+            if (!this.IsDesignMode())
+            {
+                this.driveStateWatcher.Start();
+                UpdateAvailableLocations();
+            }
         }
 
         protected override void OnHandleDestroyed(EventArgs e)

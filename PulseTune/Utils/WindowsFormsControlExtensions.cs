@@ -6,6 +6,21 @@ namespace PulseTune.Utils
     public static class WindowsFormsControlExtensions
     {
         /// <summary>
+        /// こメニューアイテムの親が持つメニューアイテムのうち、こメニューだけを選択状態にする。
+        /// </summary>
+        /// <param name="menuItem"></param>
+        public static void CheckOnlyThisMenuItem(this MenuItem menuItem)
+        {
+            var parent = menuItem.Parent;
+
+            for (int i = 0; i < parent.MenuItems.Count; i++)
+            {
+                var item = parent.MenuItems[i];
+                item.Checked = item == menuItem;
+            }
+        }
+
+        /// <summary>
         /// フォームがVisual Studioのデザイナで表示されているかどうかを判定する。
         /// </summary>
         /// <returns></returns>

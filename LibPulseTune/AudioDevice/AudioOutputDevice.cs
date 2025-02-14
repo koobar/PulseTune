@@ -107,19 +107,25 @@ namespace LibPulseTune.AudioDevice
             // WASAPIで利用可能なデバイスをすべて取得する。
             using (var enumerator = new MMDeviceEnumerator())
             {
-                // 共有モード（プッシュ駆動）
-                foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
-                {
-                    result.Add(new AudioOutputDevice(mmdevice.FriendlyName, true, false, false, AudioEngine.GetAudioOutputDeviceLatency()));
-                }
-
                 // 共有モード（イベント駆動）
                 foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
                 {
                     result.Add(new AudioOutputDevice(mmdevice.FriendlyName, true, true, false, AudioEngine.GetAudioOutputDeviceLatency()));
                 }
 
-                // 排他モード
+                // 共有モード（プッシュ駆動）
+                foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
+                {
+                    result.Add(new AudioOutputDevice(mmdevice.FriendlyName, true, false, false, AudioEngine.GetAudioOutputDeviceLatency()));
+                }
+
+                // 排他モード（イベント駆動）
+                foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
+                {
+                    result.Add(new AudioOutputDevice(mmdevice.FriendlyName, true, true, true, AudioEngine.GetAudioOutputDeviceLatency()));
+                }
+
+                // 排他モード（プッシュ駆動）
                 foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
                 {
                     result.Add(new AudioOutputDevice(mmdevice.FriendlyName, true, false, true, AudioEngine.GetAudioOutputDeviceLatency()));
@@ -139,7 +145,7 @@ namespace LibPulseTune.AudioDevice
             {
                 var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
-                return new AudioOutputDevice(device.FriendlyName, true, false, false, AudioEngine.GetAudioOutputDeviceLatency());
+                return new AudioOutputDevice(device.FriendlyName, true, true, false, AudioEngine.GetAudioOutputDeviceLatency());
             }
         }
 

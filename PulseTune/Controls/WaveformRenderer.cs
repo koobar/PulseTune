@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace PulseTune.Controls
@@ -13,6 +13,8 @@ namespace PulseTune.Controls
         private float[] waveform;
         private bool isMono;
         private float lineLength = 0;
+        private WaveformRendererStereoViewMode stereoViewMode;
+        private bool enableAntiAlias;
 
         // コンストラクタ
         public WaveformRenderer()
@@ -21,8 +23,46 @@ namespace PulseTune.Controls
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.ResizeRedraw, true);
+
+            this.stereoViewMode = WaveformRendererStereoViewMode.Separated;
         }
 
+        /// <summary>
+        /// ステレオ音声の表示モード
+        /// </summary>
+        public WaveformRendererStereoViewMode StereoViewMode
+        {
+            set
+            {
+                this.stereoViewMode = value;
+                Invalidate();
+            }
+            get
+            {
+                return this.stereoViewMode;
+            }
+        }
+
+        /// <summary>
+        /// 波形をアンチエイリアスして描画するかどうか
+        /// </summary>
+        public bool EnableWaveformAntiAlias
+        {
+            set
+            {
+                this.enableAntiAlias = value;
+                Invalidate();
+            }
+            get
+            {
+                return this.enableAntiAlias;
+            }
+        }
+
+        /// <summary>
+        /// 指定された波形を描画する。
+        /// </summary>
+        /// <param name="waveform"></param>
         public void PaintWaveform(float[] waveform)
         {
             this.isMono = true;
@@ -32,6 +72,11 @@ namespace PulseTune.Controls
             Invalidate();
         }
 
+        /// <summary>
+        /// 指定された2チャンネル分の波形を描画する。
+        /// </summary>
+        /// <param name="lch"></param>
+        /// <param name="rch"></param>
         public void PaintWaveform(float[] lch, float[] rch)
         {
             this.isMono = false;
@@ -42,85 +87,85 @@ namespace PulseTune.Controls
             Invalidate();
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        /// <summary>
+        /// 指定された描画ハンドルに、指定された色で指定された波形を、指定された中心線を中心として描画する。
+        /// </summary>
+        /// <param name="graphics"></param>
+        /// <param name="color"></param>
+        /// <param name="waveform"></param>
+        /// <param name="center"></param>
+        /// <param name="k"></param>
+        protected virtual void PaintWaveform(Graphics graphics, Color color, float[] waveform, float center, float k, bool drawCenterline = true)
         {
-            base.OnPaint(e);
+            float x = 0, y = center, x2 = 0, y2 = 0;
+            var defaultSmoothingMode = graphics.SmoothingMode;
 
-            float vCenter = e.ClipRectangle.Height * 0.5f;
-            float x = 0, y = vCenter, x2 = 0, y2 = 0;
-
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            e.Graphics.Clear(this.BackColor);
-
-            if (this.isMono)
+            if (drawCenterline)
             {
-                if (this.waveform == null || this.waveform.Length <= 1)
+                graphics.DrawLine(Pens.DarkGray, 0, center, this.ClientRectangle.Right, center);
+            }
+
+            if (waveform != null && waveform.Length >= 1)
+            {
+                // アンチエイリアスが有効なら描画モードをアンチエイリアスモードに設定
+                if (this.enableAntiAlias)
                 {
-                    return;
+                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 }
 
-                using (Pen pen = new Pen(Color.Black))
+                // 波形を太さ0.5で描画
+                using (Pen pen = new Pen(color, 0.5f))
                 {
                     x = 0;
-                    y = vCenter - (this.waveform[0] * vCenter);
+                    y = center - (waveform[0] * center);
 
-                    for (int i = 1; i < this.waveform.Length - 1; i++)
+                    for (int i = 1; i < waveform.Length - 1; i++)
                     {
                         x2 = x + this.lineLength;
-                        y2 = vCenter - (this.waveform[i] * vCenter);
+                        y2 = center - (waveform[i] * k);
 
-                        e.Graphics.DrawLine(pen, x, y, x2, y2);
+                        graphics.DrawLine(pen, x, y, x2, y2);
                         x = x2;
                         y = y2;
                     }
                 }
+
+                // 後始末
+                graphics.SmoothingMode = defaultSmoothingMode;
+            }
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            e.Graphics.Clear(this.BackColor);
+            
+            if (this.isMono)
+            {
+                float center = e.ClipRectangle.Height * 0.5f;
+                PaintWaveform(e.Graphics, Color.Blue, this.waveform, center, center);
             }
             else
             {
-                // 左チャンネルのデータがあれば緑色で描画
-                if (this.lchWaveform != null && this.lchWaveform.Length >= 1)
+                if (this.stereoViewMode == WaveformRendererStereoViewMode.Separated)
                 {
-                    x = 0;
-                    y = vCenter - (this.lchWaveform[0] * vCenter);
-                    using (Pen pen = new Pen(Color.Green))
-                    {
-                        for (int i = 1; i < this.lchWaveform.Length - 1; i++)
-                        {
-                            x2 = x + this.lineLength;
-                            y2 = vCenter - (this.lchWaveform[i] * vCenter);
+                    float leftCenter = e.ClipRectangle.Height * 0.25f;
+                    float splitter = leftCenter * 2;
+                    float rightCenter = splitter + leftCenter;
 
-                            e.Graphics.DrawLine(pen, x, y, x2, y2);
-                            x = x2;
-                            y = y2;
-                        }
-                    }
+                    PaintWaveform(e.Graphics, Color.Blue, this.lchWaveform, leftCenter, leftCenter);
+                    e.Graphics.DrawLine(Pens.Gray, 0, splitter, this.ClientRectangle.Right, splitter);
+                    PaintWaveform(e.Graphics, Color.Blue, this.rchWaveform, rightCenter, leftCenter);
                 }
-
-                // 初期化
-                x2 = 0;
-                y2 = 0;
-
-                // 右チャンネルのデータがあれば赤色で描画
-                if (this.rchWaveform != null && this.rchWaveform.Length >= 1)
+                else if (this.stereoViewMode == WaveformRendererStereoViewMode.Mixed)
                 {
-                    using (Pen pen = new Pen(Color.Red))
-                    {
-                        x = 0;
-                        y = vCenter - (this.rchWaveform[0] * vCenter);
-                        for (int i = 1; i < this.rchWaveform.Length - 1; i++)
-                        {
-                            x2 = x + this.lineLength;
-                            y2 = vCenter - (this.rchWaveform[i] * vCenter);
+                    float center = e.ClipRectangle.Height * 0.5f;
 
-                            e.Graphics.DrawLine(pen, x, y, x2, y2);
-                            x = x2;
-                            y = y2;
-                        }
-                    }
+                    PaintWaveform(e.Graphics, Color.Green, this.lchWaveform, center, center);
+                    PaintWaveform(e.Graphics, Color.Red, this.rchWaveform, center, center, false);
                 }
             }
-
-            e.Graphics.DrawLine(Pens.Blue, 0, vCenter, e.ClipRectangle.Right, vCenter);
         }
     }
 }

@@ -224,15 +224,17 @@ namespace LibPulseTune.Wasapi
                     if (this.playbackState == PlaybackState.Playing)
                     {
                         int numFramesPadding;
-                        
-                        if (this.isUsingEventSync)
+
+                        if (this.shareMode == AudioClientShareMode.Shared || !this.isUsingEventSync)
                         {
-                            // 排他モードでは、常にmax = bufferFrameCount = audioClient.BufferSizeを要求する。
-                            numFramesPadding = (this.shareMode == AudioClientShareMode.Shared) ? this.audioClient.CurrentPadding : 0;
+                            // 共有モードまたはプッシュ駆動の場合はパディングが必要
+                            numFramesPadding = this.audioClient.CurrentPadding;
                         }
                         else
                         {
-                            numFramesPadding = this.audioClient.CurrentPadding;
+                            // イベント駆動の排他モードでは、常にバッファの全体にアクセスされるため、
+                            // パディングは必要ない。（してはいけない）
+                            numFramesPadding = 0;
                         }
 
                         int numFramesAvailable = this.bufferFrameCount - numFramesPadding;
