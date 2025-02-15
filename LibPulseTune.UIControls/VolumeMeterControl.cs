@@ -21,11 +21,6 @@ namespace LibPulseTune.UIControls
         }
 
         /// <summary>
-        /// 減衰をシミュレーションするかどうか（バッファが多い場合にメーターの応答が高速に見える）
-        /// </summary>
-        public bool EnableAttenuationEmulation { set; get; }
-
-        /// <summary>
         /// 振幅
         /// </summary>
         public float Amplitude
