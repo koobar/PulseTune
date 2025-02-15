@@ -32,8 +32,6 @@ namespace LibPulseTune.Engine
             }
         }
 
-        #region IAudioSourceの実装
-
         /// <summary>
         /// フォーマット
         /// </summary>
@@ -88,8 +86,6 @@ namespace LibPulseTune.Engine
                 return read;
             }
         }
-
-        #endregion
 
         /// <summary>
         /// 指定されたミリ秒分のデータをバッファから読み込む。

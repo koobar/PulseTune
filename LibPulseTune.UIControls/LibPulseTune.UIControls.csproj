@@ -52,12 +52,6 @@
     <Compile Include="AccessList.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="BackendControls\ExplorerControlDetailViewer.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="BackendControls\ExplorerControlDetailViewer.Designer.cs">
-      <DependentUpon>ExplorerControlDetailViewer.cs</DependentUpon>
-    </Compile>
     <Compile Include="BackendControls\ExplorerLikeListView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -76,9 +70,6 @@
     </Compile>
     <Compile Include="BackendControls\VerticalTextBox.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="BackendControls\VisualStyleIconButton.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ClosableTabControl.cs">
       <SubType>UserControl</SubType>
@@ -106,6 +97,9 @@
     <Compile Include="ExplorerControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="ExplorerControl.Designer.cs">
+      <DependentUpon>ExplorerControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="IMainTabControlPageElement.cs" />
     <Compile Include="MediaControlPanel.cs">
       <SubType>UserControl</SubType>
@@ -114,9 +108,6 @@
       <DependentUpon>MediaControlPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="PictureViewer.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="PlaylistExplorer.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="PlaylistViewer.cs">
@@ -148,9 +139,6 @@
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BackendControls\ExplorerControlDetailViewer.resx">
-      <DependentUpon>ExplorerControlDetailViewer.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\FindDialog.resx">
       <DependentUpon>FindDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -159,6 +147,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WasapiOptionDialog.resx">
       <DependentUpon>WasapiOptionDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExplorerControl.resx">
+      <DependentUpon>ExplorerControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MediaControlPanel.resx">
       <DependentUpon>MediaControlPanel.cs</DependentUpon>
@@ -175,10 +166,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LibPulseTune.Codecs\LibPulseTune.Codecs.csproj">
-      <Project>{a1be451c-aa38-4990-b4d0-31c6be2c1c57}</Project>
-      <Name>LibPulseTune.Codecs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\LibPulseTune.CoreAudio\LibPulseTune.CoreAudio.csproj">
       <Project>{06d92894-97b3-4c6a-84d8-b3de81c20714}</Project>
       <Name>LibPulseTune.CoreAudio</Name>
@@ -254,6 +241,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\appicon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-left-circle-custom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow-right-circle-custom.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

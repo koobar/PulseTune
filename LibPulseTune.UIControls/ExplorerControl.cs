@@ -1,6 +1,6 @@
-﻿using LibPulseTune.Metadata;
-using LibPulseTune.Metadata.Playlist;
-using LibPulseTune.Metadata.Track;
+﻿using LibPulseTune.Engine.Playlists;
+using LibPulseTune.Engine.Providers;
+using LibPulseTune.Engine.Tracks;
 using LibPulseTune.UIControls.BackendControls;
 using LibPulseTune.UIControls.Dialogs;
 using System;
@@ -12,22 +12,8 @@ using System.Windows.Forms.VisualStyles;
 
 namespace LibPulseTune.UIControls
 {
-    public class ExplorerControl : UserControl, IMainTabControlPageElement
+    public partial class ExplorerControl : UserControl, IMainTabControlPageElement
     {
-        // パネル
-        private readonly Panel leftPanel;
-        private readonly Panel mainPanel;
-
-        // 左パネルに配置するもの
-        private readonly ExplorerControlDetailViewer detailsViewer;
-
-        // メインパネルに配置するもの
-        private readonly Panel navigationPanel;
-        private readonly VisualStyleIconButton backButton;
-        private readonly VisualStyleIconButton forwardButton;
-        private readonly VerticalTextBox currentLocationTextBox;
-        private readonly FileSystemViewer viewer;
-
         // 非公開フィールド
         private readonly Playlist playlist;
         private string lastSearchPrompt;
@@ -43,71 +29,9 @@ namespace LibPulseTune.UIControls
         // コンストラクタ
         public ExplorerControl()
         {
+            InitializeComponent();
+
             this.playlist = new Playlist();
-            
-            // 各種パネルを作成
-            this.leftPanel = new Panel();
-            this.leftPanel.Dock = DockStyle.Left;
-            this.leftPanel.Width = 150;
-            this.mainPanel = new Panel();
-            this.mainPanel.Dock = DockStyle.Fill;
-
-            // 左パネルに配置するコントロールを作成
-            this.detailsViewer = new ExplorerControlDetailViewer();
-            this.detailsViewer.Dock = DockStyle.Fill;
-            this.detailsViewer.LocationSelectionChanged += OnDetailsViewerLocationSelectionChanged;
-
-            // メインパネルに配置するコントロールを作成
-            this.navigationPanel = new Panel();
-            this.navigationPanel.Dock = DockStyle.Top;
-            this.navigationPanel.Height = 20;
-            this.navigationPanel.BackColor = Color.White;
-            this.backButton = new VisualStyleIconButton(
-                VisualStyleElement.ScrollBar.ArrowButton.LeftHot,
-                VisualStyleElement.ScrollBar.ArrowButton.LeftHot,
-                VisualStyleElement.ScrollBar.ArrowButton.LeftPressed,
-                VisualStyleElement.ScrollBar.ArrowButton.LeftDisabled);
-            this.backButton.Dock = DockStyle.Left;
-            this.backButton.Width = this.navigationPanel.Height;
-            this.backButton.MouseDown += OnBackButtonClick;
-            this.forwardButton = new VisualStyleIconButton(
-                VisualStyleElement.ScrollBar.ArrowButton.RightHot,
-                VisualStyleElement.ScrollBar.ArrowButton.RightHot,
-                VisualStyleElement.ScrollBar.ArrowButton.RightPressed,
-                VisualStyleElement.ScrollBar.ArrowButton.RightDisabled);
-            this.forwardButton.Dock = DockStyle.Left;
-            this.forwardButton.Width = this.navigationPanel.Height;
-            this.forwardButton.Enabled = false;
-            this.forwardButton.MouseDown += OnForwardButtonClick;
-            this.currentLocationTextBox = new VerticalTextBox();
-            this.currentLocationTextBox.Dock = DockStyle.Fill;
-            this.currentLocationTextBox.ReadOnly = true;
-            this.currentLocationTextBox.TabStop = false;
-            this.currentLocationTextBox.BackColor = SystemColors.Control;
-            this.currentLocationTextBox.Height = this.navigationPanel.Height;
-            this.viewer = new FileSystemViewer();
-            this.viewer.Dock = DockStyle.Fill;
-            this.viewer.Navigated += OnViewerNavigated;
-            this.viewer.SelectedIndexChanged += OnViewerSelectedIndexChanged;
-            this.viewer.DoubleClick += OnViewerDoubleClick;
-            this.viewer.FileDoubleClick += OnViewerFileClick;
-
-            // ナビゲーションパネルにコントロールを追加
-            this.navigationPanel.Controls.Add(this.currentLocationTextBox);
-            this.navigationPanel.Controls.Add(this.forwardButton);
-            this.navigationPanel.Controls.Add(this.backButton);
-
-            // 左パネルにコントロールを追加
-            this.leftPanel.Controls.Add(this.detailsViewer);
-
-            // メインパネルにコントロールを追加
-            this.mainPanel.Controls.Add(this.viewer);
-            this.mainPanel.Controls.Add(this.navigationPanel);
-            
-            // 各種パネルとセパレータを追加
-            this.Controls.Add(this.mainPanel);
-            this.Controls.Add(new Splitter());
-            this.Controls.Add(this.leftPanel);
 
             // デフォルトフォントを設定
             this.Font = SystemFonts.CaptionFont;
@@ -122,11 +46,11 @@ namespace LibPulseTune.UIControls
         {
             set
             {
-                this.viewer.ContextMenu = value;
+                this.Viewer.ContextMenu = value;
             }
             get
             {
-                return this.viewer.ContextMenu;
+                return this.Viewer.ContextMenu;
             }
         }
 
@@ -137,7 +61,7 @@ namespace LibPulseTune.UIControls
         {
             get
             {
-                return this.viewer.SelectedFileNames;
+                return this.Viewer.SelectedFileNames;
             }
         }
 
@@ -148,7 +72,7 @@ namespace LibPulseTune.UIControls
         {
             get
             {
-                return this.viewer.SelectedFileNames;
+                return this.Viewer.SelectedFileNames;
             }
         }
 
@@ -188,6 +112,17 @@ namespace LibPulseTune.UIControls
             }
         }
 
+        /// <summary>
+        /// 現在の場所
+        /// </summary>
+        public string CurrentPath
+        {
+            get
+            {
+                return this.Viewer.CurrentPath;
+            }
+        }
+
         public Playlist Playlist
         {
             get
@@ -220,9 +155,9 @@ namespace LibPulseTune.UIControls
                 prompt = prompt.ToLower();
             }
 
-            for (int i = startIndex; i < this.viewer.Items.Count; ++i)
+            for (int i = startIndex; i < this.Viewer.Items.Count; ++i)
             {
-                var item = (FileSystemViewerItem)this.viewer.Items[i];
+                var item = (FileSystemViewerItem)this.Viewer.Items[i];
                 var track = item.Path;
                 if (ignoreCase)
                 {
@@ -267,7 +202,7 @@ namespace LibPulseTune.UIControls
 
                     if (index.Count > 0)
                     {
-                        this.viewer.SelectIndex(index);
+                        this.Viewer.SelectIndex(index);
                     }
 
                     this.lastSearchPrompt = dialog.Prompt;
@@ -290,7 +225,7 @@ namespace LibPulseTune.UIControls
 
             if (index.Count > 0)
             {
-                this.viewer.SelectIndex(index);
+                this.Viewer.SelectIndex(index);
             }
         }
 
@@ -346,7 +281,7 @@ namespace LibPulseTune.UIControls
         /// </summary>
         public void Reload()
         {
-            this.viewer.Reload();
+            this.Viewer.Reload();
         }
 
         /// <summary>
@@ -355,7 +290,7 @@ namespace LibPulseTune.UIControls
         /// <param name="extensions"></param>
         public void SetFileFormatFilter(IEnumerable<string> extensions)
         {
-            this.viewer.SetFileFilter(extensions);
+            this.Viewer.SetFileFilter(extensions);
         }
 
         /// <summary>
@@ -364,7 +299,7 @@ namespace LibPulseTune.UIControls
         /// <param name="driveLetter"></param>
         public void SelectDrive(char driveLetter)
         {
-            this.detailsViewer.SelectedLocation = $"{driveLetter}:\\";
+            this.Viewer.Navigate($"{driveLetter}:\\");
         }
 
         /// <summary>
@@ -373,37 +308,56 @@ namespace LibPulseTune.UIControls
         /// <param name="path"></param>
         public void Navigate(string path)
         {
-            string fileName = Path.GetFileName(path);
-            path = Path.GetDirectoryName(path);
+            var root = Directory.GetDirectoryRoot(path);
 
-            // ドライブを選択する。
-            SelectDrive(path[0]);
+            if (root == path)
+            {
+                SelectDrive(path[0]);
+            }
+            else if (Directory.Exists(path))
+            {
+                // ドライブを選択する。
+                SelectDrive(path[0]);
 
-            // ディレクトリを開き、ファイルを選択する。
-            this.viewer.Navigate(path);
-            this.viewer.SelectFile(fileName);
+                // ディレクトリを開き、ファイルを選択する。
+                this.Viewer.Navigate(path);
+            }
+            else
+            {
+                string fileName = Path.GetFileName(path);
+                path = Path.GetDirectoryName(path);
+
+                // ドライブを選択する。
+                SelectDrive(path[0]);
+
+                // ディレクトリを開き、ファイルを選択する。
+                this.Viewer.Navigate(path);
+                this.Viewer.SelectFile(fileName);
+            }
         }
 
-        private void OnDetailsViewerLocationSelectionChanged(object sender, EventArgs e)
+        private void Viewer_Navigated(object sender, EventArgs e)
         {
-            string path = this.detailsViewer.SelectedLocation;
+            this.BackButton.Enabled = this.Viewer.CanGoBack();
+            this.NextButton.Enabled = this.Viewer.CanGoForward();
 
-            if (string.IsNullOrEmpty(path))
+            this.AddressTextBox.Text = this.Viewer.CurrentPath;
+
+            this.playlist.Clear();
+            foreach (var fileName in this.Viewer.FileNames)
             {
-                return;
+                this.playlist.Add(AudioTrackProvider.CreateFileFast(fileName));
             }
 
-            this.viewer.Navigate(path);
+            this.Navigated?.Invoke(this, e);
         }
 
-        private void OnViewerSelectedIndexChanged(object sender, EventArgs e)
+        private void Viewer_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.SelectedFileNamesChanged?.Invoke(this, EventArgs.Empty);
 
-            if (this.viewer.SelectedFileNames.Length >= 1 && this.viewer.SelectedFolders.Length == 0)
+            if (this.Viewer.SelectedFileNames.Length >= 1 && this.Viewer.SelectedFolders.Length == 0)
             {
-                this.detailsViewer.ShowDetails(this.viewer.SelectedFileNames[0]);
-
                 AudioTrackBase audioTrack = null;
                 for (int i = 0; i < this.playlist.Count; ++i)
                 {
@@ -432,47 +386,26 @@ namespace LibPulseTune.UIControls
                     this.playlist.SelectedTrack = audioTrack;
                 }
             }
-            else if (this.viewer.SelectedFileNames.Length == 0 && this.viewer.SelectedFolders.Length >= 1)
-            {
-                this.detailsViewer.ShowDetails(this.viewer.SelectedFolders[0]);
-            }
         }
 
-        private void OnViewerDoubleClick(object sender, EventArgs e)
+        private void Viewer_DoubleClick(object sender, EventArgs e)
         {
             this.ItemDoubleClick?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnViewerFileClick(object sender, EventArgs e)
+        private void Viewer_FileDoubleClick(object sender, EventArgs e)
         {
-            this.FileDoubleClick?.Invoke(this, e);
+            this.FileDoubleClick?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnViewerNavigated(object sender, EventArgs e)
+        private void BackButton_Click(object sender, EventArgs e)
         {
-            this.backButton.Enabled = this.viewer.CanGoBack();
-            this.forwardButton.Enabled = this.viewer.CanGoForward();
-
-            this.detailsViewer.ShowDetails(this.viewer.CurrentPath);
-            this.currentLocationTextBox.Text = this.viewer.CurrentPath;
-
-            this.playlist.Clear();
-            foreach (var fileName in this.viewer.FileNames)
-            {
-                this.playlist.Add(AudioTrackProvider.CreateFileFast(fileName));
-            }
-
-            this.Navigated?.Invoke(this, e);
+            this.Viewer.GoBack();
         }
 
-        private void OnForwardButtonClick(object sender, EventArgs e)
+        private void NextButton_Click(object sender, EventArgs e)
         {
-            this.viewer.GoForward();
-        }
-
-        private void OnBackButtonClick(object sender, EventArgs e)
-        {
-            this.viewer.GoBack();
+            this.Viewer.GoForward();
         }
     }
 }

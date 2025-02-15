@@ -1,8 +1,8 @@
-﻿using LibPulseTune.Metadata.Track;
+﻿using LibPulseTune.Engine.Tracks;
 using System;
 using System.Collections.Generic;
 
-namespace LibPulseTune.Metadata.Playlist
+namespace LibPulseTune.Engine.Playlists
 {
     public class Playlist
     {
@@ -65,7 +65,7 @@ namespace LibPulseTune.Metadata.Playlist
             }
             get
             {
-                if (this.currentIndex == -1)
+                if (this.currentIndex == -1 || this.currentIndex >= this.tracks.Count - 1)
                 {
                     return null;
                 }

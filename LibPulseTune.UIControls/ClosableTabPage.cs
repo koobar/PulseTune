@@ -1,10 +1,17 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace LibPulseTune.UIControls
 {
     public class ClosableTabPage
     {
+        // 非公開フィールド
+        private string text;
+
+        // イベント
+        public event EventHandler TextChanged;
+
         // コンストラクタ
         public ClosableTabPage(string text, bool isClosable = true)
         {
@@ -15,7 +22,18 @@ namespace LibPulseTune.UIControls
         /// <summary>
         /// テキスト
         /// </summary>
-        public string Text { set; get; }
+        public string Text
+        {
+            set
+            {
+                this.text = value;
+                this.TextChanged?.Invoke(this, EventArgs.Empty);
+            }
+            get
+            {
+                return this.text;
+            }
+        }
 
         /// <summary>
         /// このタブページを閉じることができるかどうかを示す。

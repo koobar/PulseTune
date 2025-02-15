@@ -1,4 +1,4 @@
-﻿namespace LibPulseTune.Metadata.Playlist
+﻿namespace LibPulseTune.Engine.Playlists
 {
     public interface IPlaylistReader
     {

@@ -42,21 +42,6 @@ namespace LibPulseTune.Options
         }
 
         /// <summary>
-        /// WASAPIで扱われるデバイスであるかどうかを示す。
-        /// </summary>
-        public static bool IsWASAPIDevice
-        {
-            set
-            {
-                applicationOptions.SetValue(nameof(IsWASAPIDevice), value);
-            }
-            get
-            {
-                return applicationOptions.GetValue(nameof(IsWASAPIDevice), false);
-            }
-        }
-
-        /// <summary>
         /// WASAPI排他モードで扱われるデバイスであるかどうかを示す。
         /// </summary>
         public static bool IsWASAPIExclusiveMode
@@ -127,7 +112,7 @@ namespace LibPulseTune.Options
             }
             get
             {
-                return applicationOptions.GetValue<MmThreadCharacteristics>(nameof(MmThreadCharacteristics), MmThreadCharacteristics.Playback);
+                return applicationOptions.GetValue(nameof(MmThreadCharacteristics), MmThreadCharacteristics.Playback);
             }
         }
 
@@ -225,7 +210,6 @@ namespace LibPulseTune.Options
 
             // デバイス設定
             AudioOutputDeviceName = defaultDevice.DeviceName;
-            IsWASAPIDevice= defaultDevice.IsWASAPIDevice;
             IsWASAPIEventSyncMode = defaultDevice.IsWASAPIEventSyncMode;
             IsWASAPIExclusiveMode = defaultDevice.IsWASAPIExclusiveMode;
             AudioOutputDeviceLatency = defaultDevice.Latency;

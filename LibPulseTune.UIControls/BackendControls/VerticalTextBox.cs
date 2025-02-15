@@ -23,8 +23,8 @@ namespace LibPulseTune.UIControls.BackendControls
             this.Controls.Add(this.textBox);
 
             // 初期化
-            this.Text = "";
-            this.LeftRightPadding = 10;
+            this.Text = string.Empty;
+            this.LeftRightPadding = 5;
         }
 
         public bool ReadOnly
@@ -67,7 +67,7 @@ namespace LibPulseTune.UIControls.BackendControls
         {
             get 
             { 
-                return base.BackColor; 
+                return this.textBox.BackColor; 
             }
             set
             {
@@ -148,5 +148,4 @@ namespace LibPulseTune.UIControls.BackendControls
             }
         }
     }
-
 }

@@ -1,4 +1,5 @@
-﻿using LibPulseTune.UIControls.BackendControls;
+﻿using LibPulseTune.Database;
+using LibPulseTune.UIControls.BackendControls;
 using LibPulseTune.UIControls.Utils;
 using System;
 using System.Drawing;
@@ -37,22 +38,23 @@ namespace LibPulseTune.UIControls
         {
             set
             {
-                if (!this.IsDesignMode())
+                if (this.IsDesignMode())
                 {
-                    this.driveStateWatcher.Stop();
-
-                    UpdateAvailableLocations();
-
-                    foreach (ListViewGroup group in this.Groups)
-                    {
-                        foreach (ListViewItem item in group.Items)
-                        {
-                            item.Selected = item.Tag.ToString() == value;
-                        }
-                    }
-
-                    this.driveStateWatcher.Start();
+                    return;
                 }
+
+                this.driveStateWatcher.Stop();
+                UpdateAvailableLocations();
+
+                foreach (ListViewGroup group in this.Groups)
+                {
+                    foreach (ListViewItem item in group.Items)
+                    {
+                        item.Selected = item.Tag.ToString() == value;
+                    }
+                }
+
+                this.driveStateWatcher.Start();
             }
             get
             {
@@ -99,14 +101,10 @@ namespace LibPulseTune.UIControls
         }
 
         /// <summary>
-        /// 利用可能なドライブのリストを更新する。
+        /// ドライブを読み込む。
         /// </summary>
-        private void UpdateAvailableLocations()
+        private void LoadDrives()
         {
-            this.Items.Clear();
-            this.Groups.Clear();
-
-            // ドライブを追加
             var driveGroup = new ListViewGroup();
             driveGroup.Header = "ドライブ";
             foreach (var info in DriveInfo.GetDrives())
@@ -122,7 +120,14 @@ namespace LibPulseTune.UIControls
                     this.Items.Add(item);
                 }
             }
+            this.Groups.Add(driveGroup);
+        }
 
+        /// <summary>
+        /// クイックアクセスを読み込む。
+        /// </summary>
+        private void LoadQuickAccess()
+        {
             // Windows 10以降か？
             if (Environment.OSVersion.Version.Major >= 10)
             {
@@ -142,13 +147,45 @@ namespace LibPulseTune.UIControls
                     this.Items.Add(item);
                 }
 
-                this.Groups.Add(quickAccessGroup);
-                this.Groups.Add(driveGroup);
+                this.Groups.Insert(0, quickAccessGroup);
             }
-            else
+        }
+
+        /// <summary>
+        /// お気に入りを読み込む。
+        /// </summary>
+        private void LoadFavorites()
+        {
+            var favoriteGroup = new ListViewGroup();
+            favoriteGroup.Header = "お気に入り";
+            
+            for (int i = 0; i < PlaylistExplorerData.GetFavoriteLocationsCount(); i++)
             {
-                this.Groups.Add(driveGroup);
+                var location = PlaylistExplorerData.GetFavoriteLocation(i);
+                var item = new ExplorerLikeListViewItem();
+                item.Tag = location;
+                item.Icon = GetFolderIcon(location, 16, 16);
+                item.Text = Path.GetFileName(location);
+
+                favoriteGroup.Items.Add(item);
+                this.Items.Add(item);
             }
+
+            this.Groups.Insert(0, favoriteGroup);
+        }
+
+        /// <summary>
+        /// 利用可能なドライブのリストを更新する。
+        /// </summary>
+        public void UpdateAvailableLocations()
+        {
+            // 古いアイテムとグループを初期化
+            this.Items.Clear();
+            this.Groups.Clear();
+
+            LoadDrives();
+            LoadQuickAccess();
+            LoadFavorites();
 
             this.Columns[0].Width = -2;
         }
@@ -157,29 +194,37 @@ namespace LibPulseTune.UIControls
         {
             base.OnHandleCreated(e);
 
-            if (!this.IsDesignMode())
+            if (this.IsDesignMode())
             {
-                this.driveStateWatcher.Start();
-                UpdateAvailableLocations();
+                return;
             }
+
+            this.driveStateWatcher.Start();
+            UpdateAvailableLocations();
         }
 
         protected override void OnHandleDestroyed(EventArgs e)
         {
             base.OnHandleDestroyed(e);
-            
-            if (!this.IsDesignMode())
+
+            if (this.IsDesignMode())
             {
-                this.driveStateWatcher.Stop();
+                return;
             }
+
+            this.driveStateWatcher.Stop();
         }
 
         private void OnDriveStateChanged(object sender, EventArgs e)
         {
+            if (this.IsDesignMode())
+            {
+                return;
+            }
+
             var location = this.SelectedLocation;
 
             UpdateAvailableLocations();
-
             this.SelectedLocation = location;
         }
 

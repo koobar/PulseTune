@@ -1,6 +1,5 @@
 ﻿using LibPulseTune.Engine;
 using NAudio.CoreAudioApi;
-using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,7 +9,6 @@ namespace LibPulseTune.CoreAudio
     {
         // 非公開フィールド
         private readonly string deviceName;
-        private readonly bool isWasapiDevice;
         private readonly bool isWasapiEventSync;
         private readonly bool isWasapiExclusiveMode;
         private readonly uint latency;
@@ -18,13 +16,11 @@ namespace LibPulseTune.CoreAudio
         // コンストラクタ
         public WasapiDevice(
             string deviceName, 
-            bool isWasapiDevice,
             bool isWasapiEventSync,
             bool isWasapiExclusiveMode,
             uint latency)
         {
             this.deviceName = deviceName;
-            this.isWasapiDevice = isWasapiDevice;
             this.isWasapiEventSync = isWasapiEventSync;
             this.isWasapiExclusiveMode = isWasapiExclusiveMode;
             this.latency = latency;
@@ -40,17 +36,6 @@ namespace LibPulseTune.CoreAudio
             get
             {
                 return this.deviceName;
-            }
-        }
-
-        /// <summary>
-        /// WASAPIで使用されるデバイスであるかどうかを示す。
-        /// </summary>
-        public bool IsWASAPIDevice
-        {
-            get
-            {
-                return this.isWasapiDevice;
             }
         }
 
@@ -87,12 +72,20 @@ namespace LibPulseTune.CoreAudio
             }
         }
 
+        /// <summary>
+        /// MMCSSを使用するかどうか
+        /// </summary>
         public bool EnableMMCSS { set; get; }
 
+        /// <summary>
+        /// 再生スレッドの特徴
+        /// </summary>
         public MmThreadCharacteristics ThreadCharacteristics { set; get; }
 
+        /// <summary>
+        /// 再生スレッドの優先度
+        /// </summary>
         public AvThreadPriority PlaybackThreadPriority { set; get; }
-
 
         #endregion
 
@@ -110,25 +103,25 @@ namespace LibPulseTune.CoreAudio
                 // 共有モード（イベント駆動）
                 foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
                 {
-                    result.Add(new WasapiDevice(mmdevice.FriendlyName, true, true, false, AudioEngine.GetAudioOutputDeviceLatency()));
+                    result.Add(new WasapiDevice(mmdevice.FriendlyName, true, false, AudioEngine.GetAudioOutputDeviceLatency()));
                 }
 
                 // 共有モード（プッシュ駆動）
                 foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
                 {
-                    result.Add(new WasapiDevice(mmdevice.FriendlyName, true, false, false, AudioEngine.GetAudioOutputDeviceLatency()));
+                    result.Add(new WasapiDevice(mmdevice.FriendlyName, false, false, AudioEngine.GetAudioOutputDeviceLatency()));
                 }
 
                 // 排他モード（イベント駆動）
                 foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
                 {
-                    result.Add(new WasapiDevice(mmdevice.FriendlyName, true, true, true, AudioEngine.GetAudioOutputDeviceLatency()));
+                    result.Add(new WasapiDevice(mmdevice.FriendlyName, true, true, AudioEngine.GetAudioOutputDeviceLatency()));
                 }
 
                 // 排他モード（プッシュ駆動）
                 foreach (var mmdevice in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
                 {
-                    result.Add(new WasapiDevice(mmdevice.FriendlyName, true, false, true, AudioEngine.GetAudioOutputDeviceLatency()));
+                    result.Add(new WasapiDevice(mmdevice.FriendlyName, false, true, AudioEngine.GetAudioOutputDeviceLatency()));
                 }
             }
 
@@ -145,7 +138,7 @@ namespace LibPulseTune.CoreAudio
             {
                 var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
-                return new WasapiDevice(device.FriendlyName, true, true, false, AudioEngine.GetAudioOutputDeviceLatency());
+                return new WasapiDevice(device.FriendlyName, true, false, AudioEngine.GetAudioOutputDeviceLatency());
             }
         }
 
@@ -156,11 +149,6 @@ namespace LibPulseTune.CoreAudio
         /// <returns></returns>
         private MMDevice GetMMDevice(string deviceName)
         {
-            if (!this.isWasapiDevice)
-            {
-                throw new InvalidOperationException("WASAPI以外のエンジンを使用している場合、GetMMDevice関数は使用できません。");
-            }
-
             using (var enumerator = new MMDeviceEnumerator())
             {
                 foreach (var device in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
@@ -175,22 +163,23 @@ namespace LibPulseTune.CoreAudio
             return null;
         }
 
+        /// <summary>
+        /// デバイスのインスタンスを生成する。
+        /// </summary>
+        /// <returns></returns>
         public IAudioPlayer CreateDeviceInstance()
         {
-            if (this.isWasapiDevice)
+            var shareMode = this.isWasapiExclusiveMode ? AudioClientShareMode.Exclusive : AudioClientShareMode.Shared;
+            var device = GetMMDevice(this.deviceName);
+
+            if (device != null)
             {
-                var shareMode = this.isWasapiExclusiveMode ? AudioClientShareMode.Exclusive : AudioClientShareMode.Shared;
-                var device = GetMMDevice(this.deviceName);
+                var result = new CustomWasapiOut(device, shareMode, this.isWasapiEventSync, (int)this.latency);
+                result.EnableMMCSS = this.EnableMMCSS;
+                result.MmThreadCharacteristics = this.ThreadCharacteristics;
+                result.PlaybackAvThreadPriority = this.PlaybackThreadPriority;
 
-                if (device != null)
-                {
-                    var result = new CustomWasapiOut(device, shareMode, this.isWasapiEventSync, (int)this.latency);
-                    result.EnableMMCSS = this.EnableMMCSS;
-                    result.MmThreadCharacteristics = this.ThreadCharacteristics;
-                    result.PlaybackAvThreadPriority = this.PlaybackThreadPriority;
-
-                    return result;
-                }
+                return result;
             }
 
             return null;
@@ -208,7 +197,6 @@ namespace LibPulseTune.CoreAudio
                 var wasapi = device as WasapiDevice;
 
                 if (this.deviceName == wasapi.deviceName &&
-                    this.isWasapiDevice == wasapi.isWasapiDevice &&
                     this.isWasapiEventSync == wasapi.isWasapiEventSync &&
                     this.isWasapiExclusiveMode == wasapi.isWasapiExclusiveMode)
                 {
@@ -223,11 +211,11 @@ namespace LibPulseTune.CoreAudio
         {
             var sb = new StringBuilder();
 
-            if (this.isWasapiDevice && !this.isWasapiExclusiveMode)
+            if (!this.isWasapiExclusiveMode)
             {
                 sb.Append("[共有モード] ");
             }
-            else if (this.isWasapiDevice && this.isWasapiExclusiveMode)
+            else if (this.isWasapiExclusiveMode)
             {
                 sb.Append("[排他モード] ");
             }

@@ -56,17 +56,10 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AudioTrackProvider.cs" />
-    <Compile Include="PlaylistReaderProvider.cs" />
-    <Compile Include="PlaylistWriterProvider.cs" />
-    <Compile Include="Playlist\IPlaylistReader.cs" />
-    <Compile Include="Playlist\IPlaylistWriter.cs" />
     <Compile Include="Playlist\M3UPlaylistReader.cs" />
     <Compile Include="Playlist\M3UPlaylistWriter.cs" />
-    <Compile Include="Playlist\Playlist.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Thumbnail.cs" />
-    <Compile Include="Track\AudioTrackBase.cs" />
     <Compile Include="Track\GeneralPurposeAudioTrack.cs" />
     <Compile Include="Track\VorbisAudioTrack.cs" />
     <Compile Include="Utils\AsyncUtils.cs" />

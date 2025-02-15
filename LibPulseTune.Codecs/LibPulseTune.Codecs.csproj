@@ -45,7 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AudioSourceProvider.cs" />
     <Compile Include="Cd\CDAudioSource.cs" />
     <Compile Include="Cd\CDDA.cs" />
     <Compile Include="Cd\CDTrack.cs" />

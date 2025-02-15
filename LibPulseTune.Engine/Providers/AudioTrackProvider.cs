@@ -1,16 +1,17 @@
-﻿using LibPulseTune.Metadata.Track;
+﻿using LibPulseTune.Engine.Tracks;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace LibPulseTune.Metadata
+namespace LibPulseTune.Engine.Providers
 {
     public static class AudioTrackProvider
     {
         // 非公開フィールド
         private static readonly Dictionary<string, List<string>> audioTrackFormatDictionary = new Dictionary<string, List<string>>();
         private static readonly Dictionary<string, Type> audioTrackTypeDictionary = new Dictionary<string, Type>();
+        private static Type typeOfGeneralPurposeTrack;
 
         /// <summary>
         /// オーディオトラックの型を登録する。
@@ -48,6 +49,15 @@ namespace LibPulseTune.Metadata
                     audioTrackTypeDictionary.Add(extension, type);
                 }
             }
+        }
+
+        /// <summary>
+        /// 汎用として扱うオーディオトラックの型を設定する。
+        /// </summary>
+        /// <param name="type"></param>
+        public static void RegisterGeneralPurposeAudioTrackType(Type type)
+        {
+            typeOfGeneralPurposeTrack = type;
         }
 
         /// <summary>
@@ -117,8 +127,13 @@ namespace LibPulseTune.Metadata
                 return (AudioTrackBase)Activator.CreateInstance(type, new object[] { path });
             }
 
+            if (typeOfGeneralPurposeTrack == null)
+            {
+                return null;
+            }
+
             // 対応するオーディオトラックの型が見つからなかった場合は、汎用トラックで読み込んで返す。
-            return new GeneralPurposeAudioTrack(path);
+            return (AudioTrackBase)Activator.CreateInstance(typeOfGeneralPurposeTrack, new object[] { path });
         }
 
         /// <summary>
@@ -148,8 +163,13 @@ namespace LibPulseTune.Metadata
                 return (AudioTrackBase)Activator.CreateInstance(type, new object[] { path, true });
             }
 
+            if (typeOfGeneralPurposeTrack == null)
+            {
+                return null;
+            }
+
             // 対応するオーディオトラックの型が見つからなかった場合は、汎用トラックで読み込んで返す。
-            return new GeneralPurposeAudioTrack(path, true);
+            return (AudioTrackBase)Activator.CreateInstance(typeOfGeneralPurposeTrack, new object[] { path });
         }
 
         /// <summary>

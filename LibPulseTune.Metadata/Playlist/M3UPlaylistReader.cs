@@ -1,5 +1,7 @@
-﻿using LibPulseTune.Codecs;
-using LibPulseTune.Metadata.Track;
+﻿using LibPulseTune.Engine;
+using LibPulseTune.Engine.Playlists;
+using LibPulseTune.Engine.Providers;
+using LibPulseTune.Engine.Tracks;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -27,7 +29,7 @@ namespace LibPulseTune.Metadata.Playlist
             }
         }
 
-        public void OpenFile(string path, Playlist playlist)
+        public void OpenFile(string path, LibPulseTune.Engine.Playlists.Playlist playlist)
         {
             var tracks = new List<AudioTrackBase>();
 

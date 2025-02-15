@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -45,14 +46,21 @@
   <ItemGroup>
     <Compile Include="AudioEngine.cs" />
     <Compile Include="AudioPlayer.cs" />
+    <Compile Include="Providers\AudioSourceProvider.cs" />
+    <Compile Include="Tracks\AudioTrackBase.cs" />
+    <Compile Include="Providers\AudioTrackProvider.cs" />
     <Compile Include="IAudioOutputDevice.cs" />
     <Compile Include="IAudioPlayer.cs" />
     <Compile Include="IAudioSource.cs" />
     <Compile Include="PlaybackTimer.cs" />
+    <Compile Include="Playlists\IPlaylistReader.cs" />
+    <Compile Include="Playlists\IPlaylistWriter.cs" />
+    <Compile Include="Playlists\Playlist.cs" />
+    <Compile Include="Providers\PlaylistReaderProvider.cs" />
+    <Compile Include="Providers\PlaylistWriterProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WaveformMonitor.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <PackageReference Include="NAudio.Core">
       <Version>2.2.1</Version>

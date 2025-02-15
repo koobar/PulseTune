@@ -38,11 +38,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.WaveformRendererControl = new LibPulseTune.UIControls.WaveformRenderer();
-            this.LeftChannelVolumeMeter = new LibPulseTune.UIControls.VolumeMeterControl();
-            this.RightChannelVolumeMeter = new LibPulseTune.UIControls.VolumeMeterControl();
-            this.TrackPictureViewer = new LibPulseTune.UIControls.PictureViewer();
-            this.PlaylistBrowser = new LibPulseTune.UIControls.PlaylistExplorer();
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.MainMenuRoot = new System.Windows.Forms.MainMenu(this.components);
             this.FileMenu = new System.Windows.Forms.MenuItem();
@@ -85,6 +80,11 @@
             this.menuItem3 = new System.Windows.Forms.MenuItem();
             this.ShowVersionDialogHelpMenuItem = new System.Windows.Forms.MenuItem();
             this.MainTabControl = new LibPulseTune.UIControls.ClosableTabControl();
+            this.AccessListControl = new LibPulseTune.UIControls.AccessList();
+            this.WaveformRendererControl = new LibPulseTune.UIControls.WaveformRenderer();
+            this.LeftChannelVolumeMeter = new LibPulseTune.UIControls.VolumeMeterControl();
+            this.RightChannelVolumeMeter = new LibPulseTune.UIControls.VolumeMeterControl();
+            this.TrackPictureViewer = new LibPulseTune.UIControls.PictureViewer();
             this.ControlPanel = new LibPulseTune.UIControls.MediaControlPanel();
             this.StatusBar.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -104,12 +104,14 @@
             // 
             // StatusText
             // 
+            this.StatusText.BackColor = System.Drawing.SystemColors.Control;
             this.StatusText.Name = "StatusText";
             this.StatusText.Size = new System.Drawing.Size(118, 17);
             this.StatusText.Text = "PulseTune by koobar.";
             // 
             // PlaybackTimeStatusText
             // 
+            this.PlaybackTimeStatusText.BackColor = System.Drawing.SystemColors.Control;
             this.PlaybackTimeStatusText.Name = "PlaybackTimeStatusText";
             this.PlaybackTimeStatusText.Size = new System.Drawing.Size(851, 17);
             this.PlaybackTimeStatusText.Spring = true;
@@ -118,6 +120,8 @@
             // 
             // panel1
             // 
+            this.panel1.BackColor = System.Drawing.SystemColors.Control;
+            this.panel1.Controls.Add(this.AccessListControl);
             this.panel1.Controls.Add(this.label4);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label2);
@@ -126,7 +130,6 @@
             this.panel1.Controls.Add(this.LeftChannelVolumeMeter);
             this.panel1.Controls.Add(this.RightChannelVolumeMeter);
             this.panel1.Controls.Add(this.TrackPictureViewer);
-            this.panel1.Controls.Add(this.PlaylistBrowser);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
@@ -163,7 +166,7 @@
             this.label2.AutoSize = true;
             this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.label2.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label2.Location = new System.Drawing.Point(49, 255);
+            this.label2.Location = new System.Drawing.Point(54, 255);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(77, 12);
             this.label2.TabIndex = 14;
@@ -180,70 +183,6 @@
             this.label1.Size = new System.Drawing.Size(96, 12);
             this.label1.TabIndex = 13;
             this.label1.Text = "LEVEL METER";
-            // 
-            // WaveformRendererControl
-            // 
-            this.WaveformRendererControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.WaveformRendererControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.WaveformRendererControl.EnableWaveformAntiAlias = true;
-            this.WaveformRendererControl.Location = new System.Drawing.Point(3, 270);
-            this.WaveformRendererControl.Name = "WaveformRendererControl";
-            this.WaveformRendererControl.Size = new System.Drawing.Size(174, 43);
-            this.WaveformRendererControl.StereoViewMode = LibPulseTune.Options.WaveformRendererStereoViewMode.Separated;
-            this.WaveformRendererControl.TabIndex = 12;
-            // 
-            // LeftChannelVolumeMeter
-            // 
-            this.LeftChannelVolumeMeter.Amplitude = 0F;
-            this.LeftChannelVolumeMeter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.LeftChannelVolumeMeter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.LeftChannelVolumeMeter.EnableAttenuationEmulation = false;
-            this.LeftChannelVolumeMeter.Location = new System.Drawing.Point(3, 331);
-            this.LeftChannelVolumeMeter.Name = "LeftChannelVolumeMeter";
-            this.LeftChannelVolumeMeter.Size = new System.Drawing.Size(174, 17);
-            this.LeftChannelVolumeMeter.TabIndex = 11;
-            // 
-            // RightChannelVolumeMeter
-            // 
-            this.RightChannelVolumeMeter.Amplitude = 0F;
-            this.RightChannelVolumeMeter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.RightChannelVolumeMeter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.RightChannelVolumeMeter.EnableAttenuationEmulation = false;
-            this.RightChannelVolumeMeter.Location = new System.Drawing.Point(3, 351);
-            this.RightChannelVolumeMeter.Name = "RightChannelVolumeMeter";
-            this.RightChannelVolumeMeter.Size = new System.Drawing.Size(174, 17);
-            this.RightChannelVolumeMeter.TabIndex = 10;
-            // 
-            // TrackPictureViewer
-            // 
-            this.TrackPictureViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TrackPictureViewer.Location = new System.Drawing.Point(3, 371);
-            this.TrackPictureViewer.Name = "TrackPictureViewer";
-            this.TrackPictureViewer.Picture = null;
-            this.TrackPictureViewer.Size = new System.Drawing.Size(174, 174);
-            this.TrackPictureViewer.TabIndex = 9;
-            this.TrackPictureViewer.TabStop = false;
-            // 
-            // PlaylistBrowser
-            // 
-            this.PlaylistBrowser.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.PlaylistBrowser.FullRowSelect = true;
-            this.PlaylistBrowser.HideSelection = false;
-            this.PlaylistBrowser.Location = new System.Drawing.Point(3, 3);
-            this.PlaylistBrowser.MultiSelect = false;
-            this.PlaylistBrowser.Name = "PlaylistBrowser";
-            this.PlaylistBrowser.ShowItemToolTips = true;
-            this.PlaylistBrowser.Size = new System.Drawing.Size(174, 249);
-            this.PlaylistBrowser.TabIndex = 8;
-            this.PlaylistBrowser.UseCompatibleStateImageBehavior = false;
-            this.PlaylistBrowser.View = System.Windows.Forms.View.Details;
-            this.PlaylistBrowser.LocationDoubleClick += new System.EventHandler(this.PlaylistBrowser_LocationDoubleClick);
             // 
             // splitter1
             // 
@@ -542,6 +481,7 @@
             // 
             // MainTabControl
             // 
+            this.MainTabControl.BackColor = System.Drawing.SystemColors.Control;
             this.MainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainTabControl.Location = new System.Drawing.Point(183, 0);
             this.MainTabControl.Name = "MainTabControl";
@@ -551,8 +491,78 @@
             this.MainTabControl.Size = new System.Drawing.Size(801, 548);
             this.MainTabControl.TabIndex = 7;
             // 
+            // AccessListControl
+            // 
+            this.AccessListControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.AccessListControl.FullRowSelect = true;
+            this.AccessListControl.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.AccessListControl.HideSelection = false;
+            this.AccessListControl.Location = new System.Drawing.Point(3, 3);
+            this.AccessListControl.Name = "AccessListControl";
+            this.AccessListControl.OwnerDraw = true;
+            this.AccessListControl.SelectedLocation = null;
+            this.AccessListControl.Size = new System.Drawing.Size(174, 249);
+            this.AccessListControl.TabIndex = 17;
+            this.AccessListControl.UseCompatibleStateImageBehavior = false;
+            this.AccessListControl.View = System.Windows.Forms.View.Details;
+            this.AccessListControl.DoubleClick += new System.EventHandler(this.AccessListControl_DoubleClick);
+            // 
+            // WaveformRendererControl
+            // 
+            this.WaveformRendererControl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.WaveformRendererControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(245)))), ((int)(((byte)(249)))));
+            this.WaveformRendererControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.WaveformRendererControl.EnableWaveformAntiAlias = true;
+            this.WaveformRendererControl.Location = new System.Drawing.Point(3, 270);
+            this.WaveformRendererControl.Name = "WaveformRendererControl";
+            this.WaveformRendererControl.Size = new System.Drawing.Size(174, 43);
+            this.WaveformRendererControl.StereoViewMode = LibPulseTune.Options.WaveformRendererStereoViewMode.Separated;
+            this.WaveformRendererControl.TabIndex = 12;
+            // 
+            // LeftChannelVolumeMeter
+            // 
+            this.LeftChannelVolumeMeter.Amplitude = 0F;
+            this.LeftChannelVolumeMeter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.LeftChannelVolumeMeter.BackColor = System.Drawing.SystemColors.Control;
+            this.LeftChannelVolumeMeter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.LeftChannelVolumeMeter.EnableAttenuationEmulation = false;
+            this.LeftChannelVolumeMeter.Location = new System.Drawing.Point(3, 331);
+            this.LeftChannelVolumeMeter.Name = "LeftChannelVolumeMeter";
+            this.LeftChannelVolumeMeter.Size = new System.Drawing.Size(174, 17);
+            this.LeftChannelVolumeMeter.TabIndex = 11;
+            // 
+            // RightChannelVolumeMeter
+            // 
+            this.RightChannelVolumeMeter.Amplitude = 0F;
+            this.RightChannelVolumeMeter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.RightChannelVolumeMeter.BackColor = System.Drawing.SystemColors.Control;
+            this.RightChannelVolumeMeter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.RightChannelVolumeMeter.EnableAttenuationEmulation = false;
+            this.RightChannelVolumeMeter.Location = new System.Drawing.Point(3, 351);
+            this.RightChannelVolumeMeter.Name = "RightChannelVolumeMeter";
+            this.RightChannelVolumeMeter.Size = new System.Drawing.Size(174, 17);
+            this.RightChannelVolumeMeter.TabIndex = 10;
+            // 
+            // TrackPictureViewer
+            // 
+            this.TrackPictureViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TrackPictureViewer.BackColor = System.Drawing.SystemColors.Control;
+            this.TrackPictureViewer.Location = new System.Drawing.Point(3, 371);
+            this.TrackPictureViewer.Name = "TrackPictureViewer";
+            this.TrackPictureViewer.Picture = null;
+            this.TrackPictureViewer.Size = new System.Drawing.Size(174, 174);
+            this.TrackPictureViewer.TabIndex = 9;
+            this.TrackPictureViewer.TabStop = false;
+            // 
             // ControlPanel
             // 
+            this.ControlPanel.BackColor = System.Drawing.SystemColors.Control;
             this.ControlPanel.BackwardCommand = null;
             this.ControlPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.ControlPanel.ForwardCommand = null;
@@ -572,6 +582,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(984, 640);
             this.Controls.Add(this.MainTabControl);
             this.Controls.Add(this.splitter1);
@@ -598,7 +609,6 @@
         private System.Windows.Forms.ToolStripStatusLabel PlaybackTimeStatusText;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Splitter splitter1;
-        private LibPulseTune.UIControls.PlaylistExplorer PlaylistBrowser;
         private LibPulseTune.UIControls.ClosableTabControl MainTabControl;
         private LibPulseTune.UIControls.PictureViewer TrackPictureViewer;
         private System.Windows.Forms.MainMenu MainMenuRoot;
@@ -648,5 +658,6 @@
         private System.Windows.Forms.MenuItem WaveformRendererViewModesMenuItem;
         private System.Windows.Forms.MenuItem SeparateByChannelsWaveformRendererViewModeMenuItem;
         private System.Windows.Forms.MenuItem MixedWaveformRendererViewModeMenuItem;
+        private LibPulseTune.UIControls.AccessList AccessListControl;
     }
 }

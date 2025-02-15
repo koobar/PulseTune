@@ -19,7 +19,6 @@ namespace LibPulseTune.UIControls.BackendControls
             this.path = path;
             this.Icon = icon;
             this.isFolder = isFolder;
-            this.Text = System.IO.Path.GetFileName(path);
         }
 
         public string Path

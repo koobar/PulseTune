@@ -27,6 +27,7 @@ namespace LibPulseTune.UIControls.BackendControls
         {
             this.View = View.Details;
             this.OwnerDraw = true;
+            this.FullRowSelect = true;
         }
 
         /// <summary>
@@ -114,6 +115,77 @@ namespace LibPulseTune.UIControls.BackendControls
         }
 
         /// <summary>
+        /// サブアイテムの描画処理
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnDrawSubItem(DrawListViewSubItemEventArgs e)
+        {
+            base.OnDrawSubItem(e);
+
+            if (e.Item == null)
+            {
+                return;
+            }
+
+            var item = e.Item;
+            int iconX = 0, iconY = 0, iconWidth = 0, iconHeight = 0;
+            int textX = 0, textY = 0, textWidth = 0, textHeight = 0;
+            Image icon = null;
+            var text = string.Empty;
+            var textAreaComputed = false;
+            var hasIcon = false;
+
+            if (e.ColumnIndex == 0)
+            {
+                if (item is ExplorerLikeListViewItem explorerLikeListViewItem)
+                {
+                    if (explorerLikeListViewItem.Icon != null)
+                    {
+                        iconX = e.SubItem.Bounds.X + SPACING;
+                        iconY = e.SubItem.Bounds.Y + SPACING / 2;
+                        iconWidth = explorerLikeListViewItem.Icon.Width;
+                        iconHeight = explorerLikeListViewItem.Icon.Height;
+                        textX = iconX + iconWidth + SPACING;
+                        textY = e.SubItem.Bounds.Y;
+                        textWidth = e.SubItem.Bounds.Width;
+                        textHeight = e.SubItem.Bounds.Height;
+
+                        if (e.ColumnIndex == 0)
+                        {
+                            icon = explorerLikeListViewItem.Icon;
+                        }
+
+                        text = e.SubItem.Text;
+                        textAreaComputed = true;
+                        hasIcon = true;
+                    }
+                }
+            }
+
+            if (!textAreaComputed)
+            {
+                textX = e.SubItem.Bounds.X + SPACING;
+                textY = e.SubItem.Bounds.Y;
+                textWidth = e.SubItem.Bounds.Width;
+                textHeight = e.SubItem.Bounds.Height;
+                text = e.SubItem.Text;
+                textAreaComputed = true;
+            }
+
+            if (hasIcon)
+            {
+                // アイコンを描画
+                e.Graphics.DrawImage(icon, iconX, iconY, iconWidth, iconHeight);
+            }
+
+            if (textAreaComputed)
+            {
+                // 文字列を描画
+                TextRenderer.DrawText(e.Graphics, text, this.Font, new Rectangle(textX, textY, textWidth, textHeight), Color.Black, Color.Transparent, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
+            }
+        }
+
+        /// <summary>
         /// アイテムの描画処理
         /// </summary>
         /// <param name="e"></param>
@@ -134,60 +206,6 @@ namespace LibPulseTune.UIControls.BackendControls
             else if (this.mousePoint != Point.Empty && item.GetBounds(ItemBoundsPortion.ItemOnly).Contains(this.mousePoint))
             {
                 e.Graphics.FillRectangle(HotItemBrush, e.Bounds.X + 1, e.Bounds.Y + 1, e.Bounds.Width - 1, e.Bounds.Height - 1);
-            }
-
-            int iconX = 0, iconY = 0, iconWidth = 0, iconHeight = 0;
-            int textX = 0, textY = 0, textWidth = 0, textHeight = 0;
-            Image icon = null;
-            string text = string.Empty;
-
-            if (item is ExplorerLikeListViewItem explorerLikeListViewItem)
-            {
-                if (explorerLikeListViewItem.Icon == null)
-                {
-                    textX = SPACING;
-                    textY = e.Bounds.Y;
-                    textWidth = e.Bounds.Width;
-                    textHeight = e.Bounds.Height;
-                    text = explorerLikeListViewItem.Text;
-                }
-                else
-                {
-                    iconX = e.Bounds.X + SPACING;
-                    iconY = e.Bounds.Y + SPACING / 2;
-                    iconWidth = explorerLikeListViewItem.Icon.Width;
-                    iconHeight = explorerLikeListViewItem.Icon.Height;
-                    textX = iconX + iconWidth + SPACING;
-                    textY = e.Bounds.Y;
-                    textWidth = e.Bounds.Width;
-                    textHeight = e.Bounds.Height;
-
-                    icon = explorerLikeListViewItem.Icon;
-                    text = explorerLikeListViewItem.Text;
-                }
-            }
-            else
-            {
-                textX = SPACING;
-                textY = e.Bounds.Y;
-                textWidth = e.Bounds.Width;
-                textHeight = e.Bounds.Height;
-                text = item.Text;
-            }
-
-            if (icon != null)
-            {
-                // アイコンを描画
-                e.Graphics.DrawImage(icon, iconX, iconY, iconWidth, iconHeight);
-            }
-
-            // 文字列を描画
-            using (var sf = new StringFormat())
-            {
-                sf.LineAlignment = StringAlignment.Center;
-                sf.Alignment = StringAlignment.Near;
-
-                e.Graphics.DrawString(text, this.Font, Brushes.Black, new Rectangle(textX, textY, textWidth, textHeight), sf);
             }
         }
     }

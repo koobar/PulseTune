@@ -103,21 +103,17 @@ namespace LibPulseTune.UIControls
             /// </summary>
             private void UpdateWidth()
             {
-                var g = CreateGraphics();
-                int width = 0;
-
-                if (this.isClosable)
+                using (var g = CreateGraphics())
                 {
-                    width = (int)Math.Round(g.MeasureString(this.Text, this.Font).Width + CLOSE_BUTTON_WIDTH + CLOSE_BUTTON_LEFT_MARGIN + CLOSE_BUTTON_RIGHT_MARGIN);
-                }
-                else
-                {
-                    width = (int)Math.Round(g.MeasureString(this.Text, this.Font).Width);
-                }
+                    float width = TextRenderer.MeasureText(this.Text, this.Font).Width;
 
-                this.ClientSize = new Size(width, this.ClientSize.Height);
+                    if (this.isClosable)
+                    {
+                        width += CLOSE_BUTTON_LEFT_MARGIN + CLOSE_BUTTON_WIDTH + CLOSE_BUTTON_RIGHT_MARGIN;
+                    }
 
-                g.Dispose();
+                    this.ClientSize = new Size((int)Math.Round(width, MidpointRounding.AwayFromZero), this.ClientSize.Height);
+                }
             }
 
             /// <summary>
@@ -262,9 +258,10 @@ namespace LibPulseTune.UIControls
 
                 // 水平スクロールバーの高さを無理やり求める。
                 // Win10では15くらいだが、OSやDPIの違いで異なる場合があるので、厳密に求めておく。
-                var tmp = new HScrollBar();
-                this.horizontalScrollBarHeight = tmp.Height;
-                tmp.Dispose();
+                using (var tmp = new HScrollBar())
+                {
+                    this.horizontalScrollBarHeight = tmp.Height;
+                }
             }
 
             #region プロパティ
@@ -380,6 +377,17 @@ namespace LibPulseTune.UIControls
             }
 
             #endregion
+
+            /// <summary>
+            /// 指定されたインデックスのつまみのテキストを設定する。
+            /// </summary>
+            /// <param name="index"></param>
+            /// <param name="text"></param>
+            public void SetText(int index, string text)
+            {
+                this.thumbs[index].Text = text;
+                this.thumbs[index].Invalidate();
+            }
 
             /// <summary>
             /// 指定されたインデックスのタブのつまみの矩形を取得する。
@@ -566,6 +574,7 @@ namespace LibPulseTune.UIControls
         /// <param name="tabPage"></param>
         public void AddTabPage(ClosableTabPage tabPage)
         {
+            tabPage.TextChanged += OnTabPageTextChanged;
             this.TabHeaderSpace.AddTabPage(tabPage);
 
             if (this.TabHeaderSpace.TabCount == 1)
@@ -582,6 +591,7 @@ namespace LibPulseTune.UIControls
         /// <param name="tabPage"></param>
         public void RemoveTabPage(ClosableTabPage tabPage)
         {
+            tabPage.TextChanged -= OnTabPageTextChanged;
             this.TabHeaderSpace.RemoveTabPage(tabPage);
             this.TabPageArea.Controls.Clear();
 
@@ -679,6 +689,22 @@ namespace LibPulseTune.UIControls
 
                 this.SelectedTab = page;
             }
+        }
+
+        /// <summary>
+        /// タブページのテキストが変更された場合の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void OnTabPageTextChanged(object sender, EventArgs e)
+        {
+            for (int i = 0; i < this.TabCount; i++)
+            {
+                this.TabHeaderSpace.SetText(i, GetTabPage(i).Text);
+            }
+
+            this.TabHeaderSpace.Invalidate();
+            this.TabPageArea.Invalidate();
         }
     }
 }

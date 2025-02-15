@@ -1,10 +1,9 @@
-using LibPulseTune.Codecs;
 using LibPulseTune.CoreAudio;
 using LibPulseTune.Database;
 using LibPulseTune.Engine;
-using LibPulseTune.Metadata;
-using LibPulseTune.Metadata.Playlist;
-using LibPulseTune.Metadata.Track;
+using LibPulseTune.Engine.Playlists;
+using LibPulseTune.Engine.Providers;
+using LibPulseTune.Engine.Tracks;
 using LibPulseTune.Options;
 using LibPulseTune.UIControls;
 using LibPulseTune.UIControls.Dialogs;
@@ -33,9 +32,7 @@ namespace PulseTune
         private readonly Command moveToStartCommand;
 
         // 非公開フィールド
-        private readonly ExplorerControl explorerViewer;    // エクスプローラーコントロール
-        private readonly ClosableTabPage explorerTabPage;   // エクスプローラーコントロールが配置されたタブページ
-        private AudioTrackBase currentTrack;                // 再生中のトラック
+        private AudioTrackBase currentTrack;
 
         // コンストラクタ
         public MainWindow()
@@ -60,16 +57,11 @@ namespace PulseTune
             this.ControlPanel.ForwardCommand = this.forwardCommand;
             this.ControlPanel.MoveToTrackStartCommand = this.moveToStartCommand;
 
-            // エクスプローラのタブページを作成
-            this.explorerViewer = new ExplorerControl();
-            this.explorerViewer.Dock = DockStyle.Fill;
-            this.explorerViewer.ContextMenu = CreateExplorerControlContextMenu(this.explorerViewer);
-            this.explorerViewer.FileDoubleClick += OnExplorerViewerFileDoubleClick;
-            this.explorerTabPage = new ClosableTabPage("エクスプローラ", false);
-            this.explorerTabPage.Control = this.explorerViewer;
-
             // タスクバーのサムネイルにメディアコントロールボタンを表示する。
             this.ControlPanel.ShowTaskBarThumbnailButtons(this);
+
+            // アクセスリストのコンテキストメニューを設定
+            this.AccessListControl.ContextMenu = CreateAccessListControlContextMenu();
 
             // フォントを設定
             this.Font = SystemFonts.CaptionFont;
@@ -78,250 +70,12 @@ namespace PulseTune
             AudioPlayer.PlaybackPositionChanged += OnPlaybackPositionChanged;
         }
 
-        /// <summary>
-        /// 再生コマンドの実装
-        /// </summary>
-        /// <param name="track"></param>
-        private void PlayCommandImplementation(object unused, object track)
-        {
-            if (track == null)
-            {
-                if (this.TabSelectedPlaylist == null)
-                {
-                    return;
-                }
-
-                if (this.TabSelectedPlaylist.SelectedTrack == null)
-                {
-                    this.TabSelectedPlaylist.SelectNextTrack();
-                }
-
-                track = this.TabSelectedPlaylist.SelectedTrack;
-            }
-
-            if (track == null)
-            {
-                return;
-            }
-
-            Play((AudioTrackBase)track);
-        }
+        #region UI処理用メソッド
 
         /// <summary>
-        /// 一時停止コマンドの実装
-        /// </summary>
-        /// <param name="unused1"></param>
-        /// <param name="unused2"></param>
-        private void PauseCommandImplementation(object unused1, object unused2)
-        {
-            Pause();
-        }
-
-        /// <summary>
-        /// 再開コマンドの実装
-        /// </summary>
-        /// <param name="unused1"></param>
-        /// <param name="unused2"></param>
-        private void ResumeCommandImplementation(object unused1, object unused2)
-        {
-            Resume();
-        }
-
-        /// <summary>
-        /// 停止コマンドの実装
-        /// </summary>
-        /// <param name="unused1"></param>
-        /// <param name="unused2"></param>
-        private void StopCommandImplementation(object unused1, object unused2)
-        {
-            Stop();
-        }
-
-        /// <summary>
-        /// 早送りコマンドの実装
-        /// </summary>
-        /// <param name="unused1"></param>
-        /// <param name="unused2"></param>
-        private void ForwardCommandImplementation(object unused1, object unused2)
-        {
-            Forward();
-        }
-
-        /// <summary>
-        /// 巻き戻しコマンドの実装
-        /// </summary>
-        /// <param name="unused1"></param>
-        /// <param name="unused2"></param>
-        private void BackwardCommandImplementation(object unused1, object unused2)
-        {
-            Backward();
-        }
-
-        /// <summary>
-        /// トラックの開始位置に移動するコマンドの実装
-        /// </summary>
-        /// <param name="unused1"></param>
-        /// <param name="unused2"></param>
-        private void MoveToStartCommandImplementation(object unused1, object unused2)
-        {
-            MoveToTrackStart();
-        }
-
-        #region プロパティ
-
-        /// <summary>
-        /// 選択されているタブのコントロール
-        /// </summary>
-        internal IMainTabControlPageElement TabSelectedControl
-        {
-            get
-            {
-                var tab = this.MainTabControl.SelectedTab;
-
-                if (tab != null && tab.Control is IMainTabControlPageElement)
-                {
-                    return (IMainTabControlPageElement)tab.Control;
-                }
-
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// タブで選択されているプレイリスト
-        /// </summary>
-        public Playlist TabSelectedPlaylist
-        {
-            get
-            {
-                var control = this.TabSelectedControl;
-                if (control != null)
-                {
-                    return control.Playlist;
-                }
-
-                return null;
-            }
-        }
-
-        #endregion
-
-        /// <summary>
-        /// 設定を読み込む。
-        /// </summary>
-        private void LoadOptions()
-        {
-            SelectDevice(CreateAudioOutputDeviceFromApplicationOptions());
-            UpdateAudioOutputDeviceMenuItems();
-
-            this.TopMost =  this.AlwaysTopMostViewMenuItem.Checked = OptionManager.MainWindowAlwaysTopMost;
-
-            switch (OptionManager.WaveformRendererViewMode)
-            {
-                case WaveformRendererStereoViewMode.Separated:
-                    this.SeparateByChannelsWaveformRendererViewModeMenuItem.CheckOnlyThisMenuItem();
-                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Separated;
-                    break;
-                case WaveformRendererStereoViewMode.Mixed:
-                    this.MixedWaveformRendererViewModeMenuItem.CheckOnlyThisMenuItem();
-                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Mixed;
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// コマンドライン引数を処理する。
-        /// </summary>
-        public void ProcessCommandLineArgs(string[] commandLineArgs)
-        {
-            var tracks = new List<string>();
-
-            // コマンドライン引数に与えられたファイルを追加して再生
-            if (commandLineArgs.Length > 0)
-            {
-                foreach (var argument in commandLineArgs)
-                {
-                    if (File.Exists(argument) && AudioSourceProvider.IsPlaybackSupportedFileFormat(argument))
-                    {
-                        tracks.Add(argument);
-                    }
-                }
-
-                if (tracks.Count > 0)
-                {
-                    this.explorerViewer.Navigate(tracks[0]);
-                    Play(AudioTrackProvider.CreateFile(tracks[0]));
-                }
-            }
-        }
-
-        #region ファイル・フォルダ処理
-
-        /// <summary>
-        /// 指定されたプレイリストを新しいタブで開く
-        /// </summary>
-        /// <param name="path"></param>
-        private void OpenPlaylistInNewTab(string path)
-        {
-            var page = CreateNewPlaylistPage(Path.GetFileName(path));
-            var viewer = (PlaylistViewer)page.Control;
-
-            // プレイリストを読み込む。
-            var reader = PlaylistReaderProvider.GetPlaylistReader(path);
-            reader.OpenFile(path, viewer.Playlist);
-
-            // タブを追加
-            this.MainTabControl.AddTabPage(page);
-            this.MainTabControl.SelectedTab = page;
-
-            // 最近開いた場所に追加
-            PlaylistExplorerData.AddToRecent(path);
-        }
-
-        /// <summary>
-        /// 指定されたフォルダを新しいタブで開く
-        /// </summary>
-        /// <param name="folderPath"></param>
-        private void OpenFolderInNewTab(string folderPath)
-        {
-            var tracks = new List<AudioTrackBase>();
-
-            foreach (string path in Directory.GetFiles(folderPath))
-            {
-                if (AudioSourceProvider.IsPlaybackSupportedFileFormat(path))
-                {
-                    var track = AudioTrackProvider.CreateFile(path);
-
-                    if (track != null)
-                    {
-                        tracks.Add(track);
-                    }
-                }
-            }
-
-            var displayName = Path.GetFileName(folderPath);
-            var page = CreateNewPlaylistPage(displayName);
-            var viewer = (PlaylistViewer)page.Control;
-
-            viewer.DisplayName = displayName;
-            viewer.AddTrackToPlaylist(tracks.ToArray());
-
-            // タブを追加
-            this.MainTabControl.AddTabPage(page);
-            this.MainTabControl.SelectedTab = page;
-
-            // 最近開いた場所に追加
-            PlaylistExplorerData.AddToRecent(folderPath);
-        }
-
-        #endregion
-
-        #region UI処理
-
-        /// <summary>
-        /// 指定されたエクスプローラコントロールのコンテキストメニューを作成する。
-        /// </summary>
-        private ContextMenu CreateExplorerControlContextMenu(ExplorerControl control)
+		/// 指定されたエクスプローラコントロールのコンテキストメニューを作成する。
+		/// </summary>
+		private ContextMenu CreateExplorerControlContextMenu(ExplorerControl control)
         {
             var playbackMenuItem = new MenuItem();
             playbackMenuItem.Text = "再生(&S)";
@@ -340,7 +94,7 @@ namespace PulseTune
             updateMenuItem.Shortcut = Shortcut.F5;
             var separator2 = new MenuItem() { Text = "-" };
             var openInExplorerMenuItem = new MenuItem();
-            openInExplorerMenuItem.Text = "エクスプローラーで開く";
+            openInExplorerMenuItem.Text = "Windowsのエクスプローラーで開く";
             openInExplorerMenuItem.Click += delegate
             {
                 ProcessUtils.OpenInExplorer(control.SelectedFileName);
@@ -376,15 +130,102 @@ namespace PulseTune
         }
 
         /// <summary>
+        /// アクセスリストのコンテキストメニューを作成する。
+        /// </summary>
+        /// <returns></returns>
+        private ContextMenu CreateAccessListControlContextMenu()
+        {
+            var openInNewTab = new MenuItem();
+            openInNewTab.Text = "新しいタブで開く";
+            openInNewTab.Click += delegate
+            {
+                OpenFolderInNewTab(this.AccessListControl.SelectedLocation);
+            };
+            var openAsPlaylist = new MenuItem();
+            openAsPlaylist.Text = "プレイリストとして開く";
+            openAsPlaylist.Click += delegate
+            {
+                OpenFolderAsPlaylistInNewTab(this.AccessListControl.SelectedLocation);
+            };
+            var separator1 = new MenuItem();
+            separator1.Text = "-";
+            var addFolderToFavoriteMenuItem = new MenuItem();
+            addFolderToFavoriteMenuItem.Text = "フォルダを選択してお気に入りに追加";
+            addFolderToFavoriteMenuItem.Click += delegate
+            {
+                using (var dialog = new CommonOpenFileDialog())
+                {
+                    dialog.IsFolderPicker = true;
+
+                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                    {
+                        foreach (var location in dialog.FileNames)
+                        {
+                            PlaylistExplorerData.AddToFavorite(location);
+                        }
+                    }
+                }
+            };
+            var separator2 = new MenuItem();
+            separator2.Text = "-";
+            var addToFavoriteMenuItem = new MenuItem();
+            addToFavoriteMenuItem.Text = "お気に入りに追加";
+            addToFavoriteMenuItem.Click += delegate
+            {
+                var location = this.AccessListControl.SelectedLocation;
+
+                if (!PlaylistExplorerData.ContainsFavorite(location))
+                {
+                    PlaylistExplorerData.AddToFavorite(location);
+                }
+            };
+            var removeFolderToFavoriteMenuItem = new MenuItem();
+            removeFolderToFavoriteMenuItem.Text = "お気に入りから削除";
+            removeFolderToFavoriteMenuItem.Click += delegate
+            {
+                PlaylistExplorerData.RemoveFromFavorite(this.AccessListControl.SelectedLocation);
+            };
+
+            var contextMenu = new ContextMenu();
+            contextMenu.Popup += delegate
+            {
+                contextMenu.MenuItems.Clear();
+
+                if (this.AccessListControl.SelectedItems.Count > 0)
+                {
+                    var containsInFavorite = PlaylistExplorerData.ContainsFavorite(this.AccessListControl.SelectedLocation);
+                    addToFavoriteMenuItem.Enabled = !containsInFavorite;
+                    removeFolderToFavoriteMenuItem.Enabled = containsInFavorite;
+
+                    contextMenu.MenuItems.Add(openInNewTab);
+                    contextMenu.MenuItems.Add(openAsPlaylist);
+                    contextMenu.MenuItems.Add(separator1);
+                    contextMenu.MenuItems.Add(addFolderToFavoriteMenuItem);
+                    contextMenu.MenuItems.Add(separator2);
+                    contextMenu.MenuItems.Add(addToFavoriteMenuItem);
+                    contextMenu.MenuItems.Add(removeFolderToFavoriteMenuItem);
+                }
+                else
+                {
+                    contextMenu.MenuItems.Add(addFolderToFavoriteMenuItem);
+                }
+            };
+
+            return contextMenu;
+        }
+
+        /// <summary>
         /// 再生中のトラックが含まれるプレイリストが含まれるタブページの要素を取得する。
         /// 再生中ではない場合、選択されたタブの要素を取得する。
         /// </summary>
         /// <returns></returns>
         private IMainTabControlPageElement GetCurrentTabPageElement()
         {
-            if (this.TabSelectedControl is IMainTabControlPageElement)
+            var tab = this.MainTabControl.SelectedTab;
+
+            if (tab != null && tab.Control is IMainTabControlPageElement)
             {
-                return this.TabSelectedControl;
+                return (IMainTabControlPageElement)tab.Control;
             }
 
             return null;
@@ -395,7 +236,7 @@ namespace PulseTune
         /// 再生中ではない場合、選択されたタブのプレイリストを取得する。
         /// </summary>
         /// <returns></returns>
-        private Playlist GetCurrentPlaylist()
+        private Playlist GetCurrentTabPagePlaylist()
         {
             var control = GetCurrentTabPageElement();
 
@@ -414,10 +255,7 @@ namespace PulseTune
         private PlaylistViewer CreateNewPlaylistViewer()
         {
             var viewer = new PlaylistViewer();
-            viewer.TrackDoubleClick += delegate
-            {
-                this.playCommand?.Execute(viewer, viewer.Playlist.SelectedTrack);
-            };
+            viewer.TrackDoubleClick += OnIMainTabControlTabPageElementDoubleClick;
 
             return viewer;
         }
@@ -431,6 +269,28 @@ namespace PulseTune
         {
             var page = new ClosableTabPage(title);
             page.Control = CreateNewPlaylistViewer();
+
+            return page;
+        }
+
+        /// <summary>
+        /// エクスプローラを指定されたタイトルのタブとして表示するタブページを生成する。
+        /// </summary>
+        /// <param name="title"></param>
+        /// <returns></returns>
+        private ClosableTabPage CreateNewExplorerTabPage(string title)
+        {
+            var control = new ExplorerControl();
+            var page = new ClosableTabPage(title);
+            page.Control = control;
+
+            control.SetFileFormatFilter(AudioSourceProvider.GetAllRegisteredFormatExtensions());
+            control.ContextMenu = CreateExplorerControlContextMenu(control);
+            control.FileDoubleClick += OnIMainTabControlTabPageElementDoubleClick;
+            control.Navigated += delegate
+            {
+                page.Text = Path.GetFileName(control.CurrentPath);
+            };
 
             return page;
         }
@@ -491,7 +351,7 @@ namespace PulseTune
                         }
                         else
                         {
-                            var playlist = GetCurrentPlaylist();
+                            var playlist = GetCurrentTabPagePlaylist();
 
                             if (playlist != null)
                             {
@@ -502,7 +362,7 @@ namespace PulseTune
                                 this.Text = Program.APPLICATION_NAME;
                             }
                         }
-                        
+
                     }
                     break;
             }
@@ -559,9 +419,77 @@ namespace PulseTune
             this.TrackPictureViewer.Picture = GetTrackPicture(track);
         }
 
+        /// <summary>
+        /// 指定されたプレイリストを新しいタブで開く
+        /// </summary>
+        /// <param name="path"></param>
+        private void OpenPlaylistInNewTab(string path)
+        {
+            var page = CreateNewPlaylistPage(Path.GetFileName(path));
+            var viewer = (PlaylistViewer)page.Control;
+
+            // プレイリストを読み込む。
+            var reader = PlaylistReaderProvider.GetPlaylistReader(path);
+            reader.OpenFile(path, viewer.Playlist);
+
+            // タブを追加
+            this.MainTabControl.AddTabPage(page);
+            this.MainTabControl.SelectedTab = page;
+        }
+
+        /// <summary>
+        /// 指定されたパスのフォルダを新しいタブのエクスプローラで開く。
+        /// </summary>
+        /// <param name="folderPath"></param>
+        private void OpenFolderInNewTab(string folderPath)
+        {
+            var page = CreateNewExplorerTabPage(Path.GetFileName(folderPath));
+            var viewer = (ExplorerControl)page.Control;
+
+            // 指定されたパスまで移動
+            viewer.Navigate(folderPath);
+
+            // タブを追加
+            this.MainTabControl.AddTabPage(page);
+            this.MainTabControl.SelectedTab = page;
+        }
+
+        /// <summary>
+        /// 指定されたフォルダをプレイリストとして新しいタブで開く
+        /// </summary>
+        /// <param name="folderPath"></param>
+        private void OpenFolderAsPlaylistInNewTab(string folderPath)
+        {
+            var tracks = new List<AudioTrackBase>();
+
+            foreach (string path in Directory.GetFiles(folderPath))
+            {
+                if (AudioSourceProvider.IsPlaybackSupportedFileFormat(path))
+                {
+                    var track = AudioTrackProvider.CreateFile(path);
+
+                    if (track != null)
+                    {
+                        tracks.Add(track);
+                    }
+                }
+            }
+
+            var displayName = Path.GetFileName(folderPath);
+            var page = CreateNewPlaylistPage(displayName);
+            var viewer = (PlaylistViewer)page.Control;
+
+            viewer.DisplayName = displayName;
+            viewer.AddTrackToPlaylist(tracks.ToArray());
+
+            // タブを追加
+            this.MainTabControl.AddTabPage(page);
+            this.MainTabControl.SelectedTab = page;
+        }
+
         #endregion
 
-        #region メディアコントロール
+        #region オーディオ制御用メソッド
 
         /// <summary>
         /// 使用するオーディオ出力デバイスを設定する。
@@ -571,7 +499,6 @@ namespace PulseTune
         {
             // アプリケーション設定側に設定を反映する。
             OptionManager.AudioOutputDeviceName = device.DeviceName;
-            OptionManager.IsWASAPIDevice = device.IsWASAPIDevice;
             OptionManager.IsWASAPIEventSyncMode = device.IsWASAPIEventSyncMode;
             OptionManager.IsWASAPIExclusiveMode = device.IsWASAPIExclusiveMode;
             OptionManager.AudioOutputDeviceLatency = device.Latency;
@@ -597,7 +524,6 @@ namespace PulseTune
         {
             var device = new WasapiDevice(
                 OptionManager.AudioOutputDeviceName,
-                OptionManager.IsWASAPIDevice,
                 OptionManager.IsWASAPIEventSyncMode,
                 OptionManager.IsWASAPIExclusiveMode,
                 OptionManager.AudioOutputDeviceLatency);
@@ -723,7 +649,7 @@ namespace PulseTune
         /// </summary>
         private void Backward()
         {
-            var playlist = GetCurrentPlaylist();
+            var playlist = GetCurrentTabPagePlaylist();
             playlist.SelectPreviousTrack();
 
             Play(playlist.SelectedTrack);
@@ -734,7 +660,7 @@ namespace PulseTune
         /// </summary>
         private void Forward()
         {
-            var playlist = GetCurrentPlaylist();
+            var playlist = GetCurrentTabPagePlaylist();
             playlist.SelectNextTrack();
 
             Play(playlist.SelectedTrack);
@@ -751,6 +677,146 @@ namespace PulseTune
         #endregion
 
         /// <summary>
+        /// 設定を読み込む。
+        /// </summary>
+        private void LoadOptions()
+        {
+            SelectDevice(CreateAudioOutputDeviceFromApplicationOptions());
+            UpdateAudioOutputDeviceMenuItems();
+
+            this.TopMost =  this.AlwaysTopMostViewMenuItem.Checked = OptionManager.MainWindowAlwaysTopMost;
+
+            switch (OptionManager.WaveformRendererViewMode)
+            {
+                case WaveformRendererStereoViewMode.Separated:
+                    this.SeparateByChannelsWaveformRendererViewModeMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Separated;
+                    break;
+                case WaveformRendererStereoViewMode.Mixed:
+                    this.MixedWaveformRendererViewModeMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Mixed;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// コマンドライン引数を処理する。
+        /// </summary>
+        public void ProcessCommandLineArgs(string[] commandLineArgs)
+        {
+            var tracks = new List<string>();
+
+            // コマンドライン引数に与えられたファイルを追加して再生
+            if (commandLineArgs.Length > 0)
+            {
+                foreach (var argument in commandLineArgs)
+                {
+                    if (File.Exists(argument) && AudioSourceProvider.IsPlaybackSupportedFileFormat(argument))
+                    {
+                        tracks.Add(argument);
+                    }
+                }
+
+                if (tracks.Count > 0)
+                {
+                    Play(AudioTrackProvider.CreateFile(tracks[0]));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 再生コマンドの実装
+        /// </summary>
+        /// <param name="track"></param>
+        private void PlayCommandImplementation(object unused, object track)
+        {
+            if (track == null)
+            {
+                var playlist = GetCurrentTabPagePlaylist();
+
+                if (playlist == null)
+                {
+                    return;
+                }
+
+                if (playlist.SelectedTrack == null)
+                {
+                    playlist.SelectNextTrack();
+                }
+
+                track = playlist.SelectedTrack;
+            }
+
+            if (track == null)
+            {
+                return;
+            }
+
+            // 新しくAudioTrackBaseを作らないと、アルバムアートが読み込まれない場合がある。
+            Play(AudioTrackProvider.CreateFile(((AudioTrackBase)track).Path));
+        }
+
+        /// <summary>
+        /// 一時停止コマンドの実装
+        /// </summary>
+        /// <param name="unused1"></param>
+        /// <param name="unused2"></param>
+        private void PauseCommandImplementation(object unused1, object unused2)
+        {
+            Pause();
+        }
+
+        /// <summary>
+        /// 再開コマンドの実装
+        /// </summary>
+        /// <param name="unused1"></param>
+        /// <param name="unused2"></param>
+        private void ResumeCommandImplementation(object unused1, object unused2)
+        {
+            Resume();
+        }
+
+        /// <summary>
+        /// 停止コマンドの実装
+        /// </summary>
+        /// <param name="unused1"></param>
+        /// <param name="unused2"></param>
+        private void StopCommandImplementation(object unused1, object unused2)
+        {
+            Stop();
+        }
+
+        /// <summary>
+        /// 早送りコマンドの実装
+        /// </summary>
+        /// <param name="unused1"></param>
+        /// <param name="unused2"></param>
+        private void ForwardCommandImplementation(object unused1, object unused2)
+        {
+            Forward();
+        }
+
+        /// <summary>
+        /// 巻き戻しコマンドの実装
+        /// </summary>
+        /// <param name="unused1"></param>
+        /// <param name="unused2"></param>
+        private void BackwardCommandImplementation(object unused1, object unused2)
+        {
+            Backward();
+        }
+
+        /// <summary>
+        /// トラックの開始位置に移動するコマンドの実装
+        /// </summary>
+        /// <param name="unused1"></param>
+        /// <param name="unused2"></param>
+        private void MoveToStartCommandImplementation(object unused1, object unused2)
+        {
+            MoveToTrackStart();
+        }
+
+        /// <summary>
         /// フォームが読み込まれた場合の処理
         /// </summary>
         /// <param name="e"></param>
@@ -758,29 +824,25 @@ namespace PulseTune
         {
             base.OnLoad(e);
 
-            // デザイナ表示のフォームでメインメニューを設定すると、
-            // デザイナを開くたびにフォームの高さが小さくなっていくバグがあるため、
-            // デザインモードではメインメニューを設定しない。
-            if (!this.IsDesignMode())
+            if (this.IsDesignMode())
             {
-                this.Menu = this.MainMenuRoot;
+                return;
             }
 
+            PlaylistExplorerData.FavoriteLocationsChanged += delegate
+            {
+                this.AccessListControl.UpdateAvailableLocations();
+            };
+            this.Menu = this.MainMenuRoot;
+            
             // ApplicationOptions側での設定を反映する。
             LoadOptions();
 
             // デフォルトのアートを表示
             ShowTrackPicture(null);
 
-            // プレイリストブラウザの表示を更新する。
-            this.PlaylistBrowser.UpdateView();
-
-            // エクスプローラに表示するファイルの拡張子を、対応しているオーディオトラックの拡張子に絞り込む。
-            this.explorerViewer.SetFileFormatFilter(AudioSourceProvider.GetAllRegisteredFormatExtensions());
-
-            // エクスプローラのタブページを追加
-            this.MainTabControl.AddTabPage(this.explorerTabPage);
-            this.explorerViewer.SelectDrive('C');
+            // マイミュージックを開く
+            OpenFolderInNewTab(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic));
 
             // コマンドライン引数に指定されたファイルを開く。
             ProcessCommandLineArgs(Environment.GetCommandLineArgs());
@@ -797,13 +859,14 @@ namespace PulseTune
         }
 
         /// <summary>
-        /// エクスプローラビューでファイルがダブルクリックされた場合の処理
+        /// メインタブに表示されているコントロールで、トラックがダブルクリックされた場合の処理
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnExplorerViewerFileDoubleClick(object sender, EventArgs e)
+        private void OnIMainTabControlTabPageElementDoubleClick(object sender, EventArgs e)
         {
-            Play(AudioTrackProvider.CreateFile(this.explorerViewer.SelectedFileName));
+            var control = (IMainTabControlPageElement)sender;
+            this.playCommand?.Execute(control, control.Playlist.SelectedTrack);
         }
 
         /// <summary>
@@ -918,9 +981,11 @@ namespace PulseTune
         /// <param name="e"></param>
         private void FileMenu_Popup(object sender, EventArgs e)
         {
-            this.AddFilesToPlaylistFileMenuItem.Enabled = this.TabSelectedControl != null && this.TabSelectedControl.CanSelectAddTrack();
-            this.AddFolderToPlaylistFileMenuItem.Enabled = this.TabSelectedControl != null && this.TabSelectedControl.CanSelectAddFolder();
-            this.SavePlaylistFileMenuItem.Enabled = this.TabSelectedControl != null && this.TabSelectedControl.CanExportPlaylist();
+            var tabSelectedControl = GetCurrentTabPageElement();
+
+            this.AddFilesToPlaylistFileMenuItem.Enabled = tabSelectedControl != null && tabSelectedControl.CanSelectAddTrack();
+            this.AddFolderToPlaylistFileMenuItem.Enabled = tabSelectedControl != null && tabSelectedControl.CanSelectAddFolder();
+            this.SavePlaylistFileMenuItem.Enabled = tabSelectedControl != null && tabSelectedControl.CanExportPlaylist();
         }
 
         /// <summary>
@@ -970,7 +1035,7 @@ namespace PulseTune
 
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    OpenFolderInNewTab(dialog.FileName);
+                    OpenFolderAsPlaylistInNewTab(dialog.FileName);
                 }
             }
         }
@@ -982,7 +1047,7 @@ namespace PulseTune
         /// <param name="e"></param>
         private void AddFilesToPlaylistFileMenuItem_Click(object sender, EventArgs e)
         {
-            this.TabSelectedControl.SelectAddTrack();
+            GetCurrentTabPageElement().SelectAddTrack();
         }
 
         /// <summary>
@@ -992,7 +1057,7 @@ namespace PulseTune
         /// <param name="e"></param>
         private void AddFolderToPlaylistFileMenuItem_Click(object sender, EventArgs e)
         {
-            this.TabSelectedControl.SelectAddFolder();
+            GetCurrentTabPageElement().SelectAddFolder();
         }
 
         /// <summary>
@@ -1002,7 +1067,7 @@ namespace PulseTune
         /// <param name="e"></param>
         private void SavePlaylistFileMenuItem_Click(object sender, EventArgs e)
         {
-            this.TabSelectedControl.ExportPlaylist();
+            GetCurrentTabPageElement().ExportPlaylist();
         }
 
         /// <summary>
@@ -1086,8 +1151,10 @@ namespace PulseTune
         /// <param name="e"></param>
         private void FindMenu_Popup(object sender, EventArgs e)
         {
-            this.ShowFindDialogFindMenuItem.Enabled = this.TabSelectedControl.CanShowFindDialog();
-            this.FindNextFindMenuItem.Enabled = this.TabSelectedControl.CanFindNext();
+            var tabSelectedControl = GetCurrentTabPageElement();
+
+            this.ShowFindDialogFindMenuItem.Enabled = tabSelectedControl.CanShowFindDialog();
+            this.FindNextFindMenuItem.Enabled = tabSelectedControl.CanFindNext();
         }
 
         /// <summary>
@@ -1097,7 +1164,7 @@ namespace PulseTune
         /// <param name="e"></param>
         private void ShowFindDialogFindMenuItem_Click(object sender, EventArgs e)
         {
-            this.TabSelectedControl.ShowFindDialog();
+            GetCurrentTabPageElement().ShowFindDialog();
         }
 
         /// <summary>
@@ -1107,7 +1174,7 @@ namespace PulseTune
         /// <param name="e"></param>
         private void FindNextFindMenuItem_Click(object sender, EventArgs e)
         {
-            this.TabSelectedControl.FindNext();
+            GetCurrentTabPageElement().FindNext();
         }
 
         /// <summary>
@@ -1149,25 +1216,6 @@ namespace PulseTune
             Process.Start(info);
         }
 
-        /// <summary>
-        /// プレイリストブラウザで場所がダブルクリックされた場合の処理
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PlaylistBrowser_LocationDoubleClick(object sender, EventArgs e)
-        {
-            var path = this.PlaylistBrowser.SelectedLocation;
-
-            if (File.Exists(path))
-            {
-                OpenPlaylistInNewTab(path);
-            }
-            else if (Directory.Exists(path))
-            {
-                OpenFolderInNewTab(path);
-            }
-        }
-
         private void ShowWasapiAndMmcssOptionMenuItem_Click(object sender, EventArgs e)
         {
             var dialog = new WasapiOptionDialog();
@@ -1197,6 +1245,29 @@ namespace PulseTune
                 {
                     this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Mixed;
                     OptionManager.WaveformRendererViewMode = WaveformRendererStereoViewMode.Mixed;
+                }
+            }
+        }
+
+        private void AccessListControl_DoubleClick(object sender, EventArgs e)
+        {
+            var path = this.AccessListControl.SelectedLocation;
+
+            if (File.Exists(path))
+            {
+                OpenPlaylistInNewTab(path);
+            }
+            else if (Directory.Exists(path))
+            {
+                var control = GetCurrentTabPageElement();
+
+                if (control != null && control is ExplorerControl)
+                {
+                    ((ExplorerControl)control).Navigate(path);
+                }
+                else
+                {
+                    OpenFolderInNewTab(path);
                 }
             }
         }

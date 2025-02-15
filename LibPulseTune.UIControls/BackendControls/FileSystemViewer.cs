@@ -1,4 +1,6 @@
-﻿using Microsoft.WindowsAPICodePack.Shell;
+﻿using LibPulseTune.Engine;
+using LibPulseTune.Engine.Providers;
+using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,6 +11,13 @@ namespace LibPulseTune.UIControls.BackendControls
 {
     internal class FileSystemViewer : ExplorerLikeListView
     {
+        // 非公開定数
+        private const string COLUMN_HEADER_FILENAME = @"名前";
+        private const string COLUMN_HEADER_FORMAT = @"種類";
+        private const string COLUMN_HEADER_SIZE = @"サイズ";
+        private const string COLUMN_HEADER_LASTWRITE = @"更新日時";
+        private const string COLUMN_HEADER_READONLY = @"読み取り専用";
+
         // アイコンの定義
         private static readonly Bitmap FolderIcon = new StockIcon(StockIconIdentifier.Folder, StockIconSize.Small, false, false).Bitmap;
         private static readonly Bitmap AudioFileIcon = new StockIcon(StockIconIdentifier.AudioFiles, StockIconSize.Small, false, false).Bitmap;
@@ -38,10 +47,15 @@ namespace LibPulseTune.UIControls.BackendControls
             this.OwnerDraw = true;
             this.View = View.Details;
             this.FullRowSelect = true;
-            this.HeaderStyle = ColumnHeaderStyle.None;
+            this.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             this.AutoArrange = false;
             this.AllowColumnReorder = false;
-            this.Columns.Add(new ColumnHeader() { Text = "名前" });
+            this.FullRowSelect = true;
+            this.Columns.Add(new ColumnHeader() { Text = COLUMN_HEADER_FILENAME });
+            this.Columns.Add(new ColumnHeader() { Text = COLUMN_HEADER_FORMAT });
+            this.Columns.Add(new ColumnHeader() { Text = COLUMN_HEADER_SIZE });
+            this.Columns.Add(new ColumnHeader() { Text = COLUMN_HEADER_LASTWRITE });
+            this.Columns.Add(new ColumnHeader() { Text = COLUMN_HEADER_READONLY });
         }
 
         #region プロパティ
@@ -290,6 +304,97 @@ namespace LibPulseTune.UIControls.BackendControls
             UpdateColumnHeaderSize();
 
             this.Navigated?.Invoke(this, EventArgs.Empty);
+            Invalidate();
+        }
+
+        /// <summary>
+        /// 指定されたフォルダを示すアイテムを生成する。
+        /// </summary>
+        /// <param name="dirInfo"></param>
+        /// <returns></returns>
+        private FileSystemViewerItem CreateDirectoryItem(DirectoryInfo dirInfo)
+        {
+            var item = new FileSystemViewerItem(dirInfo.FullName, FolderIcon, true);
+
+            for (int i = 0; i < this.Columns.Count; i++)
+            {
+                string text = string.Empty;
+
+                switch (this.Columns[i].Text)
+                {
+                    case COLUMN_HEADER_FILENAME:
+                        text = dirInfo.Name;
+                        break;
+                    case COLUMN_HEADER_FORMAT:
+                        text = "フォルダ";
+                        break;
+                    case COLUMN_HEADER_SIZE:
+                        text = string.Empty;
+                        break;
+                    case COLUMN_HEADER_LASTWRITE:
+                        text = dirInfo.LastAccessTime.ToString();
+                        break;
+                    case COLUMN_HEADER_READONLY:
+                        text = dirInfo.Attributes.HasFlag(FileAttributes.ReadOnly) ? "はい" : "いいえ";
+                        break;
+                }
+
+                if (i == 0)
+                {
+                    item.Text = text;
+                }
+                else
+                {
+                    item.SubItems.Add(text);
+                }
+            }
+
+            return item;
+        }
+
+        /// <summary>
+        /// 指定されたファイルを示すアイテムを生成する。
+        /// </summary>
+        /// <param name="fileInfo"></param>
+        /// <returns></returns>
+        private FileSystemViewerItem CreateFileItem(FileInfo fileInfo)
+        {
+            var item = new FileSystemViewerItem(fileInfo.FullName, AudioFileIcon, false);
+
+            for (int i = 0; i < this.Columns.Count; i++)
+            {
+                string text = string.Empty;
+
+                switch (this.Columns[i].Text)
+                {
+                    case COLUMN_HEADER_FILENAME:
+                        text = fileInfo.Name;
+                        break;
+                    case COLUMN_HEADER_FORMAT:
+                        text = AudioSourceProvider.GetFormatNameFromExtension(fileInfo.Extension);
+                        break;
+                    case COLUMN_HEADER_SIZE:
+                        text = Math.Round(fileInfo.Length / 1024.0 / 1024.0, 2) + "MiB";
+                        break;
+                    case COLUMN_HEADER_LASTWRITE:
+                        text = fileInfo.LastAccessTime.ToString();
+                        break;
+                    case COLUMN_HEADER_READONLY:
+                        text = fileInfo.Attributes.HasFlag(FileAttributes.ReadOnly) ? "はい" : "いいえ";
+                        break;
+                }
+
+                if (i == 0)
+                {
+                    item.Text = text;
+                }
+                else
+                {
+                    item.SubItems.Add(text);
+                }
+            }
+
+            return item;
         }
 
         /// <summary>
@@ -316,7 +421,7 @@ namespace LibPulseTune.UIControls.BackendControls
                     continue;
                 }
 
-                this.itemsSource.Add(new FileSystemViewerItem(folders.Current.FullName, FolderIcon, true));
+                this.itemsSource.Add(CreateDirectoryItem(folders.Current));
             }
 
             // ファイルを列挙
@@ -324,7 +429,7 @@ namespace LibPulseTune.UIControls.BackendControls
             {
                 if (this.fileFormatFilterExtensions.Count == 0 || this.fileFormatFilterExtensions.Contains(files.Current.Extension.ToLower()))
                 {
-                    this.itemsSource.Add(new FileSystemViewerItem(files.Current.FullName, AudioFileIcon, false));
+                    this.itemsSource.Add(CreateFileItem(files.Current));
                 }
             }
         }
@@ -351,28 +456,29 @@ namespace LibPulseTune.UIControls.BackendControls
         private void UpdateColumnHeaderSize()
         {
             const int spacing = 3;
-            int maxWidth = 0;
+            int maxFileNameWidth = 0;
 
-            using (var g = CreateGraphics())
+            foreach (FileSystemViewerItem item in this.itemsSource)
             {
-                foreach (FileSystemViewerItem item in this.itemsSource)
+                if (item == null)
                 {
-                    if (item == null)
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    var textSize = g.MeasureString(item.Text, this.Font);
-                    var width = IconWidth + spacing + textSize.Width;
+                var textSize = TextRenderer.MeasureText(item.SubItems[0].Text, this.Font);
+                var fileNameWidth = IconWidth + spacing + textSize.Width;
 
-                    if (maxWidth < width)
-                    {
-                        maxWidth = (int)Math.Round(width) + spacing;
-                    }
+                if (maxFileNameWidth < fileNameWidth)
+                {
+                    maxFileNameWidth = fileNameWidth + (spacing * 5);
                 }
             }
 
-            this.Columns[0].Width = maxWidth;
+            this.Columns[0].Width = maxFileNameWidth;
+            for (int i = 1; i < this.Columns.Count; i++)
+            {
+                this.Columns[i].Width = -2;
+            }
         }
 
         /// <summary>

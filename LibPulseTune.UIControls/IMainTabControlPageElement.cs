@@ -1,5 +1,5 @@
-﻿using LibPulseTune.Metadata.Playlist;
-using LibPulseTune.Metadata.Track;
+﻿using LibPulseTune.Engine.Playlists;
+using LibPulseTune.Engine.Tracks;
 
 namespace LibPulseTune.UIControls
 {

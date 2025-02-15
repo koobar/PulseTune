@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace LibPulseTune.Metadata.Track
+namespace LibPulseTune.Engine.Tracks
 {
     public class AudioTrackBase
     {

@@ -1,53 +1,15 @@
-﻿using LibPulseTune.Codecs.Cd;
-using LibPulseTune.Codecs.MediaFoundation;
-using LibPulseTune.Codecs.Vorbis;
-using LibPulseTune.Codecs.WavPack;
-using LibPulseTune.Codecs.ZilophiX;
-using LibPulseTune.Engine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace LibPulseTune.Codecs
+namespace LibPulseTune.Engine.Providers
 {
     public static class AudioSourceProvider
     {
         // 非公開フィールド
         private static readonly Dictionary<string, List<string>> registeredFormats = new Dictionary<string, List<string>>();
         private static readonly Dictionary<string, Type> registeredDecoderTypes = new Dictionary<string, Type>();
-
-        /// <summary>
-        /// 組み込みコーデックを読み込む。
-        /// </summary>
-        public static void Init()
-        {
-            // MediaFoundation（OS組み込みデコーダ）でデコードするフォーマットを登録
-            RegisterDecoder("AAC", typeof(MediaFoundationAudioSource), ".aac");
-            RegisterDecoder("AIFF", typeof(MediaFoundationAudioSource), ".aif", ".aiff");
-            RegisterDecoder("FLAC", typeof(MediaFoundationAudioSource), ".flac");
-            RegisterDecoder("MP2", typeof(MediaFoundationAudioSource), ".mp2");
-            RegisterDecoder("MP3", typeof(MediaFoundationAudioSource), ".mp3");
-            RegisterDecoder("Vorbis", typeof(VorbisAudioSource), ".ogg");
-            RegisterDecoder("M4A", typeof(MediaFoundationAudioSource), ".m4a");
-            RegisterDecoder("WAV", typeof(MediaFoundationAudioSource), ".wav");
-            RegisterDecoder("Windows Media Audio", typeof(MediaFoundationAudioSource), ".wma");
-
-            // オーディオCDデコーダを登録
-            RegisterDecoder("オーディオCDトラック", typeof(CDAudioSource), ".cda");
-
-            // WavPackが使用可能なら登録
-            if (WavPackAudioSource.IsAvailable())
-            {
-                RegisterDecoder("WavPack", typeof(WavPackAudioSource), ".wv");
-            }
-
-            // ZilophiXが使用可能なら登録
-            if (ZilophiXAudioSource.IsAvailable())
-            {
-                RegisterDecoder("ZilophiX", typeof(ZilophiXAudioSource), ".zpx");
-            }
-        }
 
         /// <summary>
         /// デコーダを登録する。

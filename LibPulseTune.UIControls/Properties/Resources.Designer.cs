@@ -73,6 +73,26 @@ namespace LibPulseTune.UIControls.Properties {
         /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
+        internal static System.Drawing.Bitmap arrow_left_circle_custom {
+            get {
+                object obj = ResourceManager.GetObject("arrow_left_circle_custom", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Bitmap arrow_right_circle_custom {
+            get {
+                object obj = ResourceManager.GetObject("arrow_right_circle_custom", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        /// </summary>
         internal static System.Drawing.Bitmap backward {
             get {
                 object obj = ResourceManager.GetObject("backward", resourceCulture);

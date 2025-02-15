@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using LibPulseTune.Engine.Playlists;
+using System.IO;
 using System.Text;
 
 namespace LibPulseTune.Metadata.Playlist
@@ -13,7 +14,7 @@ namespace LibPulseTune.Metadata.Playlist
             this.outputStreamWriter = CreateStreamWriter(path);
         }
 
-        public void Write(Playlist playlist)
+        public void Write(LibPulseTune.Engine.Playlists.Playlist playlist)
         {
             // #EXTM3Uフラグを書き込む。
             this.outputStreamWriter.WriteLine("#EXTM3U");

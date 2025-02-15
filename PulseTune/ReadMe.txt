@@ -16,6 +16,7 @@
 　.NET Framework 4.8 以降が動作する環境
 
 ■再生可能なフォーマット一覧
+　・AAC
 　・AIFF
 　・Vorbis
 　・FLAC

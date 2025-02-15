@@ -9,13 +9,10 @@ namespace LibPulseTune.Database
     {
         // 非公開フィールド
         private static readonly List<string> favoriteLocations = new List<string>();
-        private static readonly List<string> recentLocations = new List<string>();
         private static readonly string favoriteLocationsDataPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\PulseTune\\favorites.loc";
-        private static readonly string recentLocationsDataPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\PulseTune\\recent.loc";
 
         // 公開イベント
         public static event EventHandler FavoriteLocationsChanged;
-        public static event EventHandler RecentLocationsChanged;
 
         /// <summary>
         /// 指定されたリストに、指定されたファイルから場所のリストを読み込む。
@@ -70,7 +67,6 @@ namespace LibPulseTune.Database
         public static void Init()
         {
             favoriteLocations.Clear();
-            recentLocations.Clear();
         }
 
         /// <summary>
@@ -89,21 +85,6 @@ namespace LibPulseTune.Database
         }
 
         /// <summary>
-        /// 指定された場所を最近開いた場所に追加する。
-        /// </summary>
-        /// <param name="location"></param>
-        public static void AddToRecent(string location)
-        {
-            if (recentLocations.Contains(location))
-            {
-                return;
-            }
-
-            recentLocations.Add(location);
-            RecentLocationsChanged?.Invoke(null, EventArgs.Empty);
-        }
-
-        /// <summary>
         /// 指定された場所をお気に入りから削除する。
         /// </summary>
         /// <param name="location"></param>
@@ -117,16 +98,13 @@ namespace LibPulseTune.Database
         }
 
         /// <summary>
-        /// 指定された場所を最近開いた場所から削除する。
+        /// 指定された場所がお気に入りに登録されているかどうかを判定する。
         /// </summary>
         /// <param name="location"></param>
-        public static void RemoveFromRecent(string location)
+        /// <returns></returns>
+        public static bool ContainsFavorite(string location)
         {
-            if (recentLocations.Contains(location))
-            {
-                recentLocations.Remove(location);
-                RecentLocationsChanged?.Invoke(null, EventArgs.Empty);
-            }
+            return favoriteLocations.Contains(location);
         }
 
         /// <summary>
@@ -137,7 +115,6 @@ namespace LibPulseTune.Database
             Init();
 
             LoadLocation(favoriteLocations, favoriteLocationsDataPath);
-            LoadLocation(recentLocations, recentLocationsDataPath);
         }
 
         /// <summary>
@@ -146,7 +123,6 @@ namespace LibPulseTune.Database
         public static void Save()
         {
             SaveLocation(favoriteLocations, favoriteLocationsDataPath);
-            SaveLocation(recentLocations, recentLocationsDataPath);
         }
 
         /// <summary>
@@ -159,15 +135,6 @@ namespace LibPulseTune.Database
         }
 
         /// <summary>
-        /// 最近開いた場所に追加された場所の個数を追加する。
-        /// </summary>
-        /// <returns></returns>
-        public static int GetRecentLocationsCount()
-        {
-            return recentLocations.Count;
-        }
-
-        /// <summary>
         /// お気に入りに追加された場所のうち、指定されたインデックスに対応する場所を取得する。
         /// </summary>
         /// <param name="index"></param>
@@ -175,16 +142,6 @@ namespace LibPulseTune.Database
         public static string GetFavoriteLocation(int index)
         {
             return favoriteLocations[index];
-        }
-
-        /// <summary>
-        /// 最近開いた場所に追加された場所のうち、指定されたインデックスに対応する場所を取得する。
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public static string GetRecentLocation(int index)
-        {
-            return recentLocations[index];
         }
     }
 }

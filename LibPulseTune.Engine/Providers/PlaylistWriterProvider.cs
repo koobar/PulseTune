@@ -1,10 +1,10 @@
-﻿using LibPulseTune.Metadata.Playlist;
+﻿using LibPulseTune.Engine.Playlists;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace LibPulseTune.Metadata
+namespace LibPulseTune.Engine.Providers
 {
     public static class PlaylistWriterProvider
     {

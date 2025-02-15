@@ -1,5 +1,4 @@
-﻿using LibPulseTune.Metadata.Track;
-using LibPulseTune.UIControls;
+﻿using LibPulseTune.Engine.Tracks;
 using System.Drawing;
 using System.Windows.Forms;
 

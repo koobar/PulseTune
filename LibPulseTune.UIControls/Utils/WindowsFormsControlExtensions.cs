@@ -1,6 +1,5 @@
-﻿using LibPulseTune.Codecs;
+﻿using LibPulseTune.Engine.Providers;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Text;
 using System.Windows.Forms;
 
@@ -104,23 +103,17 @@ namespace LibPulseTune.UIControls.Utils
         /// <returns></returns>
         public static bool IsDesignMode(this Control ctrl)
         {
-            // 自身のデザインモードを取得
-            bool isDesignMode = false;// form.DesignMode;
-
-            // 親コントロールを再帰取得
-            Control parent = ctrl.Parent;
-            while (parent != null)
+            while (ctrl != null)
             {
-                ISite site = parent.Site;
-                if (site != null)
+                if ((ctrl.Site != null) && ctrl.Site.DesignMode)
                 {
-                    isDesignMode |= site.DesignMode;
+                    return true;
                 }
 
-                parent = parent.Parent;
+                ctrl = ctrl.Parent;
             }
 
-            return isDesignMode;
+            return false;
         }
     }
 }

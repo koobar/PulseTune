@@ -2,6 +2,37 @@ PulseTune のビルド方法
 よほどの理由がない限り、GitHub で配布しているバイナリをダウンロードして使用することを推奨しますが、
 ソースコードからビルドする方法についても記載しておきます。
 
+●各プロジェクトについて
+　PulseTuneのソリューションには、以下のプロジェクトが含まれます。
+
+　　・LibPulseTune.Engine
+　　　LibPulseTuneの中枢プロジェクトです。
+
+　　・LibPulseTune.Codecs
+　　　PulseTuneで再生可能な各種コーデックのデコーダ等を実装したライブラリのプロジェクトです。
+　　　LibPulseTune.Engineの拡張機能として振る舞います。
+
+　　・LibPulseTune.CoreAudio
+　　　WindowsのCoreAudioAPIを扱うための機能を実装したライブラリのプロジェクトです。
+　　　LibPulseTune.Engineの拡張機能として振る舞います。
+
+　　・LibPulseTune.Database
+　　　データベースを扱うための機能を実装したライブラリのプロジェクトです。
+
+　　・LibPulseTune.Metadata
+　　　メタデータの読み込みを行うための機能を実装したライブラリのプロジェクトです。
+　　　LibPulseTune.Engineの拡張機能として振る舞います。
+
+　　・LibPulseTune.Options
+　　　PulseTuneの設定を管理するための機能を実装したライブラリのプロジェクトです。
+
+　　・LibPulseTune.UIControls
+　　　Windows Formsのカスタムコントロールを実装したライブラリのプロジェクトです。
+
+　　・PulseTune
+　　　PulseTune本体のプロジェクトです。
+
+
 ●LibPulseTune.*のビルドについて
 　LibPulseTune.*における、ソリューション内の別プロジェクト、およびサードパーティーのライブラリへの依存関係は、
 　次のようになっています。
@@ -29,10 +60,8 @@ PulseTune のビルド方法
 　　・LibPulseTune.CoreAudio
 　　・LibPulseTune.Engine
 　・LibPulseTune.UIControls
-　　・LibPulseTune.Codecs
 　　・LibPulseTune.CoreAudio
 　　・LibPulseTune.Database
-　　・LibPulseTune.Engine
 　　・LibPulseTune.Engine
 　　・LibPulseTune.Metadata
 　　・LibPulseTune.Options
@@ -61,6 +90,7 @@ PulseTune のビルド方法
 
 　なお、これらのDLLをプロジェクトから削除してしまってもビルドは成功しますが、WavPackとZilophiXの再生ができなくなります。
 　これらの作業を完了したあとに、一度ソリューションまたはプロジェクトを再読み込みすることを推奨します。
+
 
 ●PulseTuneのビルドについて
 　PulseTuneのプロジェクトは、LibPulseTuneから始まる名称のすべてのプロジェクトに依存しています。

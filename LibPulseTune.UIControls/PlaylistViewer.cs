@@ -1,9 +1,7 @@
-﻿using LibPulseTune.Codecs;
-using LibPulseTune.Database;
-using LibPulseTune.Engine;
-using LibPulseTune.Metadata;
-using LibPulseTune.Metadata.Playlist;
-using LibPulseTune.Metadata.Track;
+﻿using LibPulseTune.Engine;
+using LibPulseTune.Engine.Playlists;
+using LibPulseTune.Engine.Providers;
+using LibPulseTune.Engine.Tracks;
 using LibPulseTune.UIControls.BackendControls;
 using LibPulseTune.UIControls.Dialogs;
 using LibPulseTune.UIControls.Utils;
@@ -410,7 +408,6 @@ namespace LibPulseTune.UIControls
                     AddTrackToPlaylist(tracks.ToArray());
 
                     // 後始末
-                    PlaylistExplorerData.AddToRecent(dialog.FileName);
                     this.DisplayName = Path.GetFileName(dialog.FileName);
                 }
             }
@@ -750,7 +747,7 @@ namespace LibPulseTune.UIControls
             if (track != null)
             {
                 this.playlist.SelectedTrack = track;
-                this.TrackDoubleClick?.Invoke(sender, e);
+                this.TrackDoubleClick?.Invoke(this, e);
             }
         }
 
