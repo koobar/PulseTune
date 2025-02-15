@@ -10,7 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{540139AC-9A1
 		HISTORY.txt = HISTORY.txt
 		LICENSE = LICENSE
 		README.md = README.md
-		README.txt = README.txt
 		THIRD-PARTY-NOTICES.txt = THIRD-PARTY-NOTICES.txt
 		ビルド方法.txt = ビルド方法.txt
 	EndProjectSection

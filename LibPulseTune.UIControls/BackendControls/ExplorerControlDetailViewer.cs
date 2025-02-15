@@ -1,5 +1,4 @@
-﻿using LibPulseTune.UIControls.Utils;
-using System;
+﻿using System;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -9,13 +8,6 @@ namespace LibPulseTune.UIControls.BackendControls
 {
     internal partial class ExplorerControlDetailViewer : UserControl
     {
-        // 非公開フィールド
-        private static readonly Color SelectedItemBackColor = Color.FromArgb(205, 232, 255);
-        private static readonly Color SelectedItemBorderColor = Color.FromArgb(153, 209, 255);
-        private static readonly Brush SelectedItemBrush = new SolidBrush(SelectedItemBackColor);
-        private static readonly Pen SelectedItemBorderPen = new Pen(SelectedItemBorderColor);
-        private readonly DriveStateWatcher driveStateWatcher;
-
         // イベント
         public event EventHandler LocationSelectionChanged;
 
@@ -23,9 +15,6 @@ namespace LibPulseTune.UIControls.BackendControls
         public ExplorerControlDetailViewer()
         {
             InitializeComponent();
-
-            this.driveStateWatcher = new DriveStateWatcher();
-            this.driveStateWatcher.DriveStateChanged += OnDriveStateChanged;
 
             this.Font = SystemFonts.CaptionFont;
             this.DetailsTextBox.Font = new Font(new FontFamily("ＭＳ ゴシック"), 9.5f, FontStyle.Regular);
@@ -38,41 +27,11 @@ namespace LibPulseTune.UIControls.BackendControls
         {
             set
             {
-                this.driveStateWatcher.Stop();
-
-                UpdateAvailableLocations();
-
-                foreach (ListViewGroup group in this.LocationsList.Groups)
-                {
-                    foreach (ListViewItem item in group.Items)
-                    {
-                        item.Selected = item.Tag.ToString() == value;
-                    }
-                }
-
-                this.driveStateWatcher.Start();
+                this.accessList1.SelectedLocation = value;
             }
             get
             {
-                ListViewItem selection = null;
-                foreach (ListViewGroup group in this.LocationsList.Groups)
-                {
-                    foreach (ListViewItem item in group.Items)
-                    {
-                        if (item.Selected)
-                        {
-                            selection = item;
-                            break;
-                        }
-                    }
-                }
-
-                if (selection != null)
-                {
-                    return selection.Tag.ToString();
-                }
-
-                return null;
+                return this.accessList1.SelectedLocation;
             }
         }
 
@@ -171,110 +130,9 @@ namespace LibPulseTune.UIControls.BackendControls
             }
         }
 
-        /// <summary>
-        /// 指定されたパスのフォルダのアイコンを取得する。
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <returns></returns>
-        private Bitmap GetFolderIcon(string path, int width, int height)
-        {
-            var result = new Bitmap(width, height);
-            var original = WinApi.ExtractIconFromPath(path, WinApi.ExtractIconSize.Small).ToBitmap();
-            var g = Graphics.FromImage(result);
-
-            g.DrawImage(original, 0, 0, width, height);
-            g.Dispose();
-            original.Dispose();
-
-            return result;
-        }
-
-        /// <summary>
-        /// 利用可能なドライブのリストを更新する。
-        /// </summary>
-        private void UpdateAvailableLocations()
-        {
-            this.LocationsList.Items.Clear();
-            this.LocationsList.Groups.Clear();
-
-            // ドライブを追加
-            var driveGroup = new ListViewGroup();
-            driveGroup.Header = "ドライブ";
-            foreach (var info in DriveInfo.GetDrives())
-            {
-                if (info.IsReady)
-                {
-                    var item = new ExplorerLikeListViewItem();
-                    item.Tag = info.RootDirectory;
-                    item.Icon = GetFolderIcon(info.RootDirectory.FullName, 16, 16);
-                    item.Text = $"{info.RootDirectory.FullName} ({info.VolumeLabel})";
-
-                    driveGroup.Items.Add(item);
-                    this.LocationsList.Items.Add(item);
-                }
-            }
-
-            // Windows 10以降か？
-            if (Environment.OSVersion.Version.Major >= 10)
-            {
-                var shell = new Shell32.Shell();
-                var folder = shell.NameSpace("shell:::{679F85CB-0220-4080-B29B-5540CC05AAB6}");
-                var quickAccessGroup = new ListViewGroup();
-                quickAccessGroup.Header = "クイックアクセス";
-
-                foreach (Shell32.FolderItem folderItem in folder.Items())
-                {
-                    var item = new ExplorerLikeListViewItem();
-                    item.Tag = folderItem.Path;
-                    item.Icon = GetFolderIcon(folderItem.Path, 16, 16);
-                    item.Text = Path.GetFileName(folderItem.Path);
-
-                    quickAccessGroup.Items.Add(item);
-                    this.LocationsList.Items.Add(item);
-                }
-
-                this.LocationsList.Groups.Add(quickAccessGroup);
-                this.LocationsList.Groups.Add(driveGroup);
-            }
-            else
-            {
-                this.LocationsList.Groups.Add(driveGroup);
-            }
-
-            this.columnHeader1.Width = -2;
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-
-            if (!this.IsDesignMode())
-            {
-                this.driveStateWatcher.Start();
-                UpdateAvailableLocations();
-            }
-        }
-
-        protected override void OnHandleDestroyed(EventArgs e)
-        {
-            this.driveStateWatcher.Stop();
-            base.OnHandleDestroyed(e);
-        }
-
-        private void OnLocationsListSelectionChanged(object sender, EventArgs e)
+        private void accessList1_LocationSelectionChanged(object sender, EventArgs e)
         {
             this.LocationSelectionChanged?.Invoke(sender, e);
-        }
-
-        private void OnDriveStateChanged(object sender, EventArgs e)
-        {
-            var location = this.SelectedLocation;
-
-            UpdateAvailableLocations();
-
-            this.SelectedLocation = location;
         }
     }
 }

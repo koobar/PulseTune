@@ -30,10 +30,9 @@ namespace LibPulseTune.UIControls.BackendControls
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.LocationsList = new ExplorerLikeListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label2 = new System.Windows.Forms.Label();
             this.DetailsTextBox = new System.Windows.Forms.TextBox();
+            this.accessList1 = new LibPulseTune.UIControls.AccessList();
             this.SuspendLayout();
             // 
             // label1
@@ -45,29 +44,6 @@ namespace LibPulseTune.UIControls.BackendControls
             this.label1.Size = new System.Drawing.Size(86, 15);
             this.label1.TabIndex = 0;
             this.label1.Text = "表示する場所：";
-            // 
-            // LocationsList
-            // 
-            this.LocationsList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.LocationsList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1});
-            this.LocationsList.FullRowSelect = true;
-            this.LocationsList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.LocationsList.HideSelection = false;
-            this.LocationsList.Location = new System.Drawing.Point(3, 18);
-            this.LocationsList.MultiSelect = false;
-            this.LocationsList.Name = "LocationsList";
-            this.LocationsList.OwnerDraw = true;
-            this.LocationsList.Size = new System.Drawing.Size(194, 160);
-            this.LocationsList.TabIndex = 1;
-            this.LocationsList.UseCompatibleStateImageBehavior = false;
-            this.LocationsList.View = System.Windows.Forms.View.Details;
-            this.LocationsList.SelectedIndexChanged += new System.EventHandler(this.OnLocationsListSelectionChanged);
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "";
             // 
             // label2
             // 
@@ -93,12 +69,28 @@ namespace LibPulseTune.UIControls.BackendControls
             this.DetailsTextBox.TabIndex = 3;
             this.DetailsTextBox.WordWrap = false;
             // 
+            // accessList1
+            // 
+            this.accessList1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.accessList1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.accessList1.HideSelection = false;
+            this.accessList1.Location = new System.Drawing.Point(3, 18);
+            this.accessList1.Name = "accessList1";
+            this.accessList1.OwnerDraw = true;
+            this.accessList1.SelectedLocation = null;
+            this.accessList1.Size = new System.Drawing.Size(194, 160);
+            this.accessList1.TabIndex = 4;
+            this.accessList1.UseCompatibleStateImageBehavior = false;
+            this.accessList1.View = System.Windows.Forms.View.Details;
+            this.accessList1.LocationSelectionChanged += new System.EventHandler(this.accessList1_LocationSelectionChanged);
+            // 
             // ExplorerControlDetailViewer
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
+            this.Controls.Add(this.accessList1);
             this.Controls.Add(this.DetailsTextBox);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.LocationsList);
             this.Controls.Add(this.label1);
             this.Font = new System.Drawing.Font("Yu Gothic UI", 9F);
             this.Name = "ExplorerControlDetailViewer";
@@ -111,9 +103,8 @@ namespace LibPulseTune.UIControls.BackendControls
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private ExplorerLikeListView LocationsList;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox DetailsTextBox;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private AccessList accessList1;
     }
 }

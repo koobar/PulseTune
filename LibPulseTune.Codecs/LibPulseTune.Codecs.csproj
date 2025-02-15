@@ -75,6 +75,9 @@
     <PackageReference Include="NAudio.Wasapi">
       <Version>2.2.1</Version>
     </PackageReference>
+    <PackageReference Include="NVorbis">
+      <Version>0.10.4</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibPulseTune.Engine\LibPulseTune.Engine.csproj">

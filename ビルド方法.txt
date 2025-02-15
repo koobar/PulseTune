@@ -2,18 +2,48 @@ PulseTune のビルド方法
 よほどの理由がない限り、GitHub で配布しているバイナリをダウンロードして使用することを推奨しますが、
 ソースコードからビルドする方法についても記載しておきます。
 
-●LibPulseTuneのビルドについて
-　LibPulseTuneは、以下のライブラリに依存しており、これらのライブラリがないとビルドできません。
-　
-　　・NAudio
-　　・NVorbis
+●LibPulseTune.*のビルドについて
+　LibPulseTune.*における、ソリューション内の別プロジェクト、およびサードパーティーのライブラリへの依存関係は、
+　次のようになっています。
+
+　・LibPulseTune.Codecs
+　　・LibPulseTune.Engine
 　　・NAudio.Vorbis
+　　・NAudio.Wasapi
+　　・NAudio.Core
+　　・NVorbis
+　・LibPulseTune.CoreAudio
+　　・LibPulseTune.Engine
+　　・NAudio.Wasapi
+　　・NAudio.Core
+　・LibPulseTune.Database
+　　・ソリューション内の別プロジェクトやサードパーティーのライブラリへの依存はありません。
+　・LibPulseTune.Engine
+　　・NAudio.Core
+　・LibPulseTune.Metadata
+　　・LibPulseTune.Codecs
+　　・LibPulseTune.Engine
+　　・Windows.Foundation.FoundationContract
+　　・Windows.Foundation.UniversalContract
+　・LibPulseTune.Options
+　　・LibPulseTune.CoreAudio
+　　・LibPulseTune.Engine
+　・LibPulseTune.UIControls
+　　・LibPulseTune.Codecs
+　　・LibPulseTune.CoreAudio
+　　・LibPulseTune.Database
+　　・LibPulseTune.Engine
+　　・LibPulseTune.Engine
+　　・LibPulseTune.Metadata
+　　・LibPulseTune.Options
+　　・Microsoft-WindowsAPICodePack-Core
+　　・Microsoft-WindowsAPICodePack-Shell
 　
-　これらのライブラリは、nugetを用いて管理されており、Visual Studioでプロジェクトを読み込んだ場合に
+　nugetで管理されているライブラリについては、Visual Studioでプロジェクトを読み込んだ場合に
 　自動的にパッケージが復元され、ビルド可能な状態になるはずです。もし、パッケージ不足等に起因する
 　コンパイルエラーが発生する場合、これらのパッケージを手動で復元することで改善する場合があります。
 
-　また、以下のDLLを参照可能にする必要があります。
+　また、LibPulseTune.Codecs のビルドには、以下のDLLを出力先にコピーできるよう、プロジェクトに追加する必要があります。
 
 　　・wavpackdll.dll  (version 5.8.0, x64)
 　　　入手先：https://www.wavpack.com/downloads.html
@@ -29,18 +59,12 @@ PulseTune のビルド方法
 　　　├ wavpackdll.dll
 　　　├ zilophixdec.dll
 
-　なお、これらのDLLをプロジェクトから削除してしまってもビルドは成功します。
-　しかし、WavPackとZilophiXの再生ができなくなります。
-
+　なお、これらのDLLをプロジェクトから削除してしまってもビルドは成功しますが、WavPackとZilophiXの再生ができなくなります。
 　これらの作業を完了したあとに、一度ソリューションまたはプロジェクトを再読み込みすることを推奨します。
 
-
 ●PulseTuneのビルドについて
-　PulseTuneのプロジェクトは、以下のライブラリに依存しており、これらのライブラリがないとビルドできません。
-
-　　・LibPulseTune
-　　・Microsoft-WindowsAPICodePack-Core 　（nugetで管理されています）
-　　・Microsoft-WindowsAPICodePack-Shell　（nugetで管理されています）
+　PulseTuneのプロジェクトは、LibPulseTuneから始まる名称のすべてのプロジェクトに依存しています。
+　そのため、PulseTuneのビルドよりも先に、LibPulseTune.*のすべてのプロジェクトをビルドする必要があります。
 
 　LibPulseTuneは同じソリューション内に存在するため、プロジェクト参照で参照されます。
 　それ以外のライブラリはnugetを用いて管理されており、Visual Studioでプロジェクトを読み込んだ場合に

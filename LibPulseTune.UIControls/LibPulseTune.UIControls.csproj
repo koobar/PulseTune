@@ -49,6 +49,9 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccessList.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="BackendControls\ExplorerControlDetailViewer.cs">
       <SubType>UserControl</SubType>
     </Compile>
