@@ -1,19 +1,20 @@
 ﻿using LibPulseTune.Engine;
-using NAudio.Vorbis;
 using NAudio.Wave;
 using System;
 
 namespace LibPulseTune.Codecs.Vorbis
 {
-    public class VorbisAudioSource : IAudioSource
+    public class VorbisDecoder : IAudioSource
     {
         // 非公開フィールド
-        private readonly VorbisWaveReader vorbisWaveReader;
+        private readonly NVorbisReader reader;
+        private readonly IWaveProvider waveProviderConverter;
 
         // コンストラクタ
-        public VorbisAudioSource(string path)
+        public VorbisDecoder(string path)
         {
-            this.vorbisWaveReader = new VorbisWaveReader(path);
+            this.reader = new NVorbisReader(path);
+            this.waveProviderConverter = this.reader.ToWaveProvider();
         }
 
         /// <summary>
@@ -23,31 +24,40 @@ namespace LibPulseTune.Codecs.Vorbis
         {
             get
             {
-                return this.vorbisWaveReader.WaveFormat;
+                return this.reader.WaveFormat;
             }
         }
 
+        /// <summary>
+        /// 下限ビットレート
+        /// </summary>
         public uint LowerBitrate
         {
             get
             {
-                return (uint)this.vorbisWaveReader.LowerBitrate;
+                return this.reader.LowerBitrate;
             }
         }
 
+        /// <summary>
+        /// 公称ビットレート
+        /// </summary>
         public uint NominalBitrate
         {
             get
             {
-                return (uint)this.vorbisWaveReader.NominalBitrate;
+                return this.reader.NominalBitrate;
             }
         }
 
+        /// <summary>
+        /// 上限ビットレート
+        /// </summary>
         public uint UpperBitrate
         {
             get
             {
-                return (uint)this.vorbisWaveReader.UpperBitrate;
+                return this.reader.UpperBitrate;
             }
         }
 
@@ -60,7 +70,7 @@ namespace LibPulseTune.Codecs.Vorbis
         /// <returns></returns>
         public int Read(byte[] buffer, int offset, int length)
         {
-            return this.vorbisWaveReader.Read(buffer, offset, length);
+            return this.waveProviderConverter.Read(buffer, offset, length);
         }
 
         /// <summary>
@@ -68,7 +78,7 @@ namespace LibPulseTune.Codecs.Vorbis
         /// </summary>
         public void Dispose()
         {
-            this.vorbisWaveReader.Dispose();
+            this.reader.Dispose();
         }
 
         /// <summary>
@@ -77,7 +87,7 @@ namespace LibPulseTune.Codecs.Vorbis
         /// <returns></returns>
         public TimeSpan GetCurrentTime()
         {
-            return this.vorbisWaveReader.CurrentTime;
+            return this.reader.GetCurrentTime();
         }
 
         /// <summary>
@@ -86,7 +96,7 @@ namespace LibPulseTune.Codecs.Vorbis
         /// <returns></returns>
         public TimeSpan GetDuration()
         {
-            return this.vorbisWaveReader.TotalTime;
+            return this.reader.GetDuration();
         }
 
         /// <summary>
@@ -95,7 +105,7 @@ namespace LibPulseTune.Codecs.Vorbis
         /// <param name="time"></param>
         public void SetCurrentTime(TimeSpan time)
         {
-            this.vorbisWaveReader.CurrentTime = time;
+            this.reader.SetCurrentTime(time);
         }
     }
 }

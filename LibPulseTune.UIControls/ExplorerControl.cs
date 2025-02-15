@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 
 namespace LibPulseTune.UIControls
 {
@@ -231,6 +230,43 @@ namespace LibPulseTune.UIControls
 
         #endregion
 
+        /// <summary>
+        /// UI上で選択されたトラックの選択を、プレイリスト上のトラックの選択に反映する。
+        /// </summary>
+        private void ApplyTrackSelectionToPlaylist()
+        {
+            if (this.Viewer.SelectedFileNames.Length >= 1 && this.Viewer.SelectedFolders.Length == 0)
+            {
+                AudioTrackBase audioTrack = null;
+                for (int i = 0; i < this.playlist.Count; ++i)
+                {
+                    var track = this.playlist.GetTrack(i);
+                    if (!track.IsAudioCDTrack)
+                    {
+                        if (track.Path == this.SelectedFileNames[0])
+                        {
+                            audioTrack = track;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        string fileName = $"Track{track.AudioCDTrackNumber.ToString("00")}";
+                        if (Path.GetFileNameWithoutExtension(this.SelectedFileNames[0]) == fileName)
+                        {
+                            audioTrack = track;
+                            break;
+                        }
+                    }
+                }
+
+                if (audioTrack != null)
+                {
+                    this.playlist.SelectedTrack = audioTrack;
+                }
+            }
+        }
+
         public bool CanSelectAddTrack()
         {
             return false;
@@ -354,38 +390,8 @@ namespace LibPulseTune.UIControls
 
         private void Viewer_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ApplyTrackSelectionToPlaylist();
             this.SelectedFileNamesChanged?.Invoke(this, EventArgs.Empty);
-
-            if (this.Viewer.SelectedFileNames.Length >= 1 && this.Viewer.SelectedFolders.Length == 0)
-            {
-                AudioTrackBase audioTrack = null;
-                for (int i = 0; i < this.playlist.Count; ++i)
-                {
-                    var track = this.playlist.GetTrack(i);
-                    if (!track.IsAudioCDTrack)
-                    {
-                        if (track.Path == this.SelectedFileNames[0])
-                        {
-                            audioTrack = track;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        string fileName = $"Track{track.AudioCDTrackNumber.ToString("00")}";
-                        if (Path.GetFileNameWithoutExtension(this.SelectedFileNames[0]) == fileName)
-                        {
-                            audioTrack = track;
-                            break;
-                        }
-                    }
-                }
-
-                if (audioTrack != null)
-                {
-                    this.playlist.SelectedTrack = audioTrack;
-                }
-            }
         }
 
         private void Viewer_DoubleClick(object sender, EventArgs e)
@@ -395,6 +401,7 @@ namespace LibPulseTune.UIControls
 
         private void Viewer_FileDoubleClick(object sender, EventArgs e)
         {
+            ApplyTrackSelectionToPlaylist();
             this.FileDoubleClick?.Invoke(this, EventArgs.Empty);
         }
 

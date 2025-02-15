@@ -1,6 +1,8 @@
+using LibPulseTune.Codecs.Aiff;
 using LibPulseTune.Codecs.Cd;
 using LibPulseTune.Codecs.MediaFoundation;
 using LibPulseTune.Codecs.Vorbis;
+using LibPulseTune.Codecs.Wav;
 using LibPulseTune.Codecs.WavPack;
 using LibPulseTune.Codecs.ZilophiX;
 using LibPulseTune.Database;
@@ -49,30 +51,28 @@ namespace PulseTune
         /// </summary>
         public static void LoadCodecs()
         {
-            // MediaFoundation（OS組み込みデコーダ）でデコードするフォーマットを登録
-            AudioSourceProvider.RegisterDecoder("AAC", typeof(MediaFoundationAudioSource), ".aac");
-            AudioSourceProvider.RegisterDecoder("AIFF", typeof(MediaFoundationAudioSource), ".aif", ".aiff");
-            AudioSourceProvider.RegisterDecoder("FLAC", typeof(MediaFoundationAudioSource), ".flac");
-            AudioSourceProvider.RegisterDecoder("MP2", typeof(MediaFoundationAudioSource), ".mp2");
-            AudioSourceProvider.RegisterDecoder("MP3", typeof(MediaFoundationAudioSource), ".mp3");
-            AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisAudioSource), ".ogg");
-            AudioSourceProvider.RegisterDecoder("M4A", typeof(MediaFoundationAudioSource), ".m4a");
-            AudioSourceProvider.RegisterDecoder("WAV", typeof(MediaFoundationAudioSource), ".wav");
-            AudioSourceProvider.RegisterDecoder("Windows Media Audio", typeof(MediaFoundationAudioSource), ".wma");
+            AudioSourceProvider.RegisterDecoder("AAC", typeof(MediaFoundationDecoder), ".aac");
+            AudioSourceProvider.RegisterDecoder("FLAC", typeof(MediaFoundationDecoder), ".flac");
+            AudioSourceProvider.RegisterDecoder("MP2", typeof(MediaFoundationDecoder), ".mp2");
+            AudioSourceProvider.RegisterDecoder("MP3", typeof(MediaFoundationDecoder), ".mp3");
+            AudioSourceProvider.RegisterDecoder("M4A", typeof(MediaFoundationDecoder), ".m4a");
+            AudioSourceProvider.RegisterDecoder("Windows Media Audio", typeof(MediaFoundationDecoder), ".wma");
 
-            // オーディオCDデコーダを登録
-            AudioSourceProvider.RegisterDecoder("オーディオCDトラック", typeof(CDAudioSource), ".cda");
+            AudioSourceProvider.RegisterDecoder("AIFF", typeof(AiffDecoder), ".aif", ".aiff");
+            AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisDecoder), ".ogg");
+            AudioSourceProvider.RegisterDecoder("WAV", typeof(WavDecoder), ".wav");
+            AudioSourceProvider.RegisterDecoder("オーディオCDトラック", typeof(CDAudioDecoder), ".cda");
 
             // WavPackが使用可能なら登録
-            if (WavPackAudioSource.IsAvailable())
+            if (WavPackDecoder.IsAvailable())
             {
-                AudioSourceProvider.RegisterDecoder("WavPack", typeof(WavPackAudioSource), ".wv");
+                AudioSourceProvider.RegisterDecoder("WavPack", typeof(WavPackDecoder), ".wv");
             }
 
             // ZilophiXが使用可能なら登録
-            if (ZilophiXAudioSource.IsAvailable())
+            if (ZilophiXDecoder.IsAvailable())
             {
-                AudioSourceProvider.RegisterDecoder("ZilophiX", typeof(ZilophiXAudioSource), ".zpx");
+                AudioSourceProvider.RegisterDecoder("ZilophiX", typeof(ZilophiXDecoder), ".zpx");
             }
         }
 

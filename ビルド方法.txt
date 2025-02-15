@@ -39,7 +39,6 @@ PulseTune のビルド方法
 
 　・LibPulseTune.Codecs
 　　・LibPulseTune.Engine
-　　・NAudio.Vorbis
 　　・NAudio.Wasapi
 　　・NAudio.Core
 　　・NVorbis

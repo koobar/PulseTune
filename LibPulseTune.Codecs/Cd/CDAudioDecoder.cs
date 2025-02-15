@@ -8,7 +8,7 @@ using static LibPulseTune.Codecs.WinApi;
 
 namespace LibPulseTune.Codecs.Cd
 {
-    public class CDAudioSource : IAudioSource
+    public class CDAudioDecoder : IAudioSource
     {
         // 非公開フィールド
         private readonly object lockObject = new object();
@@ -21,7 +21,7 @@ namespace LibPulseTune.Codecs.Cd
 
         #region コンストラクタ・デストラクタ
 
-        public CDAudioSource(DiskDrive drive, CDTrack track)
+        public CDAudioDecoder(DiskDrive drive, CDTrack track)
         {
             this.diskDrive = drive;
             this.track = track;
@@ -33,19 +33,19 @@ namespace LibPulseTune.Codecs.Cd
             this.pRawReadInfo = Marshal.AllocCoTaskMem((int)SIZE_OF_RAW_READ_INFO);
         }
 
-        public CDAudioSource(DiskDrive diskDrive, uint trackNumber)
+        public CDAudioDecoder(DiskDrive diskDrive, uint trackNumber)
             : this(diskDrive, diskDrive.Tracks[trackNumber - 1])
         {
 
         }
 
-        public CDAudioSource(string path)
+        public CDAudioDecoder(string path)
             : this(CreateDiskDrive(path), GetTrackNumber(path))
         {
 
         }
 
-        ~CDAudioSource()
+        ~CDAudioDecoder()
         {
             Dispose();
         }

@@ -65,7 +65,7 @@ namespace LibPulseTune.Engine.Playlists
             }
             get
             {
-                if (this.currentIndex == -1 || this.currentIndex >= this.tracks.Count - 1)
+                if (this.currentIndex == -1 || this.currentIndex > this.tracks.Count - 1)
                 {
                     return null;
                 }

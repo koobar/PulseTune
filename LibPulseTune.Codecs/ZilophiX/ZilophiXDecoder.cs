@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace LibPulseTune.Codecs.ZilophiX
 {
-    public class ZilophiXAudioSource : IAudioSource
+    public class ZilophiXDecoder : IAudioSource
     {
         // デリゲート
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)] private delegate IntPtr DCreateDecoder(string path);
@@ -45,7 +45,7 @@ namespace LibPulseTune.Codecs.ZilophiX
         private bool isDisposed;
 
         // コンストラクタ
-        public ZilophiXAudioSource(string path)
+        public ZilophiXDecoder(string path)
         {
             this.pDll = WinApi.LoadLibrary(ZilophiXDecoderDllPath);
             if (this.pDll == IntPtr.Zero)

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace LibPulseTune.Codecs.WavPack
 {
-    public class WavPackAudioSource : IAudioSource
+    public class WavPackDecoder : IAudioSource
     {
         enum WavPackMode
         {
@@ -68,7 +68,7 @@ namespace LibPulseTune.Codecs.WavPack
         private bool isDisposed;
 
         // コンストラクタ
-        public WavPackAudioSource(string path)
+        public WavPackDecoder(string path)
         {
             if (!IsAvailable())
             {

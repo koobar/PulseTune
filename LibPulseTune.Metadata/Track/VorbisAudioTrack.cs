@@ -26,7 +26,7 @@ namespace LibPulseTune.Metadata.Track
                 var worker = new BackgroundWorker();
                 worker.DoWork += delegate
                 {
-                    var vorbis = new VorbisAudioSource(path);
+                    var vorbis = new VorbisDecoder(path);
                     duration = vorbis.GetDuration();
                     bitRate = vorbis.NominalBitrate / 1000;
                     vorbis.Dispose();
@@ -42,7 +42,7 @@ namespace LibPulseTune.Metadata.Track
             }
             else
             {
-                var vorbis = new VorbisAudioSource(path);
+                var vorbis = new VorbisDecoder(path);
                 this.duration = vorbis.GetDuration();
                 this.bitRate = vorbis.NominalBitrate / 1000;
                 vorbis.Dispose();

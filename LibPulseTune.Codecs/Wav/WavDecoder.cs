@@ -1,0 +1,92 @@
+﻿using LibPulseTune.Engine;
+using NAudio.Wave;
+using System;
+
+namespace LibPulseTune.Codecs.Wav
+{
+    public class WavDecoder : IAudioSource
+    {
+        // 非公開フィールド
+        private WaveFileReader reader;
+        private bool isDisposed;
+
+        // コンストラクタ
+        public WavDecoder(string path)
+        {
+            this.reader = new WaveFileReader(path);
+        }
+
+        // デストラクタ
+        ~WavDecoder()
+        {
+            Dispose();
+        }
+
+        /// <summary>
+        /// フォーマット
+        /// </summary>
+        public WaveFormat WaveFormat
+        {
+            get
+            {
+                return this.reader.WaveFormat;
+            }
+        }
+
+        /// <summary>
+        /// 破棄
+        /// </summary>
+        public void Dispose()
+        {
+            if (this.isDisposed)
+            {
+                return;
+            }
+
+            this.reader.Dispose();
+            this.reader = null;
+            this.isDisposed = true;
+
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// 再生位置を取得する。
+        /// </summary>
+        /// <returns></returns>
+        public TimeSpan GetCurrentTime()
+        {
+            return this.reader.CurrentTime;
+        }
+
+        /// <summary>
+        /// 演奏時間を取得する。
+        /// </summary>
+        /// <returns></returns>
+        public TimeSpan GetDuration()
+        {
+            return this.reader.TotalTime;
+        }
+
+        /// <summary>
+        /// デコード
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public int Read(byte[] buffer, int offset, int count)
+        {
+            return this.reader.Read(buffer, offset, count);
+        }
+
+        /// <summary>
+        /// 再生位置を設定する。
+        /// </summary>
+        /// <param name="time"></param>
+        public void SetCurrentTime(TimeSpan time)
+        {
+            this.reader.CurrentTime = time;
+        }
+    }
+}

@@ -752,8 +752,10 @@ namespace PulseTune
                 return;
             }
 
+            var audioTrack = (AudioTrackBase)track;
+
             // 新しくAudioTrackBaseを作らないと、アルバムアートが読み込まれない場合がある。
-            Play(AudioTrackProvider.CreateFile(((AudioTrackBase)track).Path));
+            Play(AudioTrackProvider.CreateFile(audioTrack.Path));
         }
 
         /// <summary>

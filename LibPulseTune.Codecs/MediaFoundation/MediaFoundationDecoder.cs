@@ -4,13 +4,13 @@ using System;
 
 namespace LibPulseTune.Codecs.MediaFoundation
 {
-    public class MediaFoundationAudioSource : IAudioSource
+    public class MediaFoundationDecoder : IAudioSource
     {
         // 非公開フィールド
         private readonly MediaFoundationReader source;
 
         // コンストラクタ
-        public MediaFoundationAudioSource(string path)
+        public MediaFoundationDecoder(string path)
         {
             this.source = new MediaFoundationReader(path);
         }
