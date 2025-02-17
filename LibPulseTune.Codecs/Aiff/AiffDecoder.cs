@@ -9,7 +9,7 @@ namespace LibPulseTune.Codecs.Aiff
     public class AiffDecoder : IAudioSource
     {
         // 非公開フィールド
-        private readonly long dataChunkOffset;
+        private readonly long ssndChunkStartOffset;
         private readonly long length;
         private readonly object lockObject;
         private BinaryReader streamReader;
@@ -32,11 +32,11 @@ namespace LibPulseTune.Codecs.Aiff
             if (this.streamReader.MoveToChunk("SSND"))
             {
                 this.length = this.streamReader.ReadBigEndianUInt32();
-                this.dataChunkOffset = this.streamReader.BaseStream.Position;
+                this.ssndChunkStartOffset = this.streamReader.BaseStream.Position;
             }
             else
             {
-                throw new InvalidDataException("dataチャンクが見つかりませんでした。");
+                throw new InvalidDataException("SSNDチャンクが見つかりませんでした。");
             }
         }
 
@@ -190,7 +190,7 @@ namespace LibPulseTune.Codecs.Aiff
         {
             lock (this.lockObject)
             {
-                var result = this.streamReader.BaseStream.Position - this.dataChunkOffset;
+                var result = this.streamReader.BaseStream.Position - this.ssndChunkStartOffset;
 
                 return result;
             }
@@ -231,7 +231,7 @@ namespace LibPulseTune.Codecs.Aiff
                 var pos = (int)(time.TotalSeconds * this.averageBytesPerSecond);
                 pos -= (pos % this.blockSize);
 
-                this.streamReader.BaseStream.Position = this.dataChunkOffset + pos;
+                this.streamReader.BaseStream.Position = this.ssndChunkStartOffset + pos;
             }
         }
     }

@@ -8,7 +8,7 @@ namespace LibPulseTune.Codecs.Wav
     public class WavDecoder : IAudioSource
     {
         // 非公開フィールド
-        private readonly long dataChunkOffset;
+        private readonly long dataChunkStartOffset;
         private readonly long length;
         private readonly object lockObject;
         private BinaryReader streamReader;
@@ -31,7 +31,7 @@ namespace LibPulseTune.Codecs.Wav
             if (this.streamReader.MoveToChunk("data"))
             {
                 this.length = this.streamReader.ReadUInt32();
-                this.dataChunkOffset = this.streamReader.BaseStream.Position;
+                this.dataChunkStartOffset = this.streamReader.BaseStream.Position;
             }
             else
             {
@@ -108,7 +108,7 @@ namespace LibPulseTune.Codecs.Wav
                     this.averageBytesPerSecond = (int)this.streamReader.ReadUInt32();
                     this.blockSize = (int)this.streamReader.ReadUInt16();
                     this.bitsPerSample = (int)this.streamReader.ReadUInt16();
-                    this.isFloat = false;
+                    this.isFloat = true;
                 }
             }
             else
@@ -128,6 +128,13 @@ namespace LibPulseTune.Codecs.Wav
         {
             lock (this.lockObject)
             {
+                var position = GetPosition();
+
+                if (position + count > this.length)
+                {
+                    count = (int)this.length - (int)position;
+                }
+
                 return this.streamReader.Read(buffer, offset, count);
             }
         }
@@ -157,7 +164,7 @@ namespace LibPulseTune.Codecs.Wav
         {
             lock (this.lockObject)
             {
-                return this.streamReader.BaseStream.Position - this.dataChunkOffset;
+                return this.streamReader.BaseStream.Position - this.dataChunkStartOffset;
             }
         }
 
@@ -196,7 +203,7 @@ namespace LibPulseTune.Codecs.Wav
                 var pos = (int)(time.TotalSeconds * this.averageBytesPerSecond);
                 pos -= (pos % this.blockSize);
 
-                this.streamReader.BaseStream.Position = this.dataChunkOffset + pos;
+                this.streamReader.BaseStream.Position = this.dataChunkStartOffset + pos;
             }
         }
     }
