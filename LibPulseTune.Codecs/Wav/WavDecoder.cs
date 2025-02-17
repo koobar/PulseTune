@@ -1,19 +1,42 @@
-﻿using LibPulseTune.Engine;
-using NAudio.Wave;
+﻿using LibPulseTune.Codecs.Utils;
+using LibPulseTune.Engine;
 using System;
+using System.IO;
 
 namespace LibPulseTune.Codecs.Wav
 {
     public class WavDecoder : IAudioSource
     {
         // 非公開フィールド
-        private WaveFileReader reader;
+        private readonly long dataChunkOffset;
+        private readonly long length;
+        private readonly object lockObject;
+        private BinaryReader streamReader;
+        private int sampleRate;
+        private int bitsPerSample;
+        private int channels;
+        private int averageBytesPerSecond;
+        private int blockSize;
+        private bool isFloat;
         private bool isDisposed;
 
         // コンストラクタ
         public WavDecoder(string path)
         {
-            this.reader = new WaveFileReader(path);
+            this.streamReader = new BinaryReader(File.OpenRead(path));
+            this.lockObject = new object();
+
+            ReadFmtChunk();
+
+            if (this.streamReader.MoveToChunk("data"))
+            {
+                this.length = this.streamReader.ReadUInt32();
+                this.dataChunkOffset = this.streamReader.BaseStream.Position;
+            }
+            else
+            {
+                throw new InvalidDataException("dataチャンクが見つかりませんでした。");
+            }
         }
 
         // デストラクタ
@@ -28,7 +51,7 @@ namespace LibPulseTune.Codecs.Wav
         {
             get
             {
-                return this.reader.WaveFormat.SampleRate;
+                return this.sampleRate;
             }
         }
 
@@ -36,7 +59,7 @@ namespace LibPulseTune.Codecs.Wav
         {
             get
             {
-                return this.reader.WaveFormat.BitsPerSample;
+                return this.bitsPerSample;
             }
         }
 
@@ -44,7 +67,7 @@ namespace LibPulseTune.Codecs.Wav
         {
             get
             {
-                return this.reader.WaveFormat.Channels;
+                return this.channels;
             }
         }
 
@@ -52,45 +75,46 @@ namespace LibPulseTune.Codecs.Wav
         {
             get
             {
-                return this.reader.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat;
+                return this.isFloat;
             }
         }
 
         #endregion
 
         /// <summary>
-        /// 破棄
+        /// fmt チャンクを読み込む。
         /// </summary>
-        public void Dispose()
+        /// <exception cref="InvalidDataException"></exception>
+        private void ReadFmtChunk()
         {
-            if (this.isDisposed)
+            if (this.streamReader.MoveToChunk("fmt "))
             {
-                return;
+                this.streamReader.BaseStream.Position += 4;
+                var audioFormat = this.streamReader.ReadUInt16();
+
+                if (audioFormat == 0x0001 || audioFormat == 0xFFFE)
+                {
+                    this.channels = (int)this.streamReader.ReadUInt16();
+                    this.sampleRate = (int)this.streamReader.ReadUInt32();
+                    this.averageBytesPerSecond = (int)this.streamReader.ReadUInt32();
+                    this.blockSize = (int)this.streamReader.ReadUInt16();
+                    this.bitsPerSample = (int)this.streamReader.ReadUInt16();
+                    this.isFloat = false;
+                }
+                else if (audioFormat == 0x0003)
+                {
+                    this.channels = (int)this.streamReader.ReadUInt16();
+                    this.sampleRate = (int)this.streamReader.ReadUInt32();
+                    this.averageBytesPerSecond = (int)this.streamReader.ReadUInt32();
+                    this.blockSize = (int)this.streamReader.ReadUInt16();
+                    this.bitsPerSample = (int)this.streamReader.ReadUInt16();
+                    this.isFloat = false;
+                }
             }
-
-            this.reader.Dispose();
-            this.reader = null;
-            this.isDisposed = true;
-
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// 再生位置を取得する。
-        /// </summary>
-        /// <returns></returns>
-        public TimeSpan GetCurrentTime()
-        {
-            return this.reader.CurrentTime;
-        }
-
-        /// <summary>
-        /// 演奏時間を取得する。
-        /// </summary>
-        /// <returns></returns>
-        public TimeSpan GetDuration()
-        {
-            return this.reader.TotalTime;
+            else
+            {
+                throw new InvalidDataException("fmt チャンクが見つかりません。");
+            }
         }
 
         /// <summary>
@@ -102,16 +126,78 @@ namespace LibPulseTune.Codecs.Wav
         /// <returns></returns>
         public int Read(byte[] buffer, int offset, int count)
         {
-            return this.reader.Read(buffer, offset, count);
+            lock (this.lockObject)
+            {
+                return this.streamReader.Read(buffer, offset, count);
+            }
         }
 
         /// <summary>
-        /// 再生位置を設定する。
+        /// 破棄
+        /// </summary>
+        public void Dispose()
+        {
+            if (this.isDisposed)
+            {
+                return;
+            }
+
+            this.streamReader.Dispose();
+            this.streamReader = null;
+            this.isDisposed = true;
+
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// PCMデータのバイトオフセットを取得する。
+        /// </summary>
+        /// <returns></returns>
+        public long GetPosition()
+        {
+            lock (this.lockObject)
+            {
+                return this.streamReader.BaseStream.Position - this.dataChunkOffset;
+            }
+        }
+
+        /// <summary>
+        /// このストリームの演奏時間を取得する。
+        /// </summary>
+        /// <returns></returns>
+        public TimeSpan GetDuration()
+        {
+            lock (this.lockObject)
+            {
+                return TimeSpan.FromSeconds(this.length / this.averageBytesPerSecond);
+            }
+        }
+
+        /// <summary>
+        /// このストリームの再生位置を取得する。
+        /// </summary>
+        /// <returns></returns>
+        public TimeSpan GetCurrentTime()
+        {
+            lock (this.lockObject)
+            {
+                return TimeSpan.FromSeconds(GetPosition() / this.averageBytesPerSecond);
+            }
+        }
+
+        /// <summary>
+        /// このストリームの再生位置を設定する。
         /// </summary>
         /// <param name="time"></param>
         public void SetCurrentTime(TimeSpan time)
         {
-            this.reader.CurrentTime = time;
+            lock (this.lockObject)
+            {
+                var pos = (int)(time.TotalSeconds * this.averageBytesPerSecond);
+                pos -= (pos % this.blockSize);
+
+                this.streamReader.BaseStream.Position = this.dataChunkOffset + pos;
+            }
         }
     }
 }

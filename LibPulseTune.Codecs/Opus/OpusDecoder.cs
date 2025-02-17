@@ -1,7 +1,6 @@
 ﻿using Concentus;
 using Concentus.Oggfile;
 using LibPulseTune.Engine;
-using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.IO;

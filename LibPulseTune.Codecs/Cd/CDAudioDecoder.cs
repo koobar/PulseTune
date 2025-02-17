@@ -1,5 +1,4 @@
 ﻿using LibPulseTune.Engine;
-using NAudio.Wave;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -13,7 +12,6 @@ namespace LibPulseTune.Codecs.Cd
         // 非公開フィールド
         private readonly object lockObject = new object();
         private readonly CDTrack track;
-        private readonly WaveFormat waveFormat;
         private readonly IntPtr pRawReadInfo;
         private DiskDrive diskDrive;
         private uint sectorIndex;
@@ -25,7 +23,6 @@ namespace LibPulseTune.Codecs.Cd
         {
             this.diskDrive = drive;
             this.track = track;
-            this.waveFormat = new WaveFormat((int)PCM_SAMPLE_RATE, (int)PCM_BITS_PER_SAMPLE, (int)PCM_CHANNELS);
             this.sectorIndex = track.GetStartSector();
             this.isDisposed = false;
 

@@ -10,7 +10,7 @@ namespace LibPulseTune.Codecs.ZilophiX
     public class ZilophiXDecoder : IAudioSource
     {
         // デリゲート
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)] private delegate IntPtr DCreateDecoder(string path);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)] private delegate IntPtr DZpXCreateDecoder(string path);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void DZpXFreeDecoder(IntPtr pDecoder);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void DZpXCloseFile(IntPtr pDecoder);
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint DZpXGetSampleRate(IntPtr pDecoder);
@@ -25,7 +25,7 @@ namespace LibPulseTune.Codecs.ZilophiX
         // 非公開フィールド
         private static readonly string ZilophiXDecoderDllPath = $"{Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName)}\\zilophixdec.dll";
         private readonly IntPtr pDll;
-        private readonly DCreateDecoder _ZpXCreateDecoder;
+        private readonly DZpXCreateDecoder _ZpXCreateDecoder;
         private readonly DZpXFreeDecoder _ZpXFreeDecoder;
         private readonly DZpXCloseFile _ZpXCloseFile;
         private readonly DZpXGetSampleRate _ZpXGetSampleRate;
@@ -52,7 +52,7 @@ namespace LibPulseTune.Codecs.ZilophiX
                 throw new InvalidProgramException("zilophixdec.dll が見つかりません");
             }
 
-            this._ZpXCreateDecoder = WinApiHelper.LoadFunction<DCreateDecoder>(this.pDll, "ZpXCreateDecoderW");
+            this._ZpXCreateDecoder = WinApiHelper.LoadFunction<DZpXCreateDecoder>(this.pDll, "ZpXCreateDecoderW");
             this._ZpXFreeDecoder = WinApiHelper.LoadFunction<DZpXFreeDecoder>(this.pDll, "ZpXFreeDecoder");
             this._ZpXCloseFile = WinApiHelper.LoadFunction<DZpXCloseFile>(this.pDll, "ZpXCloseFile");
             this._ZpXGetSampleRate = WinApiHelper.LoadFunction<DZpXGetSampleRate>(this.pDll, "ZpXGetSampleRate");

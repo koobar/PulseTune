@@ -50,6 +50,8 @@
     <Compile Include="Cd\CDDA.cs" />
     <Compile Include="Cd\CDTrack.cs" />
     <Compile Include="Cd\DiskDrive.cs" />
+    <Compile Include="Utils\BigEndian.cs" />
+    <Compile Include="Utils\FourCC.cs" />
     <Compile Include="WinApiHelper.cs" />
     <Compile Include="MediaFoundation\MediaFoundationDecoder.cs" />
     <Compile Include="Opus\OpusDecoder.cs" />

@@ -1,19 +1,43 @@
-﻿using LibPulseTune.Engine;
-using NAudio.Wave;
+﻿using LibPulseTune.Codecs.Utils;
+using LibPulseTune.Engine;
+using NAudio.Utils;
 using System;
+using System.IO;
 
 namespace LibPulseTune.Codecs.Aiff
 {
     public class AiffDecoder : IAudioSource
     {
         // 非公開フィールド
-        private AiffFileReader reader;
+        private readonly long dataChunkOffset;
+        private readonly long length;
+        private readonly object lockObject;
+        private BinaryReader streamReader;
+        private int sampleRate;
+        private int bitsPerSample;
+        private int channels;
+        private int averageBytesPerSecond;
+        private int blockSize;
+        private bool isFloat;
         private bool isDisposed;
 
         // コンストラクタ
         public AiffDecoder(string path)
         {
-            this.reader = new AiffFileReader(path);
+            this.streamReader = new BinaryReader(File.OpenRead(path));
+            this.lockObject = new object();
+
+            ReadCOMMChunk();
+
+            if (this.streamReader.MoveToChunk("SSND"))
+            {
+                this.length = this.streamReader.ReadBigEndianUInt32();
+                this.dataChunkOffset = this.streamReader.BaseStream.Position;
+            }
+            else
+            {
+                throw new InvalidDataException("dataチャンクが見つかりませんでした。");
+            }
         }
 
         // デストラクタ
@@ -28,7 +52,7 @@ namespace LibPulseTune.Codecs.Aiff
         {
             get
             {
-                return this.reader.WaveFormat.SampleRate;
+                return this.sampleRate;
             }
         }
 
@@ -36,7 +60,7 @@ namespace LibPulseTune.Codecs.Aiff
         {
             get
             {
-                return this.reader.WaveFormat.BitsPerSample;
+                return this.bitsPerSample;
             }
         }
 
@@ -44,7 +68,7 @@ namespace LibPulseTune.Codecs.Aiff
         {
             get
             {
-                return this.reader.WaveFormat.Channels;
+                return this.channels;
             }
         }
 
@@ -52,45 +76,34 @@ namespace LibPulseTune.Codecs.Aiff
         {
             get
             {
-                return this.reader.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat;
+                return this.isFloat;
             }
         }
 
         #endregion
 
         /// <summary>
-        /// 破棄
+        /// COMMチャンクを読み込む。
         /// </summary>
-        public void Dispose()
+        /// <exception cref="InvalidDataException"></exception>
+        private void ReadCOMMChunk()
         {
-            if (this.isDisposed)
+            if (this.streamReader.MoveToChunk("COMM"))
             {
-                return;
+                this.streamReader.BaseStream.Position += sizeof(uint);
+
+                this.channels = this.streamReader.ReadBigEndianInt16();
+                this.streamReader.BaseStream.Position += sizeof(uint);
+                this.bitsPerSample = this.streamReader.ReadBigEndianInt16();
+                this.sampleRate = (int)IEEE.ConvertFromIeeeExtended(this.streamReader.ReadBytes(10));
+                this.isFloat = false;
+                this.blockSize = (short)(this.channels * (this.bitsPerSample / 8));
+                this.averageBytesPerSecond = this.sampleRate * this.blockSize;
             }
-
-            this.reader.Dispose();
-            this.reader = null;
-            this.isDisposed = true;
-
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// 再生位置を取得する。
-        /// </summary>
-        /// <returns></returns>
-        public TimeSpan GetCurrentTime()
-        {
-            return this.reader.CurrentTime;
-        }
-
-        /// <summary>
-        /// 演奏時間を取得する。
-        /// </summary>
-        /// <returns></returns>
-        public TimeSpan GetDuration()
-        {
-            return this.reader.TotalTime;
+            else
+            {
+                throw new InvalidDataException("COMMチャンクが見つかりません。");
+            }
         }
 
         /// <summary>
@@ -102,16 +115,124 @@ namespace LibPulseTune.Codecs.Aiff
         /// <returns></returns>
         public int Read(byte[] buffer, int offset, int count)
         {
-            return this.reader.Read(buffer, offset, count);
+            lock (this.lockObject)
+            {
+                var position = GetPosition();
+
+                if (position + count > this.length)
+                {
+                    count = (int)this.length - (int)position;
+                }
+
+                // AIFFでは、PCMデータがビッグエンディアンで記録されている。
+                // IAudioSourceはリトルエンディアンのデータを必要とするため、
+                // リトルエンディアンの順となるように並び替える。
+                byte[] bigEndian = new byte[count];
+                int read = this.streamReader.Read(bigEndian, offset, count);
+
+                int bytesPerSample = this.bitsPerSample / 8;
+                for (int i = 0; i < read; i += bytesPerSample)
+                {
+                    if (this.BitsPerSample == 8)
+                    {
+                        buffer[i] = bigEndian[i];
+                    }
+                    else if (this.bitsPerSample == 16)
+                    {
+                        buffer[i + 0] = bigEndian[i + 1];
+                        buffer[i + 1] = bigEndian[i];
+                    }
+                    else if (this.bitsPerSample == 24)
+                    {
+                        buffer[i + 0] = bigEndian[i + 2];
+                        buffer[i + 1] = bigEndian[i + 1];
+                        buffer[i + 2] = bigEndian[i + 0];
+                    }
+                    else if (this.bitsPerSample == 32)
+                    {
+                        buffer[i + 0] = bigEndian[i + 3];
+                        buffer[i + 1] = bigEndian[i + 2];
+                        buffer[i + 2] = bigEndian[i + 1];
+                        buffer[i + 3] = bigEndian[i + 0];
+                    }
+                    else
+                    {
+                        throw new FormatException("サポートされていないフォーマットです。");
+                    }
+                }
+
+                return read;
+            }
         }
 
         /// <summary>
-        /// 再生位置を設定する。
+        /// 破棄
+        /// </summary>
+        public void Dispose()
+        {
+            if (this.isDisposed)
+            {
+                return;
+            }
+
+            this.streamReader.Dispose();
+            this.streamReader = null;
+            this.isDisposed = true;
+
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// PCMデータのバイトオフセットを取得する。
+        /// </summary>
+        /// <returns></returns>
+        public long GetPosition()
+        {
+            lock (this.lockObject)
+            {
+                var result = this.streamReader.BaseStream.Position - this.dataChunkOffset;
+
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// このストリームの演奏時間を取得する。
+        /// </summary>
+        /// <returns></returns>
+        public TimeSpan GetDuration()
+        {
+            lock (this.lockObject)
+            {
+                return TimeSpan.FromSeconds(this.length / this.averageBytesPerSecond);
+            }
+        }
+
+        /// <summary>
+        /// このストリームの再生位置を取得する。
+        /// </summary>
+        /// <returns></returns>
+        public TimeSpan GetCurrentTime()
+        {
+            lock (this.lockObject)
+            {
+                return TimeSpan.FromSeconds(GetPosition() / this.averageBytesPerSecond);
+            }
+        }
+
+        /// <summary>
+        /// このストリームの再生位置を設定する。
         /// </summary>
         /// <param name="time"></param>
         public void SetCurrentTime(TimeSpan time)
         {
-            this.reader.CurrentTime = time;
+            lock (this.lockObject)
+            {
+                var pos = (int)(time.TotalSeconds * this.averageBytesPerSecond);
+                pos -= (pos % this.blockSize);
+
+                this.streamReader.BaseStream.Position = this.dataChunkOffset + pos;
+            }
         }
     }
 }
