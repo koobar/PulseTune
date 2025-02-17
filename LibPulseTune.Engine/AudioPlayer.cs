@@ -137,12 +137,13 @@ namespace LibPulseTune.Engine
             return currentAudioSource;
         }
 
-        public static WaveformMonitor GetWaveformMonitor()
-        {
-            return waveformMonitor;
-        }
-
-        private static IWaveProvider CreateWaveProvider(ISampleProvider sampleProvider, WaveFormat originalWaveformat)
+        /// <summary>
+        /// ISampleProviderを、元のフォーマットを維持したままIWaveProviderに変換する。
+        /// </summary>
+        /// <param name="sampleProvider"></param>
+        /// <param name="originalWaveformat"></param>
+        /// <returns></returns>
+        private static IWaveProvider ConvertToWaveProvider(ISampleProvider sampleProvider, WaveFormat originalWaveformat)
         {
             if (originalWaveformat.Encoding == WaveFormatEncoding.IeeeFloat)
             {
@@ -181,8 +182,10 @@ namespace LibPulseTune.Engine
                     volumeController = null;
                 }
 
+                var waveProvider = new IAudioSourceToIWaveProviderConverter(currentAudioSource);
+
                 // 波形モニタを生成
-                waveformMonitor = new WaveformMonitor(currentAudioSource);
+                waveformMonitor = new WaveformMonitor(waveProvider);
 
                 // 音量コントローラを作成
                 volumeController = new VolumeSampleProvider(waveformMonitor);
@@ -190,7 +193,7 @@ namespace LibPulseTune.Engine
 
                 // デバイスを初期化
                 currentDeviceInstance = outputDevice.CreateDeviceInstance();
-                currentDeviceInstance.Init(CreateWaveProvider(volumeController, currentAudioSource.WaveFormat));
+                currentDeviceInstance.Init(ConvertToWaveProvider(volumeController, waveProvider.WaveFormat));
 
                 GC.Collect();
             }
@@ -221,37 +224,23 @@ namespace LibPulseTune.Engine
         }
 
         /// <summary>
-        /// 指定された時間から再生を開始する。但し、一時停止中に呼び出された場合は、再開の挙動をとる。
-        /// </summary>
-        /// <param name="time"></param>
-        public static void PlayFrom(TimeSpan time)
-        {
-            switch (GetAudioPlayerState())
-            {
-                case AUDIOPLAYER_NOT_READY:
-                    throw new Exception("オーディオ出力デバイスと音声ソースの準備ができていません。");
-                case AUDIOPLAYER_STATE_STOP:
-                    currentAudioSource.SetCurrentTime(time);
-                    currentDeviceInstance.Play();
-                    timer.Start();
-                    SetAudioPlayerState(AUDIOPLAYER_STATE_PLAY);
-                    break;
-                case AUDIOPLAYER_STATE_PAUSE:
-                    currentDeviceInstance.Play();
-                    timer.Start();
-                    SetAudioPlayerState(AUDIOPLAYER_STATE_PLAY);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        /// <summary>
         /// 再生または一時停止解除
         /// </summary>
         public static void Play()
         {
-            PlayFrom(TimeSpan.FromSeconds(0));
+            if (currentDeviceInstance == null)
+            {
+                return;
+            }
+
+            if (currentAudioSource == null)
+            {
+                return;
+            }
+
+            currentDeviceInstance.Play();
+            timer.Start();
+            SetAudioPlayerState(AUDIOPLAYER_STATE_PLAY);
         }
 
         /// <summary>
@@ -289,6 +278,83 @@ namespace LibPulseTune.Engine
                     SetAudioPlayerState(AUDIOPLAYER_STATE_STOP);
                     break;
             }
+        }
+
+        /// <summary>
+        /// 再生中のオーディオソースのフォーマットを取得する。
+        /// </summary>
+        /// <param name="sampleRate"></param>
+        /// <param name="bitsPerSample"></param>
+        /// <param name="channels"></param>
+        /// <param name="isFloat"></param>
+        public static void GetWaveFormat(out int sampleRate, out int bitsPerSample, out int channels, out bool isFloat)
+        {
+            if (currentAudioSource == null)
+            {
+                sampleRate = bitsPerSample = channels = 0;
+                isFloat = false;
+                return;
+            }
+
+            sampleRate = currentAudioSource.SampleRate;
+            bitsPerSample = currentAudioSource.BitsPerSample;
+            channels = currentAudioSource.Channels;
+            isFloat = currentAudioSource.IsFloat;
+        }
+
+        /// <summary>
+        /// 再生中のオーディオソースの演奏時間を取得する。
+        /// </summary>
+        /// <returns></returns>
+        public static TimeSpan GetDuration()
+        {
+            return currentAudioSource.GetDuration();
+        }
+
+        /// <summary>
+        /// 再生中のオーディオソースの再生位置を取得する。
+        /// </summary>
+        /// <returns></returns>
+        public static TimeSpan GetCurrentTime()
+        {
+            return currentAudioSource.GetCurrentTime();
+        }
+
+        /// <summary>
+        /// 再生中のオーディオソースの再生位置を設定する。
+        /// </summary>
+        /// <param name="time"></param>
+        public static void SetCurrentTime(TimeSpan time)
+        {
+            currentAudioSource.SetCurrentTime(time);
+        }
+
+        /// <summary>
+        /// 波形モニタリング用のデータを再生位置と同期する。
+        /// </summary>
+        public static void SyncWaveformMonitor()
+        {
+            waveformMonitor.LoadData(GetTimerInterval());
+        }
+
+        /// <summary>
+        /// 指定されたチャンネルの振幅を取得する。
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public static float GetAmplitude(int channel)
+        {
+            return waveformMonitor.GetAmplitude(channel);
+        }
+
+        /// <summary>
+        /// 指定されたチャンネルの波形を取得する。
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public static float[] GetWaveform(int channel)
+        {
+            return waveformMonitor.GetWaveform(channel);
         }
 
         /// <summary>

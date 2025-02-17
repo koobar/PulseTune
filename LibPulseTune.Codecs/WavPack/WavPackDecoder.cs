@@ -1,5 +1,4 @@
-﻿using LibPulseTune.Codecs.Helpers;
-using LibPulseTune.Engine;
+﻿using LibPulseTune.Engine;
 using NAudio.Wave;
 using System;
 using System.Diagnostics;
@@ -196,16 +195,41 @@ namespace LibPulseTune.Codecs.WavPack
 
         #endregion
 
-        /// <summary>
-        /// フォーマット
-        /// </summary>
-        public WaveFormat WaveFormat
+        #region プロパティ
+
+        public int SampleRate
         {
             get
             {
-                return this.waveFormat;
+                return this.waveFormat.SampleRate;
             }
         }
+
+        public int BitsPerSample
+        {
+            get
+            {
+                return this.waveFormat.BitsPerSample;
+            }
+        }
+
+        public int Channels
+        {
+            get
+            {
+                return this.waveFormat.Channels;
+            }
+        }
+
+        public bool IsFloat
+        {
+            get
+            {
+                return this.waveFormat.Encoding == WaveFormatEncoding.IeeeFloat;
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// オーディオデータを読み込む。

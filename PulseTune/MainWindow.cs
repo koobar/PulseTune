@@ -8,7 +8,6 @@ using LibPulseTune.Options;
 using LibPulseTune.UIControls;
 using LibPulseTune.UIControls.Dialogs;
 using LibPulseTune.UIControls.Utils;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using PulseTune.Properties;
 using System;
 using System.Collections.Generic;
@@ -153,11 +152,9 @@ namespace PulseTune
             addFolderToFavoriteMenuItem.Text = "フォルダを選択してお気に入りに追加";
             addFolderToFavoriteMenuItem.Click += delegate
             {
-                using (var dialog = new CommonOpenFileDialog())
+                using (var dialog = new FolderPickerDialog())
                 {
-                    dialog.IsFolderPicker = true;
-
-                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                    if (dialog.ShowDialog() == DialogResult.OK)
                     {
                         foreach (var location in dialog.FileNames)
                         {
@@ -582,7 +579,7 @@ namespace PulseTune
             AudioPlayer.Prepare();
 
             // シークバーの設定
-            this.ControlPanel.SetSeekBar(0, 0, (int)source.GetDuration().TotalMilliseconds);
+            this.ControlPanel.SetSeekBar(0, 0, (int)AudioPlayer.GetDuration().TotalMilliseconds);
 
             // 音量設定を反映
             AudioPlayer.SetVolume(OptionManager.Volume);
@@ -671,7 +668,12 @@ namespace PulseTune
         /// </summary>
         private void MoveToTrackStart()
         {
-            AudioPlayer.GetAudioSource().SetCurrentTime(TimeSpan.FromSeconds(0));
+            var playlist = GetCurrentTabPagePlaylist();
+            Play(playlist.SelectedTrack);
+
+            // このコードのほうが再読み込みを防げて効率的だが、Opusのデコードに使用しているライブラリ「Concentus」と相性が悪く、
+            // Opusだけ開始から1秒後の位置にシークされてしまう不具合が発生する。
+            //AudioPlayer.GetAudioSource().SetCurrentTime(TimeSpan.FromSeconds(0));
         }
 
         #endregion
@@ -920,26 +922,20 @@ namespace PulseTune
         /// <param name="e"></param>
         private void OnPlaybackPositionChanged(object sender, EventArgs e)
         {
-            var source = AudioPlayer.GetWaveformMonitor();
-            if (source == null)
-            {
-                return;
-            }
+            AudioPlayer.GetWaveFormat(out _, out _, out var channels, out _);
+            AudioPlayer.SyncWaveformMonitor();
 
-            var msec = AudioPlayer.GetTimerInterval();
-            source.LoadData(msec);
-
-            if (source.WaveFormat.Channels >= 2)
+            if (channels >= 2)
             {
-                this.WaveformRendererControl.PaintWaveform(source.GetWaveform(0), source.GetWaveform(1));
-                this.LeftChannelVolumeMeter.Amplitude = source.GetAmplitude(0);
-                this.RightChannelVolumeMeter.Amplitude = source.GetAmplitude(1);
+                this.WaveformRendererControl.PaintWaveform(AudioPlayer.GetWaveform(0), AudioPlayer.GetWaveform(1));
+                this.LeftChannelVolumeMeter.Amplitude = AudioPlayer.GetAmplitude(0);
+                this.RightChannelVolumeMeter.Amplitude = AudioPlayer.GetAmplitude(1);
             }
             else
             {
-                this.WaveformRendererControl.PaintWaveform(source.GetWaveform(0));
+                this.WaveformRendererControl.PaintWaveform(AudioPlayer.GetWaveform(0));
 
-                var amp = source.GetAmplitude(0);
+                var amp = AudioPlayer.GetAmplitude(0);
                 this.LeftChannelVolumeMeter.Amplitude = amp;
                 this.RightChannelVolumeMeter.Amplitude = amp;
             }
@@ -948,7 +944,7 @@ namespace PulseTune
             {
                 case AudioPlayer.AUDIOPLAYER_STATE_PLAY:
                 case AudioPlayer.AUDIOPLAYER_STATE_PAUSE:
-                    this.PlaybackTimeStatusText.Text = $"{AudioPlayer.GetAudioSource().GetCurrentTime().ToString("mm\\:ss")}";
+                    this.PlaybackTimeStatusText.Text = $"{AudioPlayer.GetCurrentTime().ToString("mm\\:ss")}";
                     break;
                 default:
                     this.PlaybackTimeStatusText.Text = $"STOP";
@@ -963,7 +959,7 @@ namespace PulseTune
         /// <param name="e"></param>
         private void ControlPanel_Seek(object sender, EventArgs e)
         {
-            AudioPlayer.GetAudioSource()?.SetCurrentTime(this.ControlPanel.GetSeekBarTime());
+            AudioPlayer.SetCurrentTime(this.ControlPanel.GetSeekBarTime());
         }
 
         /// <summary>
@@ -1030,12 +1026,11 @@ namespace PulseTune
         /// <param name="e"></param>
         private void OpenFolderFileMenuItem_Click(object sender, EventArgs e)
         {
-            using (var dialog = new CommonOpenFileDialog())
+            using (var dialog = new FolderPickerDialog())
             {
-                dialog.IsFolderPicker = true;
                 dialog.Multiselect = false;
 
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     OpenFolderAsPlaylistInNewTab(dialog.FileName);
                 }

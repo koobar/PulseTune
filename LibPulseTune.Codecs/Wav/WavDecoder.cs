@@ -22,16 +22,41 @@ namespace LibPulseTune.Codecs.Wav
             Dispose();
         }
 
-        /// <summary>
-        /// フォーマット
-        /// </summary>
-        public WaveFormat WaveFormat
+        #region プロパティ
+
+        public int SampleRate
         {
             get
             {
-                return this.reader.WaveFormat;
+                return this.reader.WaveFormat.SampleRate;
             }
         }
+
+        public int BitsPerSample
+        {
+            get
+            {
+                return this.reader.WaveFormat.BitsPerSample;
+            }
+        }
+
+        public int Channels
+        {
+            get
+            {
+                return this.reader.WaveFormat.Channels;
+            }
+        }
+
+        public bool IsFloat
+        {
+            get
+            {
+                return this.reader.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat;
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// 破棄

@@ -50,8 +50,9 @@
     <Compile Include="Cd\CDDA.cs" />
     <Compile Include="Cd\CDTrack.cs" />
     <Compile Include="Cd\DiskDrive.cs" />
-    <Compile Include="Helpers\WinApiHelper.cs" />
+    <Compile Include="WinApiHelper.cs" />
     <Compile Include="MediaFoundation\MediaFoundationDecoder.cs" />
+    <Compile Include="Opus\OpusDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Vorbis\NVorbisReader.cs" />
     <Compile Include="Vorbis\VorbisDecoder.cs" />
@@ -71,6 +72,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Concentus">
+      <Version>2.2.2</Version>
+    </PackageReference>
+    <PackageReference Include="Concentus.Oggfile">
+      <Version>1.0.6</Version>
+    </PackageReference>
     <PackageReference Include="NAudio.Wasapi">
       <Version>2.2.1</Version>
     </PackageReference>

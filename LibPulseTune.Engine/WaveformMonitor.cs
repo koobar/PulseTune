@@ -3,7 +3,7 @@ using System;
 
 namespace LibPulseTune.Engine
 {
-    public class WaveformMonitor : ISampleProvider
+    internal class WaveformMonitor : ISampleProvider
     {
         // 非公開フィールド
         private readonly ISampleProvider source;
@@ -15,7 +15,7 @@ namespace LibPulseTune.Engine
         private readonly object lockObj;
 
         // コンストラクタ
-        public WaveformMonitor(IAudioSource source)
+        public WaveformMonitor(IWaveProvider source)
         {
             this.source = source.ToSampleProvider();
             this.samplesPerMillisecond = this.source.WaveFormat.SampleRate / 1000.0;
@@ -110,7 +110,7 @@ namespace LibPulseTune.Engine
                     }
 
                     int length = endIndex - startIndex;
-                    if (this.waveforms[channel].Length != length)
+                    if (length > 0 && this.waveforms[channel].Length != length)
                     {
                         Array.Resize(ref this.waveforms[channel], length);
                     }

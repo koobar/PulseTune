@@ -1,6 +1,7 @@
 using LibPulseTune.Codecs.Aiff;
 using LibPulseTune.Codecs.Cd;
 using LibPulseTune.Codecs.MediaFoundation;
+using LibPulseTune.Codecs.Opus;
 using LibPulseTune.Codecs.Vorbis;
 using LibPulseTune.Codecs.Wav;
 using LibPulseTune.Codecs.WavPack;
@@ -60,6 +61,7 @@ namespace PulseTune
 
             AudioSourceProvider.RegisterDecoder("AIFF", typeof(AiffDecoder), ".aif", ".aiff");
             AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisDecoder), ".ogg");
+            AudioSourceProvider.RegisterDecoder("Opus", typeof(OpusDecoder), ".opus");
             AudioSourceProvider.RegisterDecoder("WAV", typeof(WavDecoder), ".wav");
             AudioSourceProvider.RegisterDecoder("オーディオCDトラック", typeof(CDAudioDecoder), ".cda");
 

@@ -15,16 +15,41 @@ namespace LibPulseTune.Codecs.MediaFoundation
             this.source = new MediaFoundationReader(path);
         }
 
-        /// <summary>
-        /// フォーマット
-        /// </summary>
-        public WaveFormat WaveFormat
+        #region プロパティ
+
+        public int SampleRate
         {
             get
             {
-                return this.source.WaveFormat;
+                return this.source.WaveFormat.SampleRate;
             }
         }
+
+        public int BitsPerSample
+        {
+            get
+            {
+                return this.source.WaveFormat.BitsPerSample;
+            }
+        }
+
+        public int Channels
+        {
+            get
+            {
+                return this.source.WaveFormat.Channels;
+            }
+        }
+
+        public bool IsFloat
+        {
+            get
+            {
+                return this.source.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat;
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// オーディオデータを読み込む。

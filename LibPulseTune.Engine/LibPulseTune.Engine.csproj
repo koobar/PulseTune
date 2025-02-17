@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="AudioEngine.cs" />
     <Compile Include="AudioPlayer.cs" />
+    <Compile Include="IAudioSourceToIWaveProviderConverter.cs" />
     <Compile Include="Providers\AudioSourceProvider.cs" />
     <Compile Include="Tracks\AudioTrackBase.cs" />
     <Compile Include="Providers\AudioTrackProvider.cs" />

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace LibPulseTune.Codecs.Helpers
+namespace LibPulseTune.Codecs
 {
     internal static class WinApiHelper
     {

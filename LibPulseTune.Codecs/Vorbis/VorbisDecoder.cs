@@ -17,14 +17,37 @@ namespace LibPulseTune.Codecs.Vorbis
             this.waveProviderConverter = this.reader.ToWaveProvider();
         }
 
-        /// <summary>
-        /// フォーマット
-        /// </summary>
-        public WaveFormat WaveFormat
+        #region プロパティ
+
+        public int SampleRate
         {
             get
             {
-                return this.reader.WaveFormat;
+                return this.reader.WaveFormat.SampleRate;
+            }
+        }
+
+        public int BitsPerSample
+        {
+            get
+            {
+                return this.reader.WaveFormat.BitsPerSample;
+            }
+        }
+
+        public int Channels
+        {
+            get
+            {
+                return this.reader.WaveFormat.Channels;
+            }
+        }
+
+        public bool IsFloat
+        {
+            get
+            {
+                return this.reader.WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat;
             }
         }
 
@@ -61,6 +84,8 @@ namespace LibPulseTune.Codecs.Vorbis
             }
         }
 
+        #endregion
+
         /// <summary>
         /// オーディオデータを読み込む。
         /// </summary>
@@ -68,9 +93,9 @@ namespace LibPulseTune.Codecs.Vorbis
         /// <param name="offset">デコード結果出力用バッファの書き込み開始オフセット</param>
         /// <param name="count">デコード結果出力用バッファに読み込むデータのバイト数</param>
         /// <returns></returns>
-        public int Read(byte[] buffer, int offset, int length)
+        public int Read(byte[] buffer, int offset, int count)
         {
-            return this.waveProviderConverter.Read(buffer, offset, length);
+            return this.waveProviderConverter.Read(buffer, offset, count);
         }
 
         /// <summary>

@@ -83,16 +83,41 @@ namespace LibPulseTune.Codecs.Cd
 
         #endregion
 
-        /// <summary>
-        /// フォーマット
-        /// </summary>
-        public WaveFormat WaveFormat
+        #region プロパティ
+
+        public int SampleRate
         {
             get
             {
-                return this.waveFormat;
+                return 44100;
             }
         }
+
+        public int BitsPerSample
+        {
+            get
+            {
+                return 16;
+            }
+        }
+
+        public int Channels
+        {
+            get
+            {
+                return 2;
+            }
+        }
+
+        public bool IsFloat
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// ディスクから次のセクタを読み込み、指定されたバッファに格納する。

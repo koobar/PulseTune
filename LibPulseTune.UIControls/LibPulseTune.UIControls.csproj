@@ -82,6 +82,7 @@
     <Compile Include="Dialogs\FindDialog.Designer.cs">
       <DependentUpon>FindDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\FolderPickerDialog.cs" />
     <Compile Include="Dialogs\VersionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
