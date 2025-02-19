@@ -1,41 +1,13 @@
 ﻿using LibPulseTune.Engine;
 using NAudio.Wave;
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
+using static LibPulseTune.Codecs.ZilophiX.ZilophiXInterop;
 
 namespace LibPulseTune.Codecs.ZilophiX
 {
     public class ZilophiXDecoder : IAudioSource
     {
-        // デリゲート
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)] private delegate IntPtr DZpXCreateDecoder(string path);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void DZpXFreeDecoder(IntPtr pDecoder);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void DZpXCloseFile(IntPtr pDecoder);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint DZpXGetSampleRate(IntPtr pDecoder);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint DZpXGetChannels(IntPtr pDecoder);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint DZpXGetBitsPerSample(IntPtr pDecoder);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint DZpXGetNumTotalSamples(IntPtr pDecoder);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int DZpXReadSample(IntPtr pDecoder);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint DZpXGetSampleOffset(IntPtr pDecoder);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void DZpXSeekTo(IntPtr pDecoder, uint msec);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint DZpXGetDurationMsec(IntPtr pDecoder);
-
         // 非公開フィールド
-        private static readonly string ZilophiXDecoderDllPath = $"{Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName)}\\zilophixdec.dll";
-        private readonly IntPtr pDll;
-        private readonly DZpXCreateDecoder _ZpXCreateDecoder;
-        private readonly DZpXFreeDecoder _ZpXFreeDecoder;
-        private readonly DZpXCloseFile _ZpXCloseFile;
-        private readonly DZpXGetSampleRate _ZpXGetSampleRate;
-        private readonly DZpXGetChannels _ZpXGetChannels;
-        private readonly DZpXGetBitsPerSample _ZpXGetBitsPerSample;
-        private readonly DZpXGetNumTotalSamples _ZpXGetNumTotalSamples;
-        private readonly DZpXReadSample _ZpXReadSample;
-        private readonly DZpXGetSampleOffset _ZpXGetSampleOffset;
-        private readonly DZpXSeekTo _ZpXSeekTo;
-        private readonly DZpXGetDurationMsec _ZpXGetDurationMsec;
         private readonly IntPtr decoder;
         private readonly WaveFormat waveFormat;
         private readonly uint numTotalSamples;
@@ -46,23 +18,7 @@ namespace LibPulseTune.Codecs.ZilophiX
         // コンストラクタ
         public ZilophiXDecoder(string path)
         {
-            this.pDll = WinApi.LoadLibrary(ZilophiXDecoderDllPath);
-            if (this.pDll == IntPtr.Zero)
-            {
-                throw new InvalidProgramException("zilophixdec.dll が見つかりません");
-            }
-
-            this._ZpXCreateDecoder = WinApiHelper.LoadFunction<DZpXCreateDecoder>(this.pDll, "ZpXCreateDecoderW");
-            this._ZpXFreeDecoder = WinApiHelper.LoadFunction<DZpXFreeDecoder>(this.pDll, "ZpXFreeDecoder");
-            this._ZpXCloseFile = WinApiHelper.LoadFunction<DZpXCloseFile>(this.pDll, "ZpXCloseFile");
-            this._ZpXGetSampleRate = WinApiHelper.LoadFunction<DZpXGetSampleRate>(this.pDll, "ZpXGetSampleRate");
-            this._ZpXGetChannels = WinApiHelper.LoadFunction<DZpXGetChannels>(this.pDll, "ZpXGetChannels");
-            this._ZpXGetBitsPerSample = WinApiHelper.LoadFunction<DZpXGetBitsPerSample>(this.pDll, "ZpXGetBitsPerSample");
-            this._ZpXGetNumTotalSamples = WinApiHelper.LoadFunction<DZpXGetNumTotalSamples>(this.pDll, "ZpXGetNumTotalSamples");
-            this._ZpXReadSample = WinApiHelper.LoadFunction<DZpXReadSample>(this.pDll, "ZpXReadSample");
-            this._ZpXGetSampleOffset = WinApiHelper.LoadFunction<DZpXGetSampleOffset>(this.pDll, "ZpXGetSampleOffset");
-            this._ZpXSeekTo = WinApiHelper.LoadFunction<DZpXSeekTo>(this.pDll, "ZpXSeekTo");
-            this._ZpXGetDurationMsec = WinApiHelper.LoadFunction<DZpXGetDurationMsec>(this.pDll, "ZpXGetDurationMsec");
+            LoadLibrary();
 
             this.decoder = ZpXCreateDecoder(path);
             this.numTotalSamples = ZpXGetNumTotalSamples(this.decoder);
@@ -115,77 +71,13 @@ namespace LibPulseTune.Codecs.ZilophiX
 
         #endregion
 
-        #region ラッパー関数
-
-        public IntPtr ZpXCreateDecoder(string path)
-        {
-            return this._ZpXCreateDecoder(path);
-        }
-
-        public void ZpXFreeDecoder(IntPtr pDecoder)
-        {
-            this._ZpXFreeDecoder(pDecoder);
-        }
-
-        public void ZpXCloseFile(IntPtr pDecoder)
-        {
-            this._ZpXCloseFile(pDecoder);
-        }
-
-        public uint ZpXGetSampleRate(IntPtr pDecoder)
-        {
-            return this._ZpXGetSampleRate(pDecoder);
-        }
-
-        public uint ZpXGetChannels(IntPtr pDecoder)
-        {
-            return this._ZpXGetChannels(pDecoder);
-        }
-
-        public uint ZpXGetBitsPerSample(IntPtr pDecoder)
-        {
-            return this._ZpXGetBitsPerSample(pDecoder);
-        }
-
-        public uint ZpXGetNumTotalSamples(IntPtr pDecoder)
-        {
-            return this._ZpXGetNumTotalSamples(pDecoder);
-        }
-
-        public int ZpXReadSample(IntPtr pDecoder)
-        {
-            return this._ZpXReadSample(pDecoder);
-        }
-
-        public uint ZpXGetSampleOffset(IntPtr pDecoder)
-        {
-            return this._ZpXGetSampleOffset(pDecoder);
-        }
-
-        public void ZpXSeekTo(IntPtr pDecoder, uint msec)
-        {
-            this._ZpXSeekTo(pDecoder, msec);
-        }
-
-        public uint ZpXGetDurationMsec(IntPtr pDecoder)
-        {
-            return this._ZpXGetDurationMsec(pDecoder);
-        }
-
-        #endregion
-
         /// <summary>
         /// ZilophiXのデコーダが使用可能であるかどうか判定する。
         /// </summary>
         /// <returns></returns>
         public static bool IsAvailable()
         {
-            if (File.Exists(ZilophiXDecoderDllPath))
-            {
-                return true;
-            }
-
-            return false;
+            return ZilophiXInterop.IsAvailable();
         }
 
         public TimeSpan GetDuration()
@@ -224,7 +116,6 @@ namespace LibPulseTune.Codecs.ZilophiX
 
             ZpXCloseFile(this.decoder);
             ZpXFreeDecoder(this.decoder);
-            WinApi.FreeLibrary(this.pDll);
             this.isDisposed = true;
         }
 

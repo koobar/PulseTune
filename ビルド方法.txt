@@ -11,6 +11,7 @@ PulseTune のビルド方法
 　　・LibPulseTune.Codecs
 　　　PulseTuneで再生可能な各種コーデックのデコーダ等を実装したライブラリのプロジェクトです。
 　　　LibPulseTune.Engineの拡張機能として振る舞います。
+　　　一部のコーデックをデコードするには、追加のDLLが必要となります。
 
 　　・LibPulseTune.CoreAudio
 　　　WindowsのCoreAudioAPIを扱うための機能を実装したライブラリのプロジェクトです。
@@ -33,7 +34,7 @@ PulseTune のビルド方法
 　　　PulseTune本体のプロジェクトです。
 
 
-●LibPulseTune.*のビルドについて
+●LibPulseTuneの依存関係について
 　LibPulseTune.*における、ソリューション内の別プロジェクト、およびサードパーティーのライブラリへの依存関係は、
 　次のようになっています。
 
@@ -42,6 +43,8 @@ PulseTune のビルド方法
 　　・NAudio.Wasapi
 　　・NAudio.Core
 　　・NVorbis
+　　・Concentus
+　　・Concentus.Oggfile
 　・LibPulseTune.CoreAudio
 　　・LibPulseTune.Engine
 　　・NAudio.Wasapi
@@ -71,24 +74,44 @@ PulseTune のビルド方法
 　自動的にパッケージが復元され、ビルド可能な状態になるはずです。もし、パッケージ不足等に起因する
 　コンパイルエラーが発生する場合、これらのパッケージを手動で復元することで改善する場合があります。
 
-　また、LibPulseTune.Codecs のビルドには、以下のDLLを出力先にコピーできるよう、プロジェクトに追加する必要があります。
 
-　　・wavpackdll.dll  (version 5.8.0, x64)
-　　　入手先：https://www.wavpack.com/downloads.html
-　　・zilophixdec.dll (version 1.21, x64)
-　　　入手先：https://github.com/koobar/zilophix/releases/tag/1.21
+●LibPulseTune.Codecで追加のコーデックをデコードできるようにするためのビルド構成
+　LibPulseTune.Codecには、Monkey's Audio, WavPack, ZilophiXのデコードを行うためのラッパークラスが含まれています。
+　これらのクラスは、各コーデックのリファレンス実装のDLLを呼び出すことで機能します。そのため、LibPulseTune.Codecで
+　Monkey's Audio, WavPack, ZilophiXのデコードを行うためには、次のDLLを別途用意する必要があります。（リポジトリには含まれていません）
 
-　これらのDLLは、ソリューションが配置されたディレクトリより一つ上の階層に存在する「dll」フォルダ内に
+　　・Monkey's Audioのデコードに必要なDLL
+　　　・MACDll64.dll　　(ver. 10.96.0.0)
+　　　　入手先：https://www.monkeysaudio.com/
+
+　　・WavPackのデコードに必要なDLL
+　　　・wavpackdll.dll  (ver. 5.8.0)
+　　　　入手先：https://www.wavpack.com/downloads.html
+　　
+　　・ZilophiXのデコードに必要なDLL
+　　　・zilophixdec.dll (ver. 1.21)
+　　　　入手先：https://github.com/koobar/zilophix/releases/tag/1.21
+
+　記載されているDLLのバージョンは、推奨するDLLのバージョンです。DLLのバージョンが異なる場合でも、
+　DLLが以前のバージョンとの互換性を維持している場合、正常に動作すると思われます。
+　
+　DLLは、ソリューションが配置されたディレクトリより一つ上の階層に存在する「dll」フォルダ内に
 　配置されていることを前提としているため、ビルドの際には、以下の場所に「dll」フォルダを作成し、
 　その中に上記DLLを配置してください。
 
 　　カレントディレクトリ＝PulseTune のソリューションが配置されたディレクトリとした場合：
 　　　..\dll
-　　　├ wavpackdll.dll
-　　　├ zilophixdec.dll
+　　　　├ MACDll64.dll
+　　　　├ wavpackdll.dll
+　　　　├ zilophixdec.dll
 
-　なお、これらのDLLをプロジェクトから削除してしまってもビルドは成功しますが、WavPackとZilophiXの再生ができなくなります。
-　これらの作業を完了したあとに、一度ソリューションまたはプロジェクトを再読み込みすることを推奨します。
+　なお、これらのDLLは、PulseTuneのプロジェクトのビルド後のイベントにより、バイナリと同じディレクトリ内に
+　コピーされるようになっています。DLLが存在しない場合でもプロジェクトのビルドは成功しますが、存在しないDLLにより
+　デコードされるコーデックはデコードできなくなります。
+
+　ネイティブDLLは、ビルド時のプラットフォーム設定と同じビット数のものを用意する必要があります。
+　例えば、プラットフォームが「x64」に設定されている場合、64ビット版のDLLを用意する必要があります。
+　AnyCPUでビルドする場合、アプリケーション実行時のプロセスのビット数と同じビット数のDLLを用意する必要があります。
 
 
 ●PulseTuneのビルドについて
@@ -102,6 +125,7 @@ PulseTune のビルド方法
 
 　PulseTuneのビルド時にLibPulseTuneが使用可能な状態となっている必要があります。そのため、
 　PulseTuneよりも先にLibPulseTuneのビルド環境を構築することを強く推奨します。
+
 
 ●バイナリの出力先
 　ビルドして生成されたバイナリは、特に設定を変更していない場合、ソリューションが配置されたディレクトリより

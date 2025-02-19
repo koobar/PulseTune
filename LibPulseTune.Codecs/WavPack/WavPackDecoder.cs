@@ -1,64 +1,21 @@
 ﻿using LibPulseTune.Engine;
 using NAudio.Wave;
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
+using static LibPulseTune.Codecs.WavPack.WavPackInterop;
 
 namespace LibPulseTune.Codecs.WavPack
 {
     public class WavPackDecoder : IAudioSource
     {
-        enum WavPackMode
-        {
-            Wvc = 0x1,
-            Lossless = 0x2,
-            Hybrid = 0x4,
-            Float = 0x8,
-            ValidTag = 0x10,
-            High = 0x20,
-            Fast = 0x40,
-            Extra = 0x80,
-            ApeTag = 0x100,
-            Sfx = 0x200,
-            VeryHigh = 0x400,
-            Md5 = 0x800,
-            XMode = 0x7000,
-            Dns = 0x8000,
-        }
-
         // 非公開定数
-        private const string WAVPACK_DLL_NAME = @"wavpackdll.dll";
         private const int WAVPACK_BYTES_PER_SAMPLE = 4;
         private const int OPEN_WVC = 1;
         private const int OPEN_2CH_MAX = 0x08;
         private const int OPEN_NORMALIZE = 0x10;
         private const int SAMPLES_TO_READ = 16;
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)] private delegate IntPtr InternalWavpackOpenFileInput(string fileName, IntPtr error, int flags, int norm_offset);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint InternalWavpackGetSampleRate(IntPtr wpc);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint InternalWavpackGetNumSamples(IntPtr wpc);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int InternalWavpackGetNumChannels(IntPtr wpc);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int InternalWavpackGetBitsPerSample(IntPtr wpc);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint InternalWavpackUnpackSamples(IntPtr wpc, IntPtr buffer, uint samples);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate int InternalWavpackSeekSample(IntPtr wpc, uint sample);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate uint InternalWavpackGetSampleIndex(IntPtr wpc);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate IntPtr InternalWavpackCloseFile(IntPtr wpc);
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate WavPackMode InternalWavpackGetMode(IntPtr wpc);
-
         // 非公開フィールド
-        private static readonly string WavPackDllPath = $"{Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName)}\\{WAVPACK_DLL_NAME}";
-        private readonly IntPtr wavPackModule;
-        private readonly InternalWavpackOpenFileInput _wavPackOpenFileInput;
-        private readonly InternalWavpackGetSampleRate _wavPackGetSampleRate;
-        private readonly InternalWavpackGetNumSamples _wavPackGetNumSamples;
-        private readonly InternalWavpackGetNumChannels _wavPackGetNumChannels;
-        private readonly InternalWavpackGetBitsPerSample _wavPackGetBitsPerSample;
-        private readonly InternalWavpackUnpackSamples _wavPackUnpackSamples;
-        private readonly InternalWavpackSeekSample _wavPackSeekSample;
-        private readonly InternalWavpackGetSampleIndex _wavPackGetSampleIndex;
-        private readonly InternalWavpackCloseFile _wavPackCloseFile;
-        private readonly InternalWavpackGetMode _wavPackGetMode;
         private readonly IntPtr wavPackContext;
         private readonly WaveFormat waveFormat;
         private readonly int bytesPerSample;
@@ -69,29 +26,7 @@ namespace LibPulseTune.Codecs.WavPack
         // コンストラクタ
         public WavPackDecoder(string path)
         {
-            if (!IsAvailable())
-            {
-                throw new DllNotFoundException("wavpack.dll が見つかりません。");
-            }
-
-            // WavPackのDLLを読み込む。
-            this.wavPackModule = WinApi.LoadLibrary(WavPackDllPath);
-            if (this.wavPackModule == IntPtr.Zero)
-            {
-                throw new InvalidProgramException($"{WAVPACK_DLL_NAME} が見つかりません。");
-            }
-
-            // DLLから関数を取得し、delegateに変換したものを保持する。
-            this._wavPackOpenFileInput = WinApiHelper.LoadFunction<InternalWavpackOpenFileInput>(this.wavPackModule, "WavpackOpenFileInput");
-            this._wavPackGetSampleRate = WinApiHelper.LoadFunction<InternalWavpackGetSampleRate>(this.wavPackModule, "WavpackGetSampleRate");
-            this._wavPackGetNumSamples = WinApiHelper.LoadFunction<InternalWavpackGetNumSamples>(this.wavPackModule, "WavpackGetNumSamples");
-            this._wavPackGetNumChannels = WinApiHelper.LoadFunction<InternalWavpackGetNumChannels>(this.wavPackModule, "WavpackGetNumChannels");
-            this._wavPackGetBitsPerSample = WinApiHelper.LoadFunction<InternalWavpackGetBitsPerSample>(this.wavPackModule, "WavpackGetBitsPerSample");
-            this._wavPackUnpackSamples = WinApiHelper.LoadFunction<InternalWavpackUnpackSamples>(this.wavPackModule, "WavpackUnpackSamples");
-            this._wavPackSeekSample = WinApiHelper.LoadFunction<InternalWavpackSeekSample>(this.wavPackModule, "WavpackSeekSample");
-            this._wavPackGetSampleIndex = WinApiHelper.LoadFunction<InternalWavpackGetSampleIndex>(this.wavPackModule, "WavpackGetSampleIndex");
-            this._wavPackCloseFile = WinApiHelper.LoadFunction<InternalWavpackCloseFile>(this.wavPackModule, "WavpackCloseFile");
-            this._wavPackGetMode = WinApiHelper.LoadFunction<InternalWavpackGetMode>(this.wavPackModule, "WavpackGetMode");
+            LoadLibrary();
 
             // エラーメッセージを格納する領域を確保
             var error = Marshal.AllocHGlobal(1024);
@@ -126,74 +61,6 @@ namespace LibPulseTune.Codecs.WavPack
             // 後始末
             this.wavPackContext = context;
         }
-
-        /// <summary>
-        /// WavPackのDLLが存在し、WavPackのデコードが可能であるかどうかを確認する。
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsAvailable()
-        {
-            if (File.Exists(WavPackDllPath))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        #region ラッパー関数
-
-        private IntPtr WavpackOpenFileInput(string fileName, IntPtr error, int flags, int norm_offset)
-        {
-            return this._wavPackOpenFileInput(fileName, error, flags, norm_offset);
-        }
-
-        private uint WavpackGetSampleRate(IntPtr context)
-        {
-            return this._wavPackGetSampleRate(context);
-        }
-
-        private uint WavpackGetNumSamples(IntPtr context)
-        {
-            return this._wavPackGetNumSamples(context);
-        }
-
-        private int WavpackGetNumChannels(IntPtr context)
-        {
-            return this._wavPackGetNumChannels(context);
-        }
-
-        private int WavpackGetBitsPerSample(IntPtr context)
-        {
-            return this._wavPackGetBitsPerSample(context);
-        }
-
-        private uint WavpackUnpackSamples(IntPtr context, IntPtr buffer, uint samples)
-        {
-            return this._wavPackUnpackSamples(context, buffer, samples);
-        }
-
-        private int WavpackSeekSample(IntPtr context, uint sample)
-        {
-            return this._wavPackSeekSample(context, sample);
-        }
-
-        private uint WavpackGetSampleIndex(IntPtr context)
-        {
-            return this._wavPackGetSampleIndex(context);
-        }
-
-        private IntPtr WavpackCloseFile(IntPtr context)
-        {
-            return this._wavPackCloseFile(context);
-        }
-
-        private WavPackMode WavpackGetMode(IntPtr wpc)
-        {
-            return this._wavPackGetMode(wpc);
-        }
-
-        #endregion
 
         #region プロパティ
 
@@ -230,6 +97,11 @@ namespace LibPulseTune.Codecs.WavPack
         }
 
         #endregion
+
+        public static bool IsAvailable()
+        {
+            return WavPackInterop.IsAvailable();
+        }
 
         /// <summary>
         /// オーディオデータを読み込む。
@@ -289,7 +161,6 @@ namespace LibPulseTune.Codecs.WavPack
             }
 
             WavpackCloseFile(this.wavPackContext);
-            WinApi.FreeLibrary(this.wavPackModule);
             Marshal.FreeHGlobal(this.readBuffer);
 
             this.isDisposed = true;

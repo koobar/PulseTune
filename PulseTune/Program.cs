@@ -1,4 +1,5 @@
 using LibPulseTune.Codecs.Aiff;
+using LibPulseTune.Codecs.Ape;
 using LibPulseTune.Codecs.Cd;
 using LibPulseTune.Codecs.MediaFoundation;
 using LibPulseTune.Codecs.Opus;
@@ -27,24 +28,12 @@ namespace PulseTune
 
         // アプリケーション情報の定義
         public const string APPLICATION_NAME = @"PulseTune";
-        public static readonly DateTime ApplicationBuildDate = new DateTime(2025, 2, 16);
-        public static readonly Version ApplicationVersion = new Version(1, 4, ToBuildNumber(ApplicationBuildDate));
+        public static readonly DateTime ApplicationBuildDate = new DateTime(2025, 2, 20);
+        public static readonly Version ApplicationVersion = CreateApplicationVersion(1, 4, ApplicationBuildDate);
 
-        /// <summary>
-        /// ビルド日時からビルド番号を求める。
-        /// </summary>
-        /// <param name="dateOnly"></param>
-        /// <returns></returns>
-        private static int ToBuildNumber(DateTime dateOnly)
+        private static Version CreateApplicationVersion(int major, int minor, DateTime buildDate)
         {
-            string result = string.Empty;
-
-            result += dateOnly.Year.ToString().Substring(1);        // 西暦の下二桁を取得
-            result += dateOnly.Month;                               // 月を追加
-            result += dateOnly.Day;                                 // 日を追加
-
-            // 整数に変換
-            return int.Parse(result);
+            return new Version(major, minor, buildDate.Year - 2000, int.Parse($"{buildDate.Month.ToString("00")}{buildDate.Day.ToString("00")}"));
         }
 
         /// <summary>
@@ -64,6 +53,12 @@ namespace PulseTune
             AudioSourceProvider.RegisterDecoder("Opus", typeof(OpusDecoder), ".opus");
             AudioSourceProvider.RegisterDecoder("WAV", typeof(WavDecoder), ".wav");
             AudioSourceProvider.RegisterDecoder("オーディオCDトラック", typeof(CDAudioDecoder), ".cda");
+
+            // Monkey's Audioが使用可能なら登録
+            if (ApeDecoder.IsAvailable())
+            {
+                AudioSourceProvider.RegisterDecoder("Monkey's Audio", typeof(ApeDecoder), ".ape");
+            }
 
             // WavPackが使用可能なら登録
             if (WavPackDecoder.IsAvailable())

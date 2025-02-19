@@ -48,7 +48,7 @@ namespace LibPulseTune.UIControls.Dialogs
 
             var sb = new StringBuilder();
             sb.AppendLine("バージョン：" + this.version.ToString() + " (" + this.buildType + ")");
-            sb.AppendLine("ビルド日時：" + this.buildDate.ToString());
+            sb.AppendLine("ビルド日時：" + this.buildDate.ToLongDateString());
             sb.AppendLine("ランタイム：.NET " + Environment.Version.ToString());
             sb.AppendLine("====================");
             sb.AppendLine(File.ReadAllText(license_doc, Encoding.GetEncoding(932)));
