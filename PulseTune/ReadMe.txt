@@ -23,6 +23,8 @@
 　・MP2
 　・MP3
 　・M4A
+　・Opus
+　・Monkey's Audio
 　・WMA
 　・WAV
 　・WavPack

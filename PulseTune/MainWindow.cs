@@ -72,9 +72,9 @@ namespace PulseTune
         #region UI処理用メソッド
 
         /// <summary>
-		/// 指定されたエクスプローラコントロールのコンテキストメニューを作成する。
+		/// 指定されたメディアエクスプローラコントロールのコンテキストメニューを作成する。
 		/// </summary>
-		private ContextMenu CreateExplorerControlContextMenu(ExplorerControl control)
+		private ContextMenu CreateExplorerControlContextMenu(MediaExplorerControl control)
         {
             var playbackMenuItem = new MenuItem();
             playbackMenuItem.Text = "再生(&S)";
@@ -271,13 +271,13 @@ namespace PulseTune
         }
 
         /// <summary>
-        /// エクスプローラを指定されたタイトルのタブとして表示するタブページを生成する。
+        /// メディアエクスプローラを指定されたタイトルのタブとして表示するタブページを生成する。
         /// </summary>
         /// <param name="title"></param>
         /// <returns></returns>
-        private ClosableTabPage CreateNewExplorerTabPage(string title)
+        private ClosableTabPage CreateNewMediaExplorerTabPage(string title)
         {
-            var control = new ExplorerControl();
+            var control = new MediaExplorerControl();
             var page = new ClosableTabPage(title);
             page.Control = control;
 
@@ -286,7 +286,13 @@ namespace PulseTune
             control.FileDoubleClick += OnIMainTabControlTabPageElementDoubleClick;
             control.Navigated += delegate
             {
-                page.Text = Path.GetFileName(control.CurrentPath);
+                var fileName = Path.GetFileName(control.CurrentPath);
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    fileName = control.CurrentPath;
+                }
+
+                page.Text = fileName;
             };
 
             return page;
@@ -422,7 +428,13 @@ namespace PulseTune
         /// <param name="path"></param>
         private void OpenPlaylistInNewTab(string path)
         {
-            var page = CreateNewPlaylistPage(Path.GetFileName(path));
+            var fileName = Path.GetFileName(path);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                fileName = path;
+            }
+
+            var page = CreateNewPlaylistPage(fileName);
             var viewer = (PlaylistViewer)page.Control;
 
             // プレイリストを読み込む。
@@ -435,13 +447,19 @@ namespace PulseTune
         }
 
         /// <summary>
-        /// 指定されたパスのフォルダを新しいタブのエクスプローラで開く。
+        /// 指定されたパスのフォルダを新しいタブのメディアエクスプローラで開く。
         /// </summary>
         /// <param name="folderPath"></param>
         private void OpenFolderInNewTab(string folderPath)
         {
-            var page = CreateNewExplorerTabPage(Path.GetFileName(folderPath));
-            var viewer = (ExplorerControl)page.Control;
+            var fileName = Path.GetFileName(folderPath);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                fileName = folderPath;
+            }
+
+            var page = CreateNewMediaExplorerTabPage(fileName);
+            var viewer = (MediaExplorerControl)page.Control;
 
             // 指定されたパスまで移動
             viewer.Navigate(folderPath);
@@ -721,6 +739,7 @@ namespace PulseTune
 
                 if (tracks.Count > 0)
                 {
+                    OpenFolderInNewTab(tracks[0]);
                     Play(AudioTrackProvider.CreateFile(tracks[0]));
                 }
             }
@@ -845,11 +864,14 @@ namespace PulseTune
             // デフォルトのアートを表示
             ShowTrackPicture(null);
 
-            // マイミュージックを開く
-            OpenFolderInNewTab(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic));
-
             // コマンドライン引数に指定されたファイルを開く。
             ProcessCommandLineArgs(Environment.GetCommandLineArgs());
+
+            if (this.MainTabControl.TabCount == 0)
+            {
+                // マイミュージックを開く
+                OpenFolderInNewTab(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic));
+            }
         }
 
         /// <summary>
@@ -1258,9 +1280,9 @@ namespace PulseTune
             {
                 var control = GetCurrentTabPageElement();
 
-                if (control != null && control is ExplorerControl)
+                if (control != null && control is MediaExplorerControl)
                 {
-                    ((ExplorerControl)control).Navigate(path);
+                    ((MediaExplorerControl)control).Navigate(path);
                 }
                 else
                 {

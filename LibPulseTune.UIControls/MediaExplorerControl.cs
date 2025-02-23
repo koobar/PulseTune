@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace LibPulseTune.UIControls
 {
-    public partial class ExplorerControl : UserControl, IMainTabControlPageElement
+    public partial class MediaExplorerControl : UserControl, IMainTabControlPageElement
     {
         // 非公開フィールド
         private readonly Playlist playlist;
@@ -26,7 +26,7 @@ namespace LibPulseTune.UIControls
         public event EventHandler Navigated;
 
         // コンストラクタ
-        public ExplorerControl()
+        public MediaExplorerControl()
         {
             InitializeComponent();
 

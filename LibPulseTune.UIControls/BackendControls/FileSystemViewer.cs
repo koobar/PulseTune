@@ -1,5 +1,4 @@
-﻿using LibPulseTune.Engine;
-using LibPulseTune.Engine.Providers;
+﻿using LibPulseTune.Engine.Providers;
 using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
@@ -289,7 +288,6 @@ namespace LibPulseTune.UIControls.BackendControls
             }
 
             UpdateView();
-            UpdateColumnHeaderSize();
         }
 
         /// <summary>
@@ -301,7 +299,6 @@ namespace LibPulseTune.UIControls.BackendControls
             this.currentPath = path;
 
             UpdateView();
-            UpdateColumnHeaderSize();
 
             this.Navigated?.Invoke(this, EventArgs.Empty);
             Invalidate();
@@ -448,6 +445,7 @@ namespace LibPulseTune.UIControls.BackendControls
 
             LoadCurrentDirectory();
             this.Items.AddRange(this.itemsSource.ToArray());
+            UpdateColumnHeaderSize();
         }
 
         /// <summary>
@@ -477,7 +475,24 @@ namespace LibPulseTune.UIControls.BackendControls
             this.Columns[0].Width = maxFileNameWidth;
             for (int i = 1; i < this.Columns.Count; i++)
             {
-                this.Columns[i].Width = -2;
+                var headerTextWidth = TextRenderer.MeasureText(this.Columns[i].Text, this.Font).Width + spacing + spacing;
+                var maximumContentTextWidth = -1;
+
+                foreach (var item in this.itemsSource)
+                {
+                    int contentTextWidth = TextRenderer.MeasureText(item.SubItems[i].Text, this.Font).Width + spacing + spacing;
+
+                    if (maximumContentTextWidth < contentTextWidth)
+                    {
+                        maximumContentTextWidth = contentTextWidth;
+                    }
+                }
+
+                this.Columns[i].Width = Math.Max(headerTextWidth, maximumContentTextWidth);
+                this.Columns[i].TextAlign = HorizontalAlignment.Center;
+
+                // これを使うと、Windows 11環境で不要な水平スクロールバーが出現する場合がある。
+                //this.Columns[i].Width = -2;
             }
         }
 

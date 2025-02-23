@@ -1,6 +1,5 @@
 ﻿using LibPulseTune.UIControls.Utils;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -39,33 +38,21 @@ namespace LibPulseTune.UIControls.BackendControls
             base.OnMouseMove(e);
             this.mousePoint = e.Location;
 
-            // 再描画すべきアイテムを取得
-            var items = new List<ExplorerLikeListViewItem>();
+            // 再描画すべきアイテムのみを検出して再描画
             for (int i = 0; i < this.Items.Count; i++)
             {
-                if (this.Items[i] is ExplorerLikeListViewItem)
+                if (this.Items[i] is ExplorerLikeListViewItem item)
                 {
-                    ExplorerLikeListViewItem item = (ExplorerLikeListViewItem)this.Items[i];
                     bool contains = item.GetBounds(ItemBoundsPortion.ItemOnly).Contains(this.mousePoint);
 
                     if (contains != item.MouseHover)
                     {
-                        items.Add(item);
+                        RedrawItems(item.Index, item.Index, true);
                     }
 
                     item.MouseHover = contains;
                 }
             }
-
-            // 再描画対象のアイテムをすべて再描画
-            foreach (var item in items)
-            {
-                RedrawItems(item.Index, item.Index, true);
-            }
-
-            // 再描画対象をクリア
-            items.Clear();
-            items.TrimExcess();
         }
 
         /// <summary>

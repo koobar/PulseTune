@@ -28,7 +28,7 @@ namespace PulseTune
 
         // アプリケーション情報の定義
         public const string APPLICATION_NAME = @"PulseTune";
-        public static readonly DateTime ApplicationBuildDate = new DateTime(2025, 2, 20);
+        public static readonly DateTime ApplicationBuildDate = new DateTime(2025, 2, 23);
         public static readonly Version ApplicationVersion = CreateApplicationVersion(1, 4, ApplicationBuildDate);
 
         private static Version CreateApplicationVersion(int major, int minor, DateTime buildDate)
@@ -41,6 +41,7 @@ namespace PulseTune
         /// </summary>
         public static void LoadCodecs()
         {
+            // Media Foundation（OS組み込みコーデック）でデコードするフォーマットを登録
             AudioSourceProvider.RegisterDecoder("AAC", typeof(MediaFoundationDecoder), ".aac");
             AudioSourceProvider.RegisterDecoder("FLAC", typeof(MediaFoundationDecoder), ".flac");
             AudioSourceProvider.RegisterDecoder("MP2", typeof(MediaFoundationDecoder), ".mp2");
@@ -48,6 +49,7 @@ namespace PulseTune
             AudioSourceProvider.RegisterDecoder("M4A", typeof(MediaFoundationDecoder), ".m4a");
             AudioSourceProvider.RegisterDecoder("Windows Media Audio", typeof(MediaFoundationDecoder), ".wma");
 
+            // LibPulseTune.Codecsライブラリに含まれるデコーダでデコードするフォーマットを登録
             AudioSourceProvider.RegisterDecoder("AIFF", typeof(AiffDecoder), ".aif", ".aiff");
             AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisDecoder), ".ogg");
             AudioSourceProvider.RegisterDecoder("Opus", typeof(OpusDecoder), ".opus");

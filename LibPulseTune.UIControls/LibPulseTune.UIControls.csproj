@@ -96,11 +96,11 @@
     <Compile Include="Dialogs\WasapiOptionDialog.Designer.cs">
       <DependentUpon>WasapiOptionDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="ExplorerControl.cs">
+    <Compile Include="MediaExplorerControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ExplorerControl.Designer.cs">
-      <DependentUpon>ExplorerControl.cs</DependentUpon>
+    <Compile Include="MediaExplorerControl.Designer.cs">
+      <DependentUpon>MediaExplorerControl.cs</DependentUpon>
     </Compile>
     <Compile Include="IMainTabControlPageElement.cs" />
     <Compile Include="MediaControlPanel.cs">
@@ -150,8 +150,8 @@
     <EmbeddedResource Include="Dialogs\WasapiOptionDialog.resx">
       <DependentUpon>WasapiOptionDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ExplorerControl.resx">
-      <DependentUpon>ExplorerControl.cs</DependentUpon>
+    <EmbeddedResource Include="MediaExplorerControl.resx">
+      <DependentUpon>MediaExplorerControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MediaControlPanel.resx">
       <DependentUpon>MediaControlPanel.cs</DependentUpon>

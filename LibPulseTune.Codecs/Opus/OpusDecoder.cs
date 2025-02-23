@@ -27,7 +27,7 @@ namespace LibPulseTune.Codecs.Opus
 
         #region コンストラクタ
 
-        public OpusDecoder(Stream stream, int sampleRate, int channels)
+        public OpusDecoder(Stream stream)
         {
             if (stream == null)
             {
@@ -46,16 +46,6 @@ namespace LibPulseTune.Codecs.Opus
             this.lockObject = new object();
             this.startTime = this.streamReader.CurrentTime;
             this.length = Convert.ToInt64(this.streamReader.TotalTime.TotalSeconds * this.SampleRate * this.Channels * BYTES_PER_SAMPLE);
-        }
-
-        public OpusDecoder(Stream stream) : this(stream, 48000, 2)
-        {
-
-        }
-
-        public OpusDecoder(string path, int sampleRate, int channels) : this(File.OpenRead(path), sampleRate, channels)
-        {
-
         }
 
         public OpusDecoder(string path) : this(File.OpenRead(path))

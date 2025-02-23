@@ -1,6 +1,6 @@
 ﻿namespace LibPulseTune.UIControls
 {
-    partial class ExplorerControl
+    partial class MediaExplorerControl
     {
         /// <summary> 
         /// 必要なデザイナー変数です。
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExplorerControl));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MediaExplorerControl));
             this.panel1 = new System.Windows.Forms.Panel();
             this.NextButton = new System.Windows.Forms.Button();
             this.BackButton = new System.Windows.Forms.Button();
