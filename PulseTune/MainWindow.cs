@@ -278,10 +278,13 @@ namespace PulseTune
         private ClosableTabPage CreateNewMediaExplorerTabPage(string title)
         {
             var control = new MediaExplorerControl();
-            var page = new ClosableTabPage(title);
-            page.Control = control;
+            var page = new ClosableTabPage(title)
+            {
+                Control = control
+            };
 
             control.SetFileFormatFilter(AudioSourceProvider.GetAllRegisteredFormatExtensions());
+            control.ItemHeight = 25;
             control.ContextMenu = CreateExplorerControlContextMenu(control);
             control.FileDoubleClick += OnIMainTabControlTabPageElementDoubleClick;
             control.Navigated += delegate
@@ -950,16 +953,16 @@ namespace PulseTune
             if (channels >= 2)
             {
                 this.WaveformRendererControl.PaintWaveform(AudioPlayer.GetWaveform(0), AudioPlayer.GetWaveform(1));
-                this.LeftChannelVolumeMeter.Amplitude = AudioPlayer.GetAmplitude(0);
-                this.RightChannelVolumeMeter.Amplitude = AudioPlayer.GetAmplitude(1);
+                this.LeftChannelVolumeMeter.Decibels = AudioPlayer.GetAmplitude(0);
+                this.RightChannelVolumeMeter.Decibels = AudioPlayer.GetAmplitude(1);
             }
             else
             {
                 this.WaveformRendererControl.PaintWaveform(AudioPlayer.GetWaveform(0));
 
                 var amp = AudioPlayer.GetAmplitude(0);
-                this.LeftChannelVolumeMeter.Amplitude = amp;
-                this.RightChannelVolumeMeter.Amplitude = amp;
+                this.LeftChannelVolumeMeter.Decibels = amp;
+                this.RightChannelVolumeMeter.Decibels = amp;
             }
 
             switch (AudioPlayer.GetAudioPlayerState())

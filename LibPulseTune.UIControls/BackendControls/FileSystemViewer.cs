@@ -2,7 +2,6 @@
 using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -18,9 +17,9 @@ namespace LibPulseTune.UIControls.BackendControls
         private const string COLUMN_HEADER_READONLY = @"読み取り専用";
 
         // アイコンの定義
-        private static readonly Bitmap FolderIcon = new StockIcon(StockIconIdentifier.Folder, StockIconSize.Small, false, false).Bitmap;
-        private static readonly Bitmap AudioFileIcon = new StockIcon(StockIconIdentifier.AudioFiles, StockIconSize.Small, false, false).Bitmap;
-        private static readonly int IconWidth = Math.Max(FolderIcon.Width, AudioFileIcon.Width);
+        private readonly StockIcon FolderIcon;
+        private readonly StockIcon AudioFileIcon;
+        private readonly int IconWidth;
 
         // 非公開フィールド
         private readonly List<string> fileFormatFilterExtensions;
@@ -35,6 +34,10 @@ namespace LibPulseTune.UIControls.BackendControls
         // コンストラクタ
         public FileSystemViewer()
         {
+            this.FolderIcon = new StockIcon(StockIconIdentifier.Folder, StockIconSize.Small, false, false);
+            this.AudioFileIcon = new StockIcon(StockIconIdentifier.AudioFiles, StockIconSize.Small, false, false);
+            this.IconWidth = Math.Max(FolderIcon.Icon.Width, AudioFileIcon.Icon.Width);
+
             this.fileFormatFilterExtensions = new List<string>();
             this.forwardStack = new Stack<string>();
             this.itemsSource = new List<FileSystemViewerItem>();
@@ -311,7 +314,7 @@ namespace LibPulseTune.UIControls.BackendControls
         /// <returns></returns>
         private FileSystemViewerItem CreateDirectoryItem(DirectoryInfo dirInfo)
         {
-            var item = new FileSystemViewerItem(dirInfo.FullName, FolderIcon, true);
+            var item = new FileSystemViewerItem(dirInfo.FullName, this.FolderIcon.Icon, true);
 
             for (int i = 0; i < this.Columns.Count; i++)
             {
@@ -356,7 +359,7 @@ namespace LibPulseTune.UIControls.BackendControls
         /// <returns></returns>
         private FileSystemViewerItem CreateFileItem(FileInfo fileInfo)
         {
-            var item = new FileSystemViewerItem(fileInfo.FullName, AudioFileIcon, false);
+            var item = new FileSystemViewerItem(fileInfo.FullName, this.AudioFileIcon.Icon, false);
 
             for (int i = 0; i < this.Columns.Count; i++)
             {
@@ -464,7 +467,7 @@ namespace LibPulseTune.UIControls.BackendControls
                 }
 
                 var textSize = TextRenderer.MeasureText(item.SubItems[0].Text, this.Font);
-                var fileNameWidth = IconWidth + spacing + textSize.Width;
+                var fileNameWidth = this.IconWidth + SPACING + textSize.Width;
 
                 if (maxFileNameWidth < fileNameWidth)
                 {

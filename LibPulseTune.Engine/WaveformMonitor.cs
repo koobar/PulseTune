@@ -147,6 +147,11 @@ namespace LibPulseTune.Engine
             }
         }
 
+        public float GetMaximumInstantaneousDecibels(int channel)
+        {
+            return ToDecibels(GetAmplitude(channel));
+        }
+
         /// <summary>
         /// 読み込まれたデータから、指定されたチャンネルの波形を取得する。
         /// </summary>
@@ -169,6 +174,16 @@ namespace LibPulseTune.Engine
             {
                 Array.Clear(this.buffers[ch], 0, this.buffers[ch].Length);
             }
+        }
+
+        private float ToDecibels(float amplitude)
+        {
+            if (amplitude <= 0)
+            {
+                amplitude = float.Epsilon;
+            }
+
+            return 20 * (float)Math.Log10(amplitude);
         }
     }
 }

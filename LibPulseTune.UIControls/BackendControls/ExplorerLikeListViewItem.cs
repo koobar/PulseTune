@@ -8,7 +8,7 @@ namespace LibPulseTune.UIControls.BackendControls
         /// <summary>
         /// アイコン
         /// </summary>
-        public Bitmap Icon { set; get; }
+        public virtual Icon Icon { set; get; }
 
         /// <summary>
         /// アイテムの領域にマウスカーソルが重なっているかどうかを示すフラグ

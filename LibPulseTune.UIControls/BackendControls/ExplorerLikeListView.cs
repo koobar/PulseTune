@@ -1,14 +1,19 @@
 ﻿using LibPulseTune.UIControls.Utils;
 using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using static LibPulseTune.UIControls.WinApi;
 
 namespace LibPulseTune.UIControls.BackendControls
 {
     public class ExplorerLikeListView : OptimizedListView
     {
         // 非公開定数
-        private const int SPACING = 3;
+        protected const int SPACING = 2;
+        private const int GWL_STYLE = -16;
+        private const int LVS_OWNERDRAWFIXED = 0x0400;
+        private const int WM_MEASUREITEM = 0x002C + 0x2000;
 
         // 色とブラシの定義
         private static readonly Color SelectedItemBackColor = Color.FromArgb(205, 232, 255);
@@ -17,6 +22,7 @@ namespace LibPulseTune.UIControls.BackendControls
         private static readonly Brush SelectedItemBrush = new SolidBrush(SelectedItemBackColor);
         private static readonly Pen SelectedItemBorderPen = new Pen(SelectedItemBorderColor);
         private static readonly Brush HotItemBrush = new SolidBrush(HotItemBackColor);
+        private int rowHeight;
 
         // 非公開フィールド
         private Point mousePoint;
@@ -27,6 +33,32 @@ namespace LibPulseTune.UIControls.BackendControls
             this.View = View.Details;
             this.OwnerDraw = true;
             this.FullRowSelect = true;
+        }
+
+        /// <summary>
+        /// アイテムの高さ
+        /// </summary>
+        public int ItemHeight
+        {
+            set
+            {
+                this.rowHeight = value;
+
+                var size = this.Size;
+                var style = GetWindowLong(this.Handle, GWL_STYLE);
+                style |= LVS_OWNERDRAWFIXED;
+                SetWindowLong(this.Handle, GWL_STYLE, style);
+
+                this.Size = new Size(size.Width, size.Height + 1);
+                style ^= LVS_OWNERDRAWFIXED;
+                SetWindowLong(this.Handle, GWL_STYLE, style);
+
+                this.Size = size;
+            }
+            get
+            {
+                return this.rowHeight;
+            }
         }
 
         /// <summary>
@@ -115,9 +147,8 @@ namespace LibPulseTune.UIControls.BackendControls
             }
 
             var item = e.Item;
-            int iconX = 0, iconY = 0, iconWidth = 0, iconHeight = 0;
-            int textX = 0, textY = 0, textWidth = 0, textHeight = 0;
-            Image icon = null;
+            float textX = 0, textY = 0, textWidth = 0, textHeight = 0;
+            Icon icon = null;
             var text = string.Empty;
             var textAreaComputed = false;
             var hasIcon = false;
@@ -128,23 +159,18 @@ namespace LibPulseTune.UIControls.BackendControls
                 {
                     if (explorerLikeListViewItem.Icon != null)
                     {
-                        iconX = e.SubItem.Bounds.X + SPACING;
-                        iconY = e.SubItem.Bounds.Y + SPACING / 2;
-                        iconWidth = explorerLikeListViewItem.Icon.Width;
-                        iconHeight = explorerLikeListViewItem.Icon.Height;
-                        textX = iconX + iconWidth + SPACING;
-                        textY = e.SubItem.Bounds.Y;
-                        textWidth = e.SubItem.Bounds.Width;
-                        textHeight = e.SubItem.Bounds.Height;
-
                         if (e.ColumnIndex == 0)
                         {
                             icon = explorerLikeListViewItem.Icon;
+                            hasIcon = true;
                         }
 
+                        textX = (SPACING + icon.Width) + SPACING;
+                        textY = e.SubItem.Bounds.Y;
+                        textWidth = e.SubItem.Bounds.Width;
+                        textHeight = e.SubItem.Bounds.Height;
                         text = e.SubItem.Text;
                         textAreaComputed = true;
-                        hasIcon = true;
                     }
                 }
             }
@@ -162,13 +188,20 @@ namespace LibPulseTune.UIControls.BackendControls
             if (hasIcon)
             {
                 // アイコンを描画
-                e.Graphics.DrawImage(icon, iconX, iconY, iconWidth, iconHeight);
+                e.Graphics.DrawIcon(icon, new Rectangle(SPACING, (e.Bounds.Y + (e.Bounds.Height - icon.Height) / 2), icon.Width, icon.Height));
             }
 
             if (textAreaComputed)
             {
                 // 文字列を描画
-                TextRenderer.DrawText(e.Graphics, text, this.Font, new Rectangle(textX, textY, textWidth, textHeight), Color.Black, Color.Transparent, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
+                TextRenderer.DrawText(
+                    e.Graphics, 
+                    text, 
+                    this.Font, 
+                    new Rectangle((int)textX, (int)textY, (int)textWidth, (int)textHeight), 
+                    Color.Black, 
+                    Color.Transparent, 
+                    TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
             }
         }
 
@@ -193,6 +226,24 @@ namespace LibPulseTune.UIControls.BackendControls
             else if (this.mousePoint != Point.Empty && item.GetBounds(ItemBoundsPortion.ItemOnly).Contains(this.mousePoint))
             {
                 e.Graphics.FillRectangle(HotItemBrush, e.Bounds.X + 1, e.Bounds.Y + 1, e.Bounds.Width - 1, e.Bounds.Height - 1);
+            }
+        }
+
+        /// <summary>
+        /// ウィンドウプロシージャ
+        /// </summary>
+        /// <param name="m"></param>
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+
+            if (WM_MEASUREITEM == m.Msg)
+            {
+                var measure = Marshal.PtrToStructure<MEASUREITEMSTRUCT>(m.LParam);
+                measure.itemHeight = (int)(this.rowHeight * Math.Max(1.0f, this.DeviceDpi / 100.0f));
+                Marshal.StructureToPtr(measure, m.LParam, false);
+
+                m.Result = (IntPtr)1;
             }
         }
     }

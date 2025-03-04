@@ -87,17 +87,28 @@ namespace LibPulseTune.UIControls
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
-        private Bitmap GetFolderIcon(string path, int width, int height)
+        private Icon GetFolderIcon(string path, int width, int height)
         {
-            var result = new Bitmap(width, height);
-            var original = WinApi.ExtractIconFromPath(path, WinApi.ExtractIconSize.Small).ToBitmap();
-            var g = Graphics.FromImage(result);
+            return WinApi.ExtractIconFromPath(path, WinApi.ExtractIconSize.Small);
 
-            g.DrawImage(original, 0, 0, width, height);
-            g.Dispose();
-            original.Dispose();
+            /*var result = new Bitmap(width, height);
 
-            return result;
+            using (var icon = WinApi.ExtractIconFromPath(path, WinApi.ExtractIconSize.Small))
+            {
+                if (icon == null)
+                {
+                    return null;
+                }
+
+                using (var g = Graphics.FromImage(result))
+                {
+                    g.DrawIcon(icon, 0, 0);
+                    g.Dispose();
+                    icon.Dispose();
+
+                    return result;
+                }
+            }*/
         }
 
         /// <summary>

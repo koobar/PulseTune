@@ -176,7 +176,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(35, 12);
             this.label3.TabIndex = 15;
-            this.label3.Text = "-30db";
+            this.label3.Text = "-90db";
             // 
             // label2
             // 
@@ -217,7 +217,6 @@
             // 
             // LeftChannelVolumeMeter
             // 
-            this.LeftChannelVolumeMeter.Amplitude = 0F;
             this.LeftChannelVolumeMeter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.LeftChannelVolumeMeter.BackColor = System.Drawing.SystemColors.Control;
@@ -229,7 +228,6 @@
             // 
             // RightChannelVolumeMeter
             // 
-            this.RightChannelVolumeMeter.Amplitude = 0F;
             this.RightChannelVolumeMeter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.RightChannelVolumeMeter.BackColor = System.Drawing.SystemColors.Control;

@@ -255,7 +255,7 @@ namespace LibPulseTune.Engine
                 case AUDIOPLAYER_STATE_STOP:
                     throw new Exception("オーディオソースの再生はすでに停止されています。");
                 case AUDIOPLAYER_STATE_PLAY:
-                    currentDeviceInstance.Stop();
+                    currentDeviceInstance.Pause();
                     timer.Stop();
                     SetAudioPlayerState(AUDIOPLAYER_STATE_PAUSE);
                     break;
@@ -344,7 +344,7 @@ namespace LibPulseTune.Engine
         /// <returns></returns>
         public static float GetAmplitude(int channel)
         {
-            return waveformMonitor.GetAmplitude(channel);
+            return waveformMonitor.GetMaximumInstantaneousDecibels(channel);
         }
 
         /// <summary>

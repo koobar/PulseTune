@@ -17,7 +17,7 @@ namespace LibPulseTune.UIControls
         #region 構造体
 
         [StructLayout(LayoutKind.Sequential)]
-        struct SHFILEINFO
+        public struct SHFILEINFO
         {
             public IntPtr hIcon;
             public int iIcon;
@@ -26,7 +26,18 @@ namespace LibPulseTune.UIControls
             public string szDisplayName;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
             public string szTypeName;
-        };
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MEASUREITEMSTRUCT
+        {
+            public int CtlType;
+            public int CtlID;
+            public int itemID;
+            public int itemWidth;
+            public int itemHeight;
+            public IntPtr itemData;
+        }
 
         #endregion
 
@@ -43,13 +54,16 @@ namespace LibPulseTune.UIControls
         #region ラッパー関数の定義
 
         [DllImport("shell32.dll")]
-        static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
+        public static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
 
         [DllImport("user32.dll")]
-        static extern bool DestroyIcon(IntPtr handle);
+        public static extern bool DestroyIcon(IntPtr handle);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+        [DllImport("user32.dll")]
+        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll")]
+        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
         #endregion
 
@@ -62,6 +76,12 @@ namespace LibPulseTune.UIControls
         {
             SHFILEINFO shinfo = new SHFILEINFO();
             SHGetFileInfo(path, 0, ref shinfo, (uint)Marshal.SizeOf(shinfo), SHGFI_ICON | (uint)size);
+
+            if (shinfo.hIcon == IntPtr.Zero)
+            {
+                return null;
+            }
+
             return Icon.FromHandle(shinfo.hIcon);
         }
 

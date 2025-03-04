@@ -39,6 +39,21 @@ namespace LibPulseTune.UIControls
         #region プロパティ
 
         /// <summary>
+        /// アイテムの高さ
+        /// </summary>
+        public int ItemHeight
+        {
+            set
+            {
+                this.Viewer.ItemHeight = value;
+            }
+            get
+            {
+                return this.Viewer.ItemHeight;
+            }
+        }
+
+        /// <summary>
         /// コンテキストメニュー
         /// </summary>
         public new ContextMenu ContextMenu

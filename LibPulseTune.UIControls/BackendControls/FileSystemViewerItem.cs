@@ -9,13 +9,8 @@ namespace LibPulseTune.UIControls.BackendControls
         private readonly bool isFolder;
 
         // コンストラクタ
-        public FileSystemViewerItem(string path, Bitmap icon, bool isFolder) : base()
+        public FileSystemViewerItem(string path, Icon icon, bool isFolder) : base()
         {
-            if (icon != null)
-            {
-                icon.MakeTransparent();
-            }
-
             this.path = path;
             this.Icon = icon;
             this.isFolder = isFolder;

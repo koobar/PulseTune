@@ -13,7 +13,7 @@ namespace LibPulseTune.Codecs.WavPack
         private const int OPEN_WVC = 1;
         private const int OPEN_2CH_MAX = 0x08;
         private const int OPEN_NORMALIZE = 0x10;
-        private const int SAMPLES_TO_READ = 16;
+        private const int SAMPLES_TO_READ = 4;
 
         // 非公開フィールド
         private readonly IntPtr wavPackContext;
