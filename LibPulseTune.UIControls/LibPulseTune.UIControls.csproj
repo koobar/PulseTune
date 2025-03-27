@@ -21,6 +21,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -30,6 +31,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomMarshalers" />
@@ -128,7 +130,7 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="TabPageEventArgs.cs" />
-    <Compile Include="Utils\DriveStateWatcher.cs" />
+    <Compile Include="Utils\AccessListWatcher.cs" />
     <Compile Include="Utils\ProcessUtils.cs" />
     <Compile Include="Utils\WindowsFormsControlExtensions.cs" />
     <Compile Include="VolumeMeterControl.cs">

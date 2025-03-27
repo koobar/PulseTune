@@ -1293,5 +1293,11 @@ namespace PulseTune
                 }
             }
         }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            AccessListWatcher.DoWndProc(ref m);
+        }
     }
 }

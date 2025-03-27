@@ -2,7 +2,7 @@
 using LibPulseTune.UIControls.BackendControls;
 using LibPulseTune.UIControls.Utils;
 using System;
-using System.Drawing;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
@@ -12,9 +12,10 @@ namespace LibPulseTune.UIControls
     {
         // 非公開定数
         private const string SHELL_NAMESPACE_QUICKACCESS = @"shell:::{679F85CB-0220-4080-B29B-5540CC05AAB6}";
+        private const int WM_DEVICECHANGE = 0x0219;  // デバイス変化のWindowsイベントの値
 
         // 非公開フィールド
-        private readonly DriveStateWatcher driveStateWatcher;
+        private readonly List<DriveInfo> connectedDrives;
 
         // イベント
         public event EventHandler LocationSelectionChanged;
@@ -22,13 +23,15 @@ namespace LibPulseTune.UIControls
         // コンストラクタ
         public AccessList()
         {
-            this.driveStateWatcher = new DriveStateWatcher();
-            this.driveStateWatcher.DriveStateChanged += OnDriveStateChanged;
+            this.connectedDrives = new List<DriveInfo>();
 
             this.View = View.Details;
             this.HeaderStyle = ColumnHeaderStyle.None;
             this.Columns.Add(new ColumnHeader() { Text = "場所" });
             this.SelectedIndexChanged += OnSelectedIndexChanged;
+
+            AccessListWatcher.NewDriveConnected += OnConnectedDrivesChanged;
+            AccessListWatcher.NewDriveDisconnected += OnConnectedDrivesChanged;
         }
 
         /// <summary>
@@ -43,7 +46,6 @@ namespace LibPulseTune.UIControls
                     return;
                 }
 
-                this.driveStateWatcher.Stop();
                 UpdateAvailableLocations();
 
                 foreach (ListViewGroup group in this.Groups)
@@ -53,8 +55,6 @@ namespace LibPulseTune.UIControls
                         item.Selected = item.Tag.ToString() == value;
                     }
                 }
-
-                this.driveStateWatcher.Start();
             }
             get
             {
@@ -81,50 +81,19 @@ namespace LibPulseTune.UIControls
         }
 
         /// <summary>
-        /// 指定されたパスのフォルダのアイコンを取得する。
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <returns></returns>
-        private Icon GetFolderIcon(string path, int width, int height)
-        {
-            return WinApi.ExtractIconFromPath(path, WinApi.ExtractIconSize.Small);
-
-            /*var result = new Bitmap(width, height);
-
-            using (var icon = WinApi.ExtractIconFromPath(path, WinApi.ExtractIconSize.Small))
-            {
-                if (icon == null)
-                {
-                    return null;
-                }
-
-                using (var g = Graphics.FromImage(result))
-                {
-                    g.DrawIcon(icon, 0, 0);
-                    g.Dispose();
-                    icon.Dispose();
-
-                    return result;
-                }
-            }*/
-        }
-
-        /// <summary>
         /// ドライブを読み込む。
         /// </summary>
         private void LoadDrives()
         {
             var driveGroup = new ListViewGroup();
             driveGroup.Header = "ドライブ";
-            foreach (var info in DriveInfo.GetDrives())
+            foreach (var info in this.connectedDrives)
             {
                 if (info.IsReady)
                 {
                     var item = new ExplorerLikeListViewItem();
                     item.Tag = info.RootDirectory;
-                    item.Icon = GetFolderIcon(info.RootDirectory.FullName, 16, 16);
+                    item.Icon = WinApi.ExtractIconFromPath(info.RootDirectory.FullName, WinApi.ExtractIconSize.Small);
                     item.Text = $"{info.RootDirectory.FullName} ({info.VolumeLabel})";
 
                     driveGroup.Items.Add(item);
@@ -132,6 +101,23 @@ namespace LibPulseTune.UIControls
                 }
             }
             this.Groups.Add(driveGroup);
+
+            /*var driveGroup = new ListViewGroup();
+            driveGroup.Header = "ドライブ";
+            foreach (var info in DriveInfo.GetDrives())
+            {
+                if (info.IsReady)
+                {
+                    var item = new ExplorerLikeListViewItem();
+                    item.Tag = info.RootDirectory;
+                    item.Icon = WinApi.ExtractIconFromPath(info.RootDirectory.FullName, WinApi.ExtractIconSize.Small);
+                    item.Text = $"{info.RootDirectory.FullName} ({info.VolumeLabel})";
+
+                    driveGroup.Items.Add(item);
+                    this.Items.Add(item);
+                }
+            }
+            this.Groups.Add(driveGroup);*/
         }
 
         /// <summary>
@@ -151,7 +137,7 @@ namespace LibPulseTune.UIControls
                 {
                     var item = new ExplorerLikeListViewItem();
                     item.Tag = folderItem.Path;
-                    item.Icon = GetFolderIcon(folderItem.Path, 16, 16);
+                    item.Icon = WinApi.ExtractIconFromPath(folderItem.Path, WinApi.ExtractIconSize.Small);
                     item.Text = Path.GetFileName(folderItem.Path);
 
                     quickAccessGroup.Items.Add(item);
@@ -175,7 +161,7 @@ namespace LibPulseTune.UIControls
                 var location = PlaylistExplorerData.GetFavoriteLocation(i);
                 var item = new ExplorerLikeListViewItem();
                 item.Tag = location;
-                item.Icon = GetFolderIcon(location, 16, 16);
+                item.Icon = WinApi.ExtractIconFromPath(location, WinApi.ExtractIconSize.Small);
                 item.Text = Path.GetFileName(location);
 
                 favoriteGroup.Items.Add(item);
@@ -210,7 +196,7 @@ namespace LibPulseTune.UIControls
                 return;
             }
 
-            this.driveStateWatcher.Start();
+            UpdateConnectedDrives();
             UpdateAvailableLocations();
         }
 
@@ -222,8 +208,6 @@ namespace LibPulseTune.UIControls
             {
                 return;
             }
-
-            this.driveStateWatcher.Stop();
         }
 
         private void OnDriveStateChanged(object sender, EventArgs e)
@@ -242,6 +226,42 @@ namespace LibPulseTune.UIControls
         private void OnSelectedIndexChanged(object sender, EventArgs e)
         {
             this.LocationSelectionChanged?.Invoke(sender, e);
+        }
+
+        protected virtual void UpdateConnectedDrives()
+        {
+            var currentDrives = DriveInfo.GetDrives();
+            var flgChanged = false;
+
+            if (currentDrives.Length != this.connectedDrives.Count)
+            {
+                flgChanged = true;
+            }
+            else
+            {
+                for (int i = 0; i < this.connectedDrives.Count; i++)
+                {
+                    if (!this.connectedDrives[i].Equals(currentDrives[i]))
+                    {
+                        flgChanged = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!flgChanged)
+            {
+                return;
+            }
+
+            this.connectedDrives.Clear();
+            this.connectedDrives.AddRange(currentDrives);
+            UpdateAvailableLocations();
+        }
+
+        private void OnConnectedDrivesChanged(object sender, EventArgs e)
+        {
+            UpdateConnectedDrives();
         }
     }
 }
