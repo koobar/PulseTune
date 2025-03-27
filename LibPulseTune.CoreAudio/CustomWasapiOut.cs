@@ -325,7 +325,7 @@ namespace LibPulseTune.CoreAudio
             // デバイスのバッファにデータをコピー
             var buffer = this.renderClient.GetBuffer(frameCount);
             Marshal.Copy(this.readBuffer, 0, buffer, read);
-            
+
             if (this.isUsingEventSync && this.shareMode == AudioClientShareMode.Exclusive)
             {
                 if (read < readLength)

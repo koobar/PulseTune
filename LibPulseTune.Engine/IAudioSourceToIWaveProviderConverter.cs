@@ -1,4 +1,5 @@
 ﻿using NAudio.Wave;
+using System;
 
 namespace LibPulseTune.Engine
 {
@@ -31,8 +32,16 @@ namespace LibPulseTune.Engine
             }
         }
 
+        public bool IsPaused { set; get; }
+
         public int Read(byte[] buffer, int offset, int count)
         {
+            if (this.IsPaused)
+            {
+                Array.Clear(buffer, offset, count);
+                return count;
+            }
+
             return this.source.Read(buffer, offset, count);
         }
     }

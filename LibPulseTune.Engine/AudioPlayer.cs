@@ -1,6 +1,7 @@
 ﻿using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace LibPulseTune.Engine
 {
@@ -16,6 +17,7 @@ namespace LibPulseTune.Engine
         private static IAudioOutputDevice outputDevice;
         private static IAudioPlayer currentDeviceInstance;
         private static IAudioSource currentAudioSource;
+        private static IAudioSourceToIWaveProviderConverter currentAudioSourceConverter;
         private static WaveformMonitor waveformMonitor;
         private static VolumeSampleProvider volumeController;
         private static int volume;
@@ -182,10 +184,10 @@ namespace LibPulseTune.Engine
                     volumeController = null;
                 }
 
-                var waveProvider = new IAudioSourceToIWaveProviderConverter(currentAudioSource);
+                currentAudioSourceConverter = new IAudioSourceToIWaveProviderConverter(currentAudioSource);
 
                 // 波形モニタを生成
-                waveformMonitor = new WaveformMonitor(waveProvider);
+                waveformMonitor = new WaveformMonitor(currentAudioSourceConverter);
 
                 // 音量コントローラを作成
                 volumeController = new VolumeSampleProvider(waveformMonitor);
@@ -193,7 +195,7 @@ namespace LibPulseTune.Engine
 
                 // デバイスを初期化
                 currentDeviceInstance = outputDevice.CreateDeviceInstance();
-                currentDeviceInstance.Init(ConvertToWaveProvider(volumeController, waveProvider.WaveFormat));
+                currentDeviceInstance.Init(ConvertToWaveProvider(volumeController, currentAudioSourceConverter.WaveFormat));
 
                 GC.Collect();
             }
@@ -238,8 +240,14 @@ namespace LibPulseTune.Engine
                 return;
             }
 
+            if (currentAudioSourceConverter == null)
+            {
+                return;
+            }
+
             currentDeviceInstance.Play();
             timer.Start();
+            currentAudioSourceConverter.IsPaused = false;
             SetAudioPlayerState(AUDIOPLAYER_STATE_PLAY);
         }
 
@@ -255,8 +263,15 @@ namespace LibPulseTune.Engine
                 case AUDIOPLAYER_STATE_STOP:
                     throw new Exception("オーディオソースの再生はすでに停止されています。");
                 case AUDIOPLAYER_STATE_PLAY:
-                    currentDeviceInstance.Pause();
                     timer.Stop();
+                    if (outputDevice.IsPauseSupported)
+                    {
+                        currentAudioSourceConverter.IsPaused = true;
+                    }
+                    else
+                    {
+                        currentDeviceInstance.Pause();
+                    }
                     SetAudioPlayerState(AUDIOPLAYER_STATE_PAUSE);
                     break;
             }
@@ -274,6 +289,7 @@ namespace LibPulseTune.Engine
                     currentAudioSource.SetCurrentTime(TimeSpan.FromMilliseconds(0));
                     currentDeviceInstance.Stop();
                     timer.Stop();
+                    currentAudioSourceConverter.IsPaused = false;
                     PlaybackPositionChanged?.Invoke(null, EventArgs.Empty);
                     SetAudioPlayerState(AUDIOPLAYER_STATE_STOP);
                     break;

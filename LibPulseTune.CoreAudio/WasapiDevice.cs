@@ -78,6 +78,18 @@ namespace LibPulseTune.CoreAudio
         public bool EnableMMCSS { set; get; }
 
         /// <summary>
+        /// 一時停止がサポートされているかどうかを示す。<br/>
+        /// 一時停止がサポートされていない環境では、AudioPlayer側で、一時停止を「無音データの再生」に置き換えて再現します。
+        /// </summary>
+        public bool IsPauseSupported
+        {
+            get
+            {
+                return this.isWasapiExclusiveMode;
+            }
+        }
+
+        /// <summary>
         /// 再生スレッドの特徴
         /// </summary>
         public MmThreadCharacteristics ThreadCharacteristics { set; get; }
