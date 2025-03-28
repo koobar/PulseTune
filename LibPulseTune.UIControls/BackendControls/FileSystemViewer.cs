@@ -30,7 +30,6 @@ namespace LibPulseTune.UIControls.BackendControls
         private readonly List<FileSystemViewerItem> itemsSource;
         private readonly FileSystemWatcher fileSystemWatcher;
         private readonly ReloadCurrentDirectory reloadCurrentDirectory;
-        private string currentPath;
 
         // イベント
         public event EventHandler Navigated;
@@ -48,7 +47,7 @@ namespace LibPulseTune.UIControls.BackendControls
             this.itemsSource = new List<FileSystemViewerItem>();
 
             this.fileSystemWatcher = new FileSystemWatcher();
-            this.fileSystemWatcher.NotifyFilter = NotifyFilters.FileName;
+            this.fileSystemWatcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite;
             this.fileSystemWatcher.Created += OnFileSystemChanged;
             this.fileSystemWatcher.Deleted += OnFileSystemChanged;
             this.fileSystemWatcher.Renamed += OnFileSystemChanged;
@@ -81,7 +80,7 @@ namespace LibPulseTune.UIControls.BackendControls
         {
             get
             {
-                return this.currentPath;
+                return this.fileSystemWatcher.Path;
             }
         }
 
@@ -185,7 +184,7 @@ namespace LibPulseTune.UIControls.BackendControls
         /// <returns></returns>
         public bool CanGoBack()
         {
-            var parentDirectory = Path.GetDirectoryName(currentPath);
+            var parentDirectory = Path.GetDirectoryName(this.CurrentPath);
 
             return !string.IsNullOrEmpty(parentDirectory);
         }
@@ -206,8 +205,8 @@ namespace LibPulseTune.UIControls.BackendControls
         {
             if (CanGoBack())
             {
-                this.forwardStack.Push(this.currentPath);
-                InternalNavigate(Path.GetDirectoryName(this.currentPath));
+                this.forwardStack.Push(this.CurrentPath);
+                InternalNavigate(Path.GetDirectoryName(this.CurrentPath));
             }
         }
 
@@ -228,7 +227,7 @@ namespace LibPulseTune.UIControls.BackendControls
         /// </summary>
         public void Reload()
         {
-            InternalNavigate(this.currentPath);
+            InternalNavigate(this.CurrentPath);
         }
 
         /// <summary>
@@ -238,7 +237,6 @@ namespace LibPulseTune.UIControls.BackendControls
         public void Navigate(string path)
         {
             this.forwardStack?.Clear();
-
             InternalNavigate(path);
         }
 
@@ -311,8 +309,6 @@ namespace LibPulseTune.UIControls.BackendControls
         /// <param name="path"></param>
         private void InternalNavigate(string path)
         {
-            this.currentPath = path;
-
             this.fileSystemWatcher.Path = path;
             this.fileSystemWatcher.EnableRaisingEvents = true;
 
@@ -417,14 +413,14 @@ namespace LibPulseTune.UIControls.BackendControls
         /// </summary>
         private void LoadCurrentDirectory()
         {
-            if (string.IsNullOrEmpty(this.currentPath))
+            if (string.IsNullOrEmpty(this.CurrentPath))
             {
                 return;
             }
 
             this.itemsSource.Clear();
 
-            var info = new DirectoryInfo(this.currentPath);
+            var info = new DirectoryInfo(this.CurrentPath);
             var folders = info.EnumerateDirectories().GetEnumerator();
             var files = info.EnumerateFiles().GetEnumerator();
 
@@ -456,7 +452,7 @@ namespace LibPulseTune.UIControls.BackendControls
         {
             this.Items.Clear();
 
-            if (string.IsNullOrEmpty(this.currentPath))
+            if (string.IsNullOrEmpty(this.CurrentPath))
             {
                 return;
             }
