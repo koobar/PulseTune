@@ -4,6 +4,7 @@ using LibPulseTune.UIControls.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace LibPulseTune.UIControls
@@ -12,7 +13,10 @@ namespace LibPulseTune.UIControls
     {
         // 非公開定数
         private const string SHELL_NAMESPACE_QUICKACCESS = @"shell:::{679F85CB-0220-4080-B29B-5540CC05AAB6}";
-        private const int WM_DEVICECHANGE = 0x0219;  // デバイス変化のWindowsイベントの値
+        private const int WM_DEVICECHANGE = 0x219;              // デバイス変化のWindowsイベントの値
+        private const int DBT_DEVICEARRIVAL = 0x8000;           // USBの挿入
+        private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;    // USBの取り外し
+        private const int DBT_DEVTYP_VOLUME = 0x00000002;       // デバイスの種類がボリューム
 
         // 非公開フィールド
         private readonly List<DriveInfo> connectedDrives;
@@ -30,8 +34,13 @@ namespace LibPulseTune.UIControls
             this.Columns.Add(new ColumnHeader() { Text = "場所" });
             this.SelectedIndexChanged += OnSelectedIndexChanged;
 
-            AccessListWatcher.NewDriveConnected += OnConnectedDrivesChanged;
-            AccessListWatcher.NewDriveDisconnected += OnConnectedDrivesChanged;
+            MainWindowProcMgr.RegisterAction(WM_DEVICECHANGE, OnDeviceChanged);
+        }
+
+        // デストラクタ
+        ~AccessList()
+        {
+            MainWindowProcMgr.UnregisterAction(WM_DEVICECHANGE, OnDeviceChanged);
         }
 
         /// <summary>
@@ -101,23 +110,6 @@ namespace LibPulseTune.UIControls
                 }
             }
             this.Groups.Add(driveGroup);
-
-            /*var driveGroup = new ListViewGroup();
-            driveGroup.Header = "ドライブ";
-            foreach (var info in DriveInfo.GetDrives())
-            {
-                if (info.IsReady)
-                {
-                    var item = new ExplorerLikeListViewItem();
-                    item.Tag = info.RootDirectory;
-                    item.Icon = WinApi.ExtractIconFromPath(info.RootDirectory.FullName, WinApi.ExtractIconSize.Small);
-                    item.Text = $"{info.RootDirectory.FullName} ({info.VolumeLabel})";
-
-                    driveGroup.Items.Add(item);
-                    this.Items.Add(item);
-                }
-            }
-            this.Groups.Add(driveGroup);*/
         }
 
         /// <summary>
@@ -259,9 +251,33 @@ namespace LibPulseTune.UIControls
             UpdateAvailableLocations();
         }
 
-        private void OnConnectedDrivesChanged(object sender, EventArgs e)
+        /// <summary>
+        /// コンピュータに接続された外部デバイスが変更された場合の処理
+        /// </summary>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        protected virtual void OnDeviceChanged(IntPtr wParam, IntPtr lParam)
         {
-            UpdateConnectedDrives();
+            if (wParam == IntPtr.Zero || lParam == IntPtr.Zero)
+            {
+                return;
+            }
+
+            long wp = wParam.ToInt64();
+            int lp = Marshal.ReadInt32(lParam, 4);
+
+            if (lp == DBT_DEVTYP_VOLUME)
+            {
+                switch (wp)
+                {
+                    case DBT_DEVICEARRIVAL:
+                        UpdateConnectedDrives();
+                        break;
+                    case DBT_DEVICEREMOVECOMPLETE:
+                        UpdateConnectedDrives();
+                        break;
+                }
+            }
         }
     }
 }

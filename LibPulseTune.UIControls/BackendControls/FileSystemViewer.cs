@@ -21,10 +21,15 @@ namespace LibPulseTune.UIControls.BackendControls
         private readonly StockIcon AudioFileIcon;
         private readonly int IconWidth;
 
+        // 非公開デリゲート
+        private delegate void ReloadCurrentDirectory();
+
         // 非公開フィールド
         private readonly List<string> fileFormatFilterExtensions;
         private readonly Stack<string> forwardStack;
         private readonly List<FileSystemViewerItem> itemsSource;
+        private readonly FileSystemWatcher fileSystemWatcher;
+        private readonly ReloadCurrentDirectory reloadCurrentDirectory;
         private string currentPath;
 
         // イベント
@@ -41,6 +46,13 @@ namespace LibPulseTune.UIControls.BackendControls
             this.fileFormatFilterExtensions = new List<string>();
             this.forwardStack = new Stack<string>();
             this.itemsSource = new List<FileSystemViewerItem>();
+
+            this.fileSystemWatcher = new FileSystemWatcher();
+            this.fileSystemWatcher.NotifyFilter = NotifyFilters.FileName;
+            this.fileSystemWatcher.Created += OnFileSystemChanged;
+            this.fileSystemWatcher.Deleted += OnFileSystemChanged;
+            this.fileSystemWatcher.Renamed += OnFileSystemChanged;
+            this.reloadCurrentDirectory = new ReloadCurrentDirectory(Reload);
 
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
@@ -173,7 +185,7 @@ namespace LibPulseTune.UIControls.BackendControls
         /// <returns></returns>
         public bool CanGoBack()
         {
-            var parentDirectory = Path.GetDirectoryName(this.currentPath);
+            var parentDirectory = Path.GetDirectoryName(currentPath);
 
             return !string.IsNullOrEmpty(parentDirectory);
         }
@@ -300,6 +312,9 @@ namespace LibPulseTune.UIControls.BackendControls
         private void InternalNavigate(string path)
         {
             this.currentPath = path;
+
+            this.fileSystemWatcher.Path = path;
+            this.fileSystemWatcher.EnableRaisingEvents = true;
 
             UpdateView();
 
@@ -497,6 +512,16 @@ namespace LibPulseTune.UIControls.BackendControls
                 // これを使うと、Windows 11環境で不要な水平スクロールバーが出現する場合がある。
                 //this.Columns[i].Width = -2;
             }
+        }
+
+        /// <summary>
+        /// ファイルシステム上で何らかの変更があった場合の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnFileSystemChanged(object sender, FileSystemEventArgs e)
+        {
+            Invoke(this.reloadCurrentDirectory);
         }
 
         /// <summary>

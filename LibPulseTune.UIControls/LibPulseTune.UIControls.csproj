@@ -98,6 +98,7 @@
     <Compile Include="Dialogs\WasapiOptionDialog.Designer.cs">
       <DependentUpon>WasapiOptionDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="MainWindowProcedureManager.cs" />
     <Compile Include="MediaExplorerControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -130,7 +131,6 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="TabPageEventArgs.cs" />
-    <Compile Include="Utils\AccessListWatcher.cs" />
     <Compile Include="Utils\ProcessUtils.cs" />
     <Compile Include="Utils\WindowsFormsControlExtensions.cs" />
     <Compile Include="VolumeMeterControl.cs">

@@ -843,6 +843,23 @@ namespace PulseTune
         }
 
         /// <summary>
+        /// ウィンドウプロシージャ
+        /// </summary>
+        /// <param name="m"></param>
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+
+            if (MainWindowProcMgr.GetRegisteredActionCount(m) > 0)
+            {
+                foreach (var action in MainWindowProcMgr.GetActions(m))
+                {
+                    action?.Invoke(m.WParam, m.LParam);
+                }
+            }
+        }
+
+        /// <summary>
         /// フォームが読み込まれた場合の処理
         /// </summary>
         /// <param name="e"></param>
@@ -1238,18 +1255,25 @@ namespace PulseTune
             Process.Start(info);
         }
 
+        /// <summary>
+        /// WASAIとMMCSSの設定メニューがクリックされた場合の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ShowWasapiAndMmcssOptionMenuItem_Click(object sender, EventArgs e)
         {
             var dialog = new WasapiOptionDialog();
 
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-
-            }
+            dialog.ShowDialog();
 
             dialog.Dispose();
         }
 
+        /// <summary>
+        /// 波形レンダラの表示モードメニューがクリックされた場合の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void WaveformRendererViewModesMenuItem_Clicked(object sender, EventArgs e)
         {
             if (sender != null && sender is MenuItem)
@@ -1271,6 +1295,11 @@ namespace PulseTune
             }
         }
 
+        /// <summary>
+        /// アクセスリストがダブルクリックされた場合の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AccessListControl_DoubleClick(object sender, EventArgs e)
         {
             var path = this.AccessListControl.SelectedLocation;
@@ -1292,12 +1321,6 @@ namespace PulseTune
                     OpenFolderInNewTab(path);
                 }
             }
-        }
-
-        protected override void WndProc(ref Message m)
-        {
-            base.WndProc(ref m);
-            AccessListWatcher.DoWndProc(ref m);
         }
     }
 }
