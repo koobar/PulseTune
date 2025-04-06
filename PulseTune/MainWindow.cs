@@ -72,9 +72,9 @@ namespace PulseTune
         #region UI処理用メソッド
 
         /// <summary>
-		/// 指定されたメディアエクスプローラコントロールのコンテキストメニューを作成する。
-		/// </summary>
-		private ContextMenu CreateExplorerControlContextMenu(MediaExplorerControl control)
+        /// 指定されたメディアエクスプローラコントロールのコンテキストメニューを作成する。
+        /// </summary>
+        private ContextMenu CreateExplorerControlContextMenu(MediaExplorerControl control)
         {
             var playbackMenuItem = new MenuItem();
             playbackMenuItem.Text = "再生(&S)";
@@ -549,6 +549,7 @@ namespace PulseTune
             device.EnableMMCSS = OptionManager.EnableMMCSS;
             device.ThreadCharacteristics = OptionManager.MmThreadCharacteristics;
             device.PlaybackThreadPriority = OptionManager.PlaybackThreadPriority;
+            device.CreatePlaybackThreadAsBackgroundThread = OptionManager.CreatePlaybackThreadAsBackgroundThread;
 
             return device;
         }
@@ -571,8 +572,7 @@ namespace PulseTune
         private void Play(AudioTrackBase track)
         {
             // レベルメーターをリセット
-            this.LeftChannelVolumeMeter.Reset();
-            this.RightChannelVolumeMeter.Reset();
+            this.LevelMeterControl.Reset();
 
             switch (AudioPlayer.GetAudioPlayerState())
             {
@@ -655,8 +655,7 @@ namespace PulseTune
             UpdateWindowTitle(null);
 
             // レベルメーターをリセット
-            this.LeftChannelVolumeMeter.Reset();
-            this.RightChannelVolumeMeter.Reset();
+            this.LevelMeterControl.Reset();
 
             // 後始末
             this.currentTrack = null;
@@ -700,15 +699,11 @@ namespace PulseTune
         #endregion
 
         /// <summary>
-        /// 設定を読み込む。
+        /// 波形レンダラのステレオ表示モードを設定し、UIやメニュー項目のチェック状態にも反映する。
         /// </summary>
-        private void LoadOptions()
+        /// <param name="stereoViewMode"></param>
+        private void SetWaveformRendererStereoViewMode(WaveformRendererStereoViewMode stereoViewMode)
         {
-            SelectDevice(CreateAudioOutputDeviceFromApplicationOptions());
-            UpdateAudioOutputDeviceMenuItems();
-
-            this.TopMost =  this.AlwaysTopMostViewMenuItem.Checked = OptionManager.MainWindowAlwaysTopMost;
-
             switch (OptionManager.WaveformRendererViewMode)
             {
                 case WaveformRendererStereoViewMode.Separated:
@@ -720,6 +715,55 @@ namespace PulseTune
                     this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Mixed;
                     break;
             }
+
+            OptionManager.WaveformRendererViewMode = stereoViewMode;
+        }
+
+        /// <summary>
+        /// 波形レンダラの描画精度を設定し、UIやメニュー項目のチェック状態にも反映する。
+        /// </summary>
+        /// <param name="precision"></param>
+        private void SetWaveformRendererRenderingPrecision(WaveformRendererRenderingPrecision precision)
+        {
+            switch (precision)
+            {
+                case WaveformRendererRenderingPrecision.Lowest:
+                    this.LowestQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Lowest;
+                    break;
+                case WaveformRendererRenderingPrecision.Low:
+                    this.LowQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Low;
+                    break;
+                case WaveformRendererRenderingPrecision.Normal:
+                    this.NormalQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Normal;
+                    break;
+                case WaveformRendererRenderingPrecision.High:
+                    this.HighQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.High;
+                    break;
+                case WaveformRendererRenderingPrecision.Highest:
+                    this.HighestQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Highest;
+                    break;
+            }
+
+            OptionManager.WaveformRendererRenderingPrecision = precision;
+        }
+
+        /// <summary>
+        /// 設定を読み込む。
+        /// </summary>
+        private void LoadOptions()
+        {
+            SelectDevice(CreateAudioOutputDeviceFromApplicationOptions());
+            UpdateAudioOutputDeviceMenuItems();
+
+            SetWaveformRendererStereoViewMode(OptionManager.WaveformRendererViewMode);
+            SetWaveformRendererRenderingPrecision(OptionManager.WaveformRendererRenderingPrecision);
+
+            this.TopMost = this.AlwaysTopMostViewMenuItem.Checked = OptionManager.MainWindowAlwaysTopMost;
         }
 
         /// <summary>
@@ -970,16 +1014,16 @@ namespace PulseTune
             if (channels >= 2)
             {
                 this.WaveformRendererControl.PaintWaveform(AudioPlayer.GetWaveform(0), AudioPlayer.GetWaveform(1));
-                this.LeftChannelVolumeMeter.Decibels = AudioPlayer.GetAmplitude(0);
-                this.RightChannelVolumeMeter.Decibels = AudioPlayer.GetAmplitude(1);
+                this.LevelMeterControl.LeftMeterDecibels = AudioPlayer.GetAmplitude(0);
+                this.LevelMeterControl.RightMeterDecibels  = AudioPlayer.GetAmplitude(1);
             }
             else
             {
                 this.WaveformRendererControl.PaintWaveform(AudioPlayer.GetWaveform(0));
 
                 var amp = AudioPlayer.GetAmplitude(0);
-                this.LeftChannelVolumeMeter.Decibels = amp;
-                this.RightChannelVolumeMeter.Decibels = amp;
+                this.LevelMeterControl.LeftMeterDecibels = amp;
+                this.LevelMeterControl.RightMeterDecibels = amp;
             }
 
             switch (AudioPlayer.GetAudioPlayerState())
@@ -1320,6 +1364,30 @@ namespace PulseTune
                 {
                     OpenFolderInNewTab(path);
                 }
+            }
+        }
+
+        private void WaveformRendererRenderingPrecisionMenuItem_Click(object sender, EventArgs e)
+        {
+            if (sender == this.LowestQualityWaveformRendererPrecisionMenuItem)
+            {
+                SetWaveformRendererRenderingPrecision(WaveformRendererRenderingPrecision.Lowest);
+            }
+            else if (sender == this.LowQualityWaveformRendererPrecisionMenuItem)
+            {
+                SetWaveformRendererRenderingPrecision(WaveformRendererRenderingPrecision.Low);
+            }
+            else if (sender == this.NormalQualityWaveformRendererPrecisionMenuItem)
+            {
+                SetWaveformRendererRenderingPrecision(WaveformRendererRenderingPrecision.Normal);
+            }
+            else if (sender == this.HighQualityWaveformRendererPrecisionMenuItem)
+            {
+                SetWaveformRendererRenderingPrecision(WaveformRendererRenderingPrecision.High);
+            }
+            else if (sender == this.HighestQualityWaveformRendererPrecisionMenuItem)
+            {
+                SetWaveformRendererRenderingPrecision(WaveformRendererRenderingPrecision.Highest);
             }
         }
     }

@@ -98,6 +98,12 @@
     <Compile Include="Dialogs\WasapiOptionDialog.Designer.cs">
       <DependentUpon>WasapiOptionDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="LevelMeterPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LevelMeterPanel.Designer.cs">
+      <DependentUpon>LevelMeterPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainWindowProcedureManager.cs" />
     <Compile Include="MediaExplorerControl.cs">
       <SubType>UserControl</SubType>
@@ -133,10 +139,16 @@
     <Compile Include="TabPageEventArgs.cs" />
     <Compile Include="Utils\ProcessUtils.cs" />
     <Compile Include="Utils\WindowsFormsControlExtensions.cs" />
-    <Compile Include="VolumeMeterControl.cs">
+    <Compile Include="BackendControls\VolumeMeterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="WaveformRenderer.cs">
+    <Compile Include="WaveformPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WaveformPanel.Designer.cs">
+      <DependentUpon>WaveformPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BackendControls\WaveformRenderer.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="WinApi.cs" />
@@ -151,6 +163,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WasapiOptionDialog.resx">
       <DependentUpon>WasapiOptionDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LevelMeterPanel.resx">
+      <DependentUpon>LevelMeterPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MediaExplorerControl.resx">
       <DependentUpon>MediaExplorerControl.cs</DependentUpon>
@@ -167,6 +182,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WaveformPanel.resx">
+      <DependentUpon>WaveformPanel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -2,18 +2,18 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace LibPulseTune.UIControls
+namespace LibPulseTune.UIControls.BackendControls
 {
-    public class VolumeMeterControl : UserControl
+    internal class VolumeMeterControl : UserControl
     {
         // 非公開定数
         private const float METER_SCALE_WIDTH = 4.0f;               // 目盛りの幅
         private const float METER_DECIBELS_NOT_MUTE = -90.0f;       // 無音ではないと判定する基準とするデシベル（これより小さい音は無音と判定する）
 
         // 非公開フィールド
+        private readonly float scaleWidth;
         private float decibels;
         private float minimumDecibels;
-        private float scaleWidth;
         private float scaleSpacing;
 
         // コンストラクタ
@@ -88,7 +88,7 @@ namespace LibPulseTune.UIControls
         public void Reset()
         {
             this.decibels = METER_DECIBELS_NOT_MUTE;
-            Invalidate();
+            Refresh();
         }
 
         /// <summary>

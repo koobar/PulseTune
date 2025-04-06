@@ -99,6 +99,11 @@ namespace LibPulseTune.CoreAudio
         /// </summary>
         public AvThreadPriority PlaybackThreadPriority { set; get; }
 
+        /// <summary>
+        /// 再生スレッドをバックグラウンドスレッドとして作成するかどうかを示す。
+        /// </summary>
+        public bool CreatePlaybackThreadAsBackgroundThread { set; get; }
+
         #endregion
 
         /// <summary>
@@ -190,6 +195,7 @@ namespace LibPulseTune.CoreAudio
                 result.EnableMMCSS = this.EnableMMCSS;
                 result.MmThreadCharacteristics = this.ThreadCharacteristics;
                 result.PlaybackAvThreadPriority = this.PlaybackThreadPriority;
+                result.CreatePlaybackThreadAsBackgroundThread = this.CreatePlaybackThreadAsBackgroundThread;
 
                 return result;
             }

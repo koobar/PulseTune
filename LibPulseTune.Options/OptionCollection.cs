@@ -103,6 +103,13 @@ namespace LibPulseTune.Options
             }
         }
 
+        /// <summary>
+        /// 設定を取得する。
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="valueType"></param>
+        /// <returns></returns>
         public dynamic GetValue(string key, object defaultValue, Type valueType)
         {
             string value = null;

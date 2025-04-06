@@ -96,6 +96,11 @@ namespace LibPulseTune.CoreAudio
         public MmThreadCharacteristics MmThreadCharacteristics { set; get; } = MmThreadCharacteristics.Audio;
 
         /// <summary>
+        /// 再生スレッドをバックグラウンドスレッドとして作成するかどうかを示す。
+        /// </summary>
+        public bool CreatePlaybackThreadAsBackgroundThread { set; get; } = false;
+
+        /// <summary>
         /// MMCSSを使用するかどうか
         /// </summary>
         public bool EnableMMCSS { set; get; }
@@ -446,7 +451,7 @@ namespace LibPulseTune.CoreAudio
                 {
                     this.playbackThread = new Thread(PlayThread)
                     {
-                        IsBackground = true,
+                        IsBackground = this.CreatePlaybackThreadAsBackgroundThread,
                     };
                     this.playbackState = PlaybackState.Playing;
                     this.playbackThread.Start();

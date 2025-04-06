@@ -116,6 +116,21 @@ namespace LibPulseTune.Options
             }
         }
 
+        /// <summary>
+        /// 再生スレッドをバックグラウンドスレッドとして作成するかどうかを示す。
+        /// </summary>
+        public static bool CreatePlaybackThreadAsBackgroundThread
+        {
+            set
+            {
+                applicationOptions.SetValue(nameof(CreatePlaybackThreadAsBackgroundThread), value);
+            }
+            get
+            {
+                return applicationOptions.GetValue<bool>(nameof(CreatePlaybackThreadAsBackgroundThread), true);
+            }
+        }
+
         #endregion
 
         #region UI設定
@@ -147,6 +162,21 @@ namespace LibPulseTune.Options
             get
             {
                 return applicationOptions.GetValue(nameof(WaveformRendererViewMode), WaveformRendererStereoViewMode.Separated);
+            }
+        }
+
+        /// <summary>
+        /// 波形レンダラの描画精度
+        /// </summary>
+        public static WaveformRendererRenderingPrecision WaveformRendererRenderingPrecision
+        {
+            set
+            {
+                applicationOptions.SetValue(nameof(WaveformRendererRenderingPrecision), value);
+            }
+            get
+            {
+                return applicationOptions.GetValue(nameof(WaveformRendererRenderingPrecision), WaveformRendererRenderingPrecision.Highest);
             }
         }
 

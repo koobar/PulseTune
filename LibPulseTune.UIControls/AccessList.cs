@@ -179,48 +179,7 @@ namespace LibPulseTune.UIControls
             this.Columns[0].Width = -2;
         }
 
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            base.OnHandleCreated(e);
-
-            if (this.IsDesignMode())
-            {
-                return;
-            }
-
-            UpdateConnectedDrives();
-            UpdateAvailableLocations();
-        }
-
-        protected override void OnHandleDestroyed(EventArgs e)
-        {
-            base.OnHandleDestroyed(e);
-
-            if (this.IsDesignMode())
-            {
-                return;
-            }
-        }
-
-        private void OnDriveStateChanged(object sender, EventArgs e)
-        {
-            if (this.IsDesignMode())
-            {
-                return;
-            }
-
-            var location = this.SelectedLocation;
-
-            UpdateAvailableLocations();
-            this.SelectedLocation = location;
-        }
-
-        private void OnSelectedIndexChanged(object sender, EventArgs e)
-        {
-            this.LocationSelectionChanged?.Invoke(sender, e);
-        }
-
-        protected virtual void UpdateConnectedDrives()
+        private void UpdateConnectedDrives()
         {
             var currentDrives = DriveInfo.GetDrives();
             var flgChanged = false;
@@ -251,6 +210,60 @@ namespace LibPulseTune.UIControls
             UpdateAvailableLocations();
         }
 
+        private void OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.LocationSelectionChanged?.Invoke(sender, e);
+        }
+
+        /// <summary>
+        /// コントロールのハンドルが作成された場合の処理
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+
+            if (this.IsDesignMode())
+            {
+                return;
+            }
+
+            UpdateConnectedDrives();
+            UpdateAvailableLocations();
+        }
+
+        /// <summary>
+        /// コントロールのハンドルが破棄された場合の処理
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            base.OnHandleDestroyed(e);
+
+            if (this.IsDesignMode())
+            {
+                return;
+            }
+        }
+
+        /// <summary>
+        /// コンピュータに接続されたドライブの状態が変化した場合の処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnDriveStateChanged(object sender, EventArgs e)
+        {
+            if (this.IsDesignMode())
+            {
+                return;
+            }
+
+            var location = this.SelectedLocation;
+
+            UpdateAvailableLocations();
+            this.SelectedLocation = location;
+        }
+        
         /// <summary>
         /// コンピュータに接続された外部デバイスが変更された場合の処理
         /// </summary>

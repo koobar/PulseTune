@@ -4,15 +4,16 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using LibPulseTune.Options;
 
-namespace LibPulseTune.UIControls
+namespace LibPulseTune.UIControls.BackendControls
 {
-    public class WaveformRenderer : UserControl
+    internal class WaveformRenderer : UserControl
     {
         // 非公開フィールド
         private float[] lchWaveform;
         private float[] rchWaveform;
         private float[] waveform;
         private bool isMono;
+        private int precision;
         private float lineLength = 0;
         private WaveformRendererStereoViewMode stereoViewMode;
         private bool enableAntiAlias;
@@ -26,6 +27,22 @@ namespace LibPulseTune.UIControls
             SetStyle(ControlStyles.ResizeRedraw, true);
 
             this.stereoViewMode = WaveformRendererStereoViewMode.Separated;
+            this.RenderingPrecision = WaveformRendererRenderingPrecision.Normal;
+        }
+
+        /// <summary>
+        /// 波形の描画精度
+        /// </summary>
+        public WaveformRendererRenderingPrecision RenderingPrecision
+        {
+            set
+            {
+                this.precision = (int)value;
+            }
+            get
+            {
+                return (WaveformRendererRenderingPrecision)this.precision;
+            }
         }
 
         /// <summary>
@@ -68,9 +85,9 @@ namespace LibPulseTune.UIControls
         {
             this.isMono = true;
             this.waveform = waveform;
-            this.lineLength = (float)this.ClientRectangle.Width / waveform.Length;
+            this.lineLength = (float)(this.ClientRectangle.Width / waveform.Length) / this.precision;
 
-            Invalidate();
+            Refresh();
         }
 
         /// <summary>
@@ -83,9 +100,9 @@ namespace LibPulseTune.UIControls
             this.isMono = false;
             this.lchWaveform = lch;
             this.rchWaveform = rch;
-            this.lineLength = (float)this.ClientRectangle.Width / Math.Max(lch.Length, rch.Length);
+            this.lineLength = (float)this.ClientRectangle.Width / (Math.Max(lch.Length, rch.Length) / this.precision);
 
-            Invalidate();
+            Refresh();
         }
 
         /// <summary>
@@ -120,7 +137,7 @@ namespace LibPulseTune.UIControls
                     x = 0;
                     y = center - (waveform[0] * center);
 
-                    for (int i = 1; i < waveform.Length - 1; i++)
+                    for (int i = 1; i < waveform.Length - 1; i += this.precision)
                     {
                         x2 = x + this.lineLength;
                         y2 = center - (waveform[i] * k);
@@ -141,7 +158,7 @@ namespace LibPulseTune.UIControls
             base.OnPaint(e);
 
             e.Graphics.Clear(this.BackColor);
-            
+
             if (this.isMono)
             {
                 float center = e.ClipRectangle.Height * 0.5f;

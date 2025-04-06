@@ -1,7 +1,6 @@
 ﻿using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
-using System.Runtime.CompilerServices;
 
 namespace LibPulseTune.Engine
 {
