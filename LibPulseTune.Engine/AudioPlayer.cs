@@ -372,6 +372,46 @@ namespace LibPulseTune.Engine
             return waveformMonitor.GetWaveform(channel);
         }
 
+        public static uint GetOutputSampleRate()
+        {
+            if (currentAudioSource == null)
+            {
+                return 0;
+            }
+
+            return (uint)currentAudioSource.SampleRate;
+        }
+
+        public static uint GetOutputBitsPerSample()
+        {
+            if (currentAudioSource == null)
+            {
+                return 0;
+            }
+
+            return (uint)currentAudioSource.BitsPerSample;
+        }
+
+        public static uint GetOutputChannels()
+        {
+            if (currentAudioSource == null)
+            {
+                return 0;
+            }
+
+            return (uint)currentAudioSource.Channels;
+        }
+
+        public static bool GetOutputIsFloat()
+        {
+            if (currentAudioSource == null)
+            {
+                return false;
+            }
+
+            return currentAudioSource.IsFloat;
+        }
+
         /// <summary>
         /// イベントタイマーが更新された場合の処理
         /// </summary>

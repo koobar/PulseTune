@@ -358,9 +358,9 @@ namespace LibPulseTune.UIControls
 
                     for (int i = 0; i < dialog.FileNames.Length; ++i)
                     {
-                        if (AudioSourceProvider.IsPlaybackSupportedFileFormat(dialog.FileNames[i]))
+                        if (FileFormatProvider.IsPlaybackSupportedFileFormat(dialog.FileNames[i]))
                         {
-                            var track = AudioTrackProvider.CreateFile(dialog.FileNames[i]);
+                            var track = FileFormatProvider.CreateAudioTrackFromFile(dialog.FileNames[i]);
 
                             if (track != null)
                             {
@@ -393,9 +393,9 @@ namespace LibPulseTune.UIControls
                     {
                         foreach (string path in Directory.GetFiles(fileName))
                         {
-                            if (AudioSourceProvider.IsPlaybackSupportedFileFormat(path))
+                            if (FileFormatProvider.IsPlaybackSupportedFileFormat(path))
                             {
-                                var track = AudioTrackProvider.CreateFile(path);
+                                var track = FileFormatProvider.CreateAudioTrackFromFile(path);
 
                                 if (track != null)
                                 {
@@ -441,7 +441,7 @@ namespace LibPulseTune.UIControls
             }
 
             // ファイルに保存する。
-            var writer = PlaylistWriterProvider.GetPlaylistReader(path);
+            var writer = FileFormatProvider.CreatePlaylistWriter(path);
             writer.OpenFile(path);
             writer.Write(this.Playlist);
         }
@@ -716,9 +716,9 @@ namespace LibPulseTune.UIControls
 
             foreach (string path in fileName)
             {
-                if (AudioSourceProvider.IsPlaybackSupportedFileFormat(path))
+                if (FileFormatProvider.IsPlaybackSupportedFileFormat(path))
                 {
-                    list.Add(AudioTrackProvider.CreateFile(path));
+                    list.Add(FileFormatProvider.CreateAudioTrackFromFile(path));
                 }
             }
 

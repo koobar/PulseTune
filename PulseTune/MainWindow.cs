@@ -81,7 +81,7 @@ namespace PulseTune
             playbackMenuItem.DefaultItem = true;
             playbackMenuItem.Click += delegate
             {
-                Play(AudioTrackProvider.CreateFile(control.SelectedFileNames[0]));
+                Play(FileFormatProvider.CreateAudioTrackFromFile(control.SelectedFileNames[0]));
             };
             var separator1 = new MenuItem() { Text = "-" };
             var updateMenuItem = new MenuItem();
@@ -283,7 +283,7 @@ namespace PulseTune
                 Control = control
             };
 
-            control.SetFileFormatFilter(AudioSourceProvider.GetAllRegisteredFormatExtensions());
+            control.SetFileFormatFilter(FileFormatProvider.GetAllPlaybackSupportedFileFormatExtensions());
             control.ItemHeight = 25;
             control.ContextMenu = CreateExplorerControlContextMenu(control);
             control.FileDoubleClick += OnIMainTabControlTabPageElementDoubleClick;
@@ -375,6 +375,35 @@ namespace PulseTune
         }
 
         /// <summary>
+        /// ステータスバーのテキストを更新する。
+        /// </summary>
+        /// <param name="audioTrack"></param>
+        private void UpdateStatusBarText(AudioTrackBase audioTrack = null)
+        {
+            if (audioTrack == null)
+            {
+                this.StatusText.Text = "PulseTune by koobar.";
+                return;
+            }
+
+            switch (AudioPlayer.GetAudioPlayerState())
+            {
+                case AudioPlayer.AUDIOPLAYER_STATE_PLAY:
+                case AudioPlayer.AUDIOPLAYER_STATE_PAUSE:
+                    this.StatusText.Text = $"{audioTrack.Title} - " +
+                        $"{AudioPlayer.GetOutputSampleRate()}Hz, " +
+                        $"{AudioPlayer.GetOutputBitsPerSample()}Bits, " +
+                        $"{AudioPlayer.GetOutputChannels()}Channels, " +
+                        $"{(AudioPlayer.GetOutputIsFloat() ? "Float" : "PCM")}, " +
+                        $"Codec: {FileFormatProvider.GetFormatNameFromExtension(Path.GetExtension(audioTrack.Path))}";
+                    break;
+                default:
+                    this.StatusText.Text = "PulseTune by koobar.";
+                    break;
+            }
+        }
+
+        /// <summary>
         /// トラックの画像として表示する画像を取得する。
         /// </summary>
         /// <returns></returns>
@@ -441,7 +470,7 @@ namespace PulseTune
             var viewer = (PlaylistViewer)page.Control;
 
             // プレイリストを読み込む。
-            var reader = PlaylistReaderProvider.GetPlaylistReader(path);
+            var reader = FileFormatProvider.CreatePlaylistReader(path);
             reader.OpenFile(path, viewer.Playlist);
 
             // タブを追加
@@ -482,9 +511,9 @@ namespace PulseTune
 
             foreach (string path in Directory.GetFiles(folderPath))
             {
-                if (AudioSourceProvider.IsPlaybackSupportedFileFormat(path))
+                if (FileFormatProvider.IsPlaybackSupportedFileFormat(path))
                 {
-                    var track = AudioTrackProvider.CreateFile(path);
+                    var track = FileFormatProvider.CreateAudioTrackFromFile(path);
 
                     if (track != null)
                     {
@@ -592,7 +621,7 @@ namespace PulseTune
             }
 
             // ファイルを開く
-            var source = AudioSourceProvider.CreateAudioSource(track.Path);
+            var source = FileFormatProvider.CreateAudioSource(track.Path);
             AudioPlayer.SetAudioSource(source);
 
             // 出力デバイスの準備
@@ -611,8 +640,9 @@ namespace PulseTune
             // トラックの画像を表示する。
             ShowTrackPicture(track);
 
-            // ウィンドウのタイトルを更新する。
+            // ウィンドウのタイトルバーとステータスバーを更新する。
             UpdateWindowTitle(track);
+            UpdateStatusBarText(track);
 
             // 後始末
             this.currentTrack = track;
@@ -627,6 +657,7 @@ namespace PulseTune
 
             // ウィンドウのタイトルを更新する。
             UpdateWindowTitle(null);
+            UpdateStatusBarText(this.currentTrack);
         }
 
         /// <summary>
@@ -636,8 +667,9 @@ namespace PulseTune
         {
             AudioPlayer.Play();
 
-            // ウィンドウのタイトルを更新する。
+            // ウィンドウのタイトルバーとステータスバーを更新する。
             UpdateWindowTitle(this.currentTrack);
+            UpdateStatusBarText(this.currentTrack);
         }
 
         /// <summary>
@@ -651,8 +683,9 @@ namespace PulseTune
             // トラックの画像を表示する。
             ShowTrackPicture(null);
 
-            // ウィンドウのタイトルを更新する。
+            // ウィンドウのタイトルバーとステータスバーを更新する。
             UpdateWindowTitle(null);
+            UpdateStatusBarText(null);
 
             // レベルメーターをリセット
             this.LevelMeterControl.Reset();
@@ -688,12 +721,19 @@ namespace PulseTune
         /// </summary>
         private void MoveToTrackStart()
         {
-            var playlist = GetCurrentTabPagePlaylist();
-            Play(playlist.SelectedTrack);
+            var formatCode = FileFormatProvider.GetFormatCode(Path.GetExtension(this.currentTrack.Path));
 
-            // このコードのほうが再読み込みを防げて効率的だが、Opusのデコードに使用しているライブラリ「Concentus」と相性が悪く、
-            // Opusだけ開始から1秒後の位置にシークされてしまう不具合が発生する。
-            //AudioPlayer.GetAudioSource().SetCurrentTime(TimeSpan.FromSeconds(0));
+            if (formatCode == FormatCodes.CODE_OPUS)
+            {
+                // Opusのデコードに使用しているライブラリ「Concentus」と相性の都合上、
+                // Opusはファイルを開きなおして再生することでトラックの最初に戻る必要がある。
+                var playlist = GetCurrentTabPagePlaylist();
+                Play(this.currentTrack);
+            }
+            else
+            {
+                AudioPlayer.GetAudioSource().SetCurrentTime(TimeSpan.FromSeconds(0));
+            }
         }
 
         #endregion
@@ -778,7 +818,7 @@ namespace PulseTune
             {
                 foreach (var argument in commandLineArgs)
                 {
-                    if (File.Exists(argument) && AudioSourceProvider.IsPlaybackSupportedFileFormat(argument))
+                    if (File.Exists(argument) && FileFormatProvider.IsPlaybackSupportedFileFormat(argument))
                     {
                         tracks.Add(argument);
                     }
@@ -787,7 +827,7 @@ namespace PulseTune
                 if (tracks.Count > 0)
                 {
                     OpenFolderInNewTab(tracks[0]);
-                    Play(AudioTrackProvider.CreateFile(tracks[0]));
+                    Play(FileFormatProvider.CreateAudioTrackFromFile(tracks[0]));
                 }
             }
         }
@@ -823,7 +863,7 @@ namespace PulseTune
             var audioTrack = (AudioTrackBase)track;
 
             // 新しくAudioTrackBaseを作らないと、アルバムアートが読み込まれない場合がある。
-            Play(AudioTrackProvider.CreateFile(audioTrack.Path));
+            Play(FileFormatProvider.CreateAudioTrackFromFile(audioTrack.Path));
         }
 
         /// <summary>

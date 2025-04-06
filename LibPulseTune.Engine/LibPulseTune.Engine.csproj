@@ -48,9 +48,9 @@
     <Compile Include="AudioEngine.cs" />
     <Compile Include="AudioPlayer.cs" />
     <Compile Include="IAudioSourceToIWaveProviderConverter.cs" />
-    <Compile Include="Providers\AudioSourceProvider.cs" />
+    <Compile Include="Providers\FileFormatInfo.cs" />
+    <Compile Include="Providers\FileFormatProvider.cs" />
     <Compile Include="Tracks\AudioTrackBase.cs" />
-    <Compile Include="Providers\AudioTrackProvider.cs" />
     <Compile Include="IAudioOutputDevice.cs" />
     <Compile Include="IAudioPlayer.cs" />
     <Compile Include="IAudioSource.cs" />
@@ -58,8 +58,6 @@
     <Compile Include="Playlists\IPlaylistReader.cs" />
     <Compile Include="Playlists\IPlaylistWriter.cs" />
     <Compile Include="Playlists\Playlist.cs" />
-    <Compile Include="Providers\PlaylistReaderProvider.cs" />
-    <Compile Include="Providers\PlaylistWriterProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WaveformMonitor.cs" />
   </ItemGroup>

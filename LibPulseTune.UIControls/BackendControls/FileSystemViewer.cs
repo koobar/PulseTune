@@ -382,7 +382,7 @@ namespace LibPulseTune.UIControls.BackendControls
                         text = fileInfo.Name;
                         break;
                     case COLUMN_HEADER_FORMAT:
-                        text = AudioSourceProvider.GetFormatNameFromExtension(fileInfo.Extension);
+                        text = FileFormatProvider.GetFormatNameFromExtension(fileInfo.Extension);
                         break;
                     case COLUMN_HEADER_SIZE:
                         text = Math.Round(fileInfo.Length / 1024.0 / 1024.0, 2) + "MiB";

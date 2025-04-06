@@ -1,5 +1,4 @@
-﻿using LibPulseTune.Engine;
-using LibPulseTune.Engine.Playlists;
+﻿using LibPulseTune.Engine.Playlists;
 using LibPulseTune.Engine.Providers;
 using LibPulseTune.Engine.Tracks;
 using System.Collections.Generic;
@@ -46,17 +45,17 @@ namespace LibPulseTune.Metadata.Playlist
 
                     if (!line.StartsWith("#"))
                     {
-                        if (AudioSourceProvider.IsPlaybackSupportedFileFormat(line))
+                        if (FileFormatProvider.IsPlaybackSupportedFileFormat(line))
                         {
-                            tracks.Add(AudioTrackProvider.CreateFileFast(line));
+                            tracks.Add(FileFormatProvider.CreateAudioTrackFromFileFast(line));
                         }
                         else if (Directory.Exists(line))
                         {
                             foreach (string fileName in Directory.GetFiles(line))
                             {
-                                if (AudioSourceProvider.IsPlaybackSupportedFileFormat(fileName))
+                                if (FileFormatProvider.IsPlaybackSupportedFileFormat(fileName))
                                 {
-                                    var track = AudioTrackProvider.CreateFile(fileName);
+                                    var track = FileFormatProvider.CreateAudioTrackFromFile(fileName);
 
                                     if (track != null)
                                     {
@@ -69,9 +68,9 @@ namespace LibPulseTune.Metadata.Playlist
                         {
                             string fullPath = $"{Path.GetDirectoryName(path)}\\{line}";
 
-                            if (AudioSourceProvider.IsPlaybackSupportedFileFormat(fullPath))
+                            if (FileFormatProvider.IsPlaybackSupportedFileFormat(fullPath))
                             {
-                                var track = AudioTrackProvider.CreateFile(fullPath);
+                                var track = FileFormatProvider.CreateAudioTrackFromFile(fullPath);
 
                                 if (track != null)
                                 {

@@ -37,16 +37,17 @@ namespace LibPulseTune.UIControls.Utils
         public static string GetSupportedPlaybackFileFormatsDialogFilterString()
         {
             var sb = new StringBuilder();
-            var allTypes = MakeFilterExtensionString(AudioSourceProvider.GetAllRegisteredFormatExtensions());
+            var allTypes = MakeFilterExtensionString(FileFormatProvider.GetAllPlaybackSupportedFileFormatExtensions());
 
             sb.Append("対応するすべての形式(");
             sb.Append(allTypes);
             sb.Append(")|");
             sb.Append(allTypes);
 
-            foreach (var formatName in AudioSourceProvider.GetRegisteredFormatNames())
+            foreach (var formatCode in FileFormatProvider.GetRegisteredPlaybackSupportedFormatCodes())
             {
-                var filter = MakeFilterExtensionString(AudioSourceProvider.GetRegisteredExtensions(formatName));
+                var formatName = FileFormatProvider.GetFormatName(formatCode);
+                var filter = MakeFilterExtensionString(FileFormatProvider.GetRegisteredExtensions(formatCode));
 
                 sb.Append("|");
                 sb.Append(formatName);

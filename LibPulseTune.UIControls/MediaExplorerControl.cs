@@ -397,7 +397,7 @@ namespace LibPulseTune.UIControls
             this.playlist.Clear();
             foreach (var fileName in this.Viewer.FileNames)
             {
-                this.playlist.Add(AudioTrackProvider.CreateFileFast(fileName));
+                this.playlist.Add(FileFormatProvider.CreateAudioTrackFromFileFast(fileName));
             }
 
             this.Navigated?.Invoke(this, e);

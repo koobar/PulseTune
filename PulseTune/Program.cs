@@ -42,36 +42,36 @@ namespace PulseTune
         public static void LoadCodecs()
         {
             // Media Foundation（OS組み込みコーデック）でデコードするフォーマットを登録
-            AudioSourceProvider.RegisterDecoder("AAC", typeof(MediaFoundationDecoder), ".aac");
-            AudioSourceProvider.RegisterDecoder("FLAC", typeof(MediaFoundationDecoder), ".flac");
-            AudioSourceProvider.RegisterDecoder("MP2", typeof(MediaFoundationDecoder), ".mp2");
-            AudioSourceProvider.RegisterDecoder("MP3", typeof(MediaFoundationDecoder), ".mp3");
-            AudioSourceProvider.RegisterDecoder("M4A", typeof(MediaFoundationDecoder), ".m4a");
-            AudioSourceProvider.RegisterDecoder("Windows Media Audio", typeof(MediaFoundationDecoder), ".wma");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_AAC, "AAC", typeof(MediaFoundationDecoder), null, typeof(GeneralPurposeAudioTrack), ".aac");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_FLAC, "FLAC", typeof(MediaFoundationDecoder), null, typeof(GeneralPurposeAudioTrack), ".flac");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_MP2, "MP2", typeof(MediaFoundationDecoder), null, typeof(GeneralPurposeAudioTrack), ".mp2");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_MP3, "MP3", typeof(MediaFoundationDecoder), null, typeof(GeneralPurposeAudioTrack), ".mp3");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_M4A, "M4A", typeof(MediaFoundationDecoder), null, typeof(GeneralPurposeAudioTrack), ".m4a");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_WMA, "Windows Media Audio", typeof(MediaFoundationDecoder), null, typeof(GeneralPurposeAudioTrack), ".wma");
 
             // LibPulseTune.Codecsライブラリに含まれるデコーダでデコードするフォーマットを登録
-            AudioSourceProvider.RegisterDecoder("AIFF", typeof(AiffDecoder), ".aif", ".aiff");
-            AudioSourceProvider.RegisterDecoder("Vorbis", typeof(VorbisDecoder), ".ogg");
-            AudioSourceProvider.RegisterDecoder("Opus", typeof(OpusDecoder), ".opus");
-            AudioSourceProvider.RegisterDecoder("WAV", typeof(WavDecoder), ".wav");
-            AudioSourceProvider.RegisterDecoder("オーディオCDトラック", typeof(CDAudioDecoder), ".cda");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_AIFF, "AIFF", typeof(AiffDecoder), null, typeof(GeneralPurposeAudioTrack), ".aif", ".aiff");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_VORBIS, "Vorbis", typeof(VorbisDecoder), null, typeof(VorbisAudioTrack), ".ogg");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_OPUS, "Opus", typeof(OpusDecoder), null, typeof(GeneralPurposeAudioTrack), ".opus");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_WAV, "WAV", typeof(WavDecoder), null, typeof(GeneralPurposeAudioTrack), ".wav");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_CDA, "オーディオCDトラック", typeof(CDAudioDecoder), null, typeof(GeneralPurposeAudioTrack), ".cda");
 
             // Monkey's Audioが使用可能なら登録
             if (ApeDecoder.IsAvailable())
             {
-                AudioSourceProvider.RegisterDecoder("Monkey's Audio", typeof(ApeDecoder), ".ape");
+                FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_APE, "Monkey's Audio", typeof(VorbisDecoder), null, typeof(GeneralPurposeAudioTrack), ".ape");
             }
 
             // WavPackが使用可能なら登録
             if (WavPackDecoder.IsAvailable())
             {
-                AudioSourceProvider.RegisterDecoder("WavPack", typeof(WavPackDecoder), ".wv");
+                FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_WV, "WavPack", typeof(VorbisDecoder), null, typeof(GeneralPurposeAudioTrack), ".wv");
             }
 
             // ZilophiXが使用可能なら登録
             if (ZilophiXDecoder.IsAvailable())
             {
-                AudioSourceProvider.RegisterDecoder("ZilophiX", typeof(ZilophiXDecoder), ".zpx");
+                FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_ZPX, "ZilophiX", typeof(ZilophiXDecoder), null, typeof(GeneralPurposeAudioTrack), ".zpx");
             }
         }
 
@@ -85,13 +85,8 @@ namespace PulseTune
             AudioEngine.Init();
             LoadCodecs();
 
-            // オーディオトラックの読み込み準備
-            AudioTrackProvider.RegisterGeneralPurposeAudioTrackType(typeof(GeneralPurposeAudioTrack));
-            AudioTrackProvider.RegisterAudioTrackType("Vorbis", typeof(VorbisAudioTrack), ".ogg");
-
             // M3Uプレイリストの読み書きを可能にする。
-            PlaylistReaderProvider.RegisterPlaylistReader("M3U", typeof(M3UPlaylistReader), ".m3u", ".m3u8");
-            PlaylistWriterProvider.RegisterPlaylistWriter("M3U", typeof(M3UPlaylistWriter), ".m3u", ".m3u8");
+            FileFormatProvider.RegisterFileFormat(FormatCodes.CODE_M3U, "M3U", typeof(M3UPlaylistReader), typeof(M3UPlaylistWriter), null, ".m3u", ".m3u8");
 
             // 設定を読み込む。
             OptionManager.Init();
