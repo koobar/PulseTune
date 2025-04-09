@@ -33,8 +33,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.RightVolumeMeter = new LibPulseTune.UIControls.BackendControls.VolumeMeterControl();
-            this.LeftVolumeMeter = new LibPulseTune.UIControls.BackendControls.VolumeMeterControl();
+            this.RightVolumeMeter = new LibPulseTune.UIControls.BackendControls.LevelMeterControl();
+            this.LeftVolumeMeter = new LibPulseTune.UIControls.BackendControls.LevelMeterControl();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -141,7 +141,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel panel2;
-        private LibPulseTune.UIControls.BackendControls.VolumeMeterControl RightVolumeMeter;
-        private LibPulseTune.UIControls.BackendControls.VolumeMeterControl LeftVolumeMeter;
+        private LibPulseTune.UIControls.BackendControls.LevelMeterControl RightVolumeMeter;
+        private LibPulseTune.UIControls.BackendControls.LevelMeterControl LeftVolumeMeter;
     }
 }

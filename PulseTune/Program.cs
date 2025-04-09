@@ -28,7 +28,7 @@ namespace PulseTune
 
         // アプリケーション情報の定義
         public const string APPLICATION_NAME = @"PulseTune";
-        public static readonly DateTime ApplicationBuildDate = new DateTime(2025, 3, 28);
+        public static readonly DateTime ApplicationBuildDate = new DateTime(2025, 4, 9);
         public static readonly Version ApplicationVersion = CreateApplicationVersion(1, 4, ApplicationBuildDate);
 
         private static Version CreateApplicationVersion(int major, int minor, DateTime buildDate)

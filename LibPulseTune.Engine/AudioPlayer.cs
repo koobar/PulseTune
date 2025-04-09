@@ -359,7 +359,7 @@ namespace LibPulseTune.Engine
         /// <returns></returns>
         public static float GetAmplitude(int channel)
         {
-            return waveformMonitor.GetMaximumInstantaneousDecibels(channel);
+            return waveformMonitor.GetDecibels(channel);
         }
 
         /// <summary>

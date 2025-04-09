@@ -534,6 +534,81 @@ namespace PulseTune
             this.MainTabControl.SelectedTab = page;
         }
 
+        /// <summary>
+        /// 波形レンダラの可視性を設定し、メニュー項目のチェック状態にも反映する。
+        /// </summary>
+        /// <param name="visible"></param>
+        private void SetWaveformRendererVisible(bool visible)
+        {
+            this.ShowWaveformRendererMenuItem.Checked = visible;
+
+            if (this.WaveformRendererControl.Visible == visible)
+            {
+                return;
+            }
+
+            this.WaveformRendererControl.Visible = visible;
+
+            int adjust = this.WaveformRendererControl.Height * (visible ? -1 : 1);
+            this.AccessListControl.Height += adjust;
+
+            OptionManager.WaveformRendererVisibility = visible;
+        }
+
+        /// <summary>
+        /// 波形レンダラのステレオ表示モードを設定し、UIやメニュー項目のチェック状態にも反映する。
+        /// </summary>
+        /// <param name="stereoViewMode"></param>
+        private void SetWaveformRendererStereoViewMode(WaveformRendererStereoViewMode stereoViewMode)
+        {
+            switch (OptionManager.WaveformRendererViewMode)
+            {
+                case WaveformRendererStereoViewMode.Separated:
+                    this.SeparateByChannelsWaveformRendererViewModeMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Separated;
+                    break;
+                case WaveformRendererStereoViewMode.Mixed:
+                    this.MixedWaveformRendererViewModeMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Mixed;
+                    break;
+            }
+
+            OptionManager.WaveformRendererViewMode = stereoViewMode;
+        }
+
+        /// <summary>
+        /// 波形レンダラの描画精度を設定し、UIやメニュー項目のチェック状態にも反映する。
+        /// </summary>
+        /// <param name="precision"></param>
+        private void SetWaveformRendererRenderingPrecision(WaveformRendererRenderingPrecision precision)
+        {
+            switch (precision)
+            {
+                case WaveformRendererRenderingPrecision.Lowest:
+                    this.LowestQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Lowest;
+                    break;
+                case WaveformRendererRenderingPrecision.Low:
+                    this.LowQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Low;
+                    break;
+                case WaveformRendererRenderingPrecision.Normal:
+                    this.NormalQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Normal;
+                    break;
+                case WaveformRendererRenderingPrecision.High:
+                    this.HighQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.High;
+                    break;
+                case WaveformRendererRenderingPrecision.Highest:
+                    this.HighestQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
+                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Highest;
+                    break;
+            }
+
+            OptionManager.WaveformRendererRenderingPrecision = precision;
+        }
+
         #endregion
 
         #region オーディオ制御用メソッド
@@ -739,60 +814,6 @@ namespace PulseTune
         #endregion
 
         /// <summary>
-        /// 波形レンダラのステレオ表示モードを設定し、UIやメニュー項目のチェック状態にも反映する。
-        /// </summary>
-        /// <param name="stereoViewMode"></param>
-        private void SetWaveformRendererStereoViewMode(WaveformRendererStereoViewMode stereoViewMode)
-        {
-            switch (OptionManager.WaveformRendererViewMode)
-            {
-                case WaveformRendererStereoViewMode.Separated:
-                    this.SeparateByChannelsWaveformRendererViewModeMenuItem.CheckOnlyThisMenuItem();
-                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Separated;
-                    break;
-                case WaveformRendererStereoViewMode.Mixed:
-                    this.MixedWaveformRendererViewModeMenuItem.CheckOnlyThisMenuItem();
-                    this.WaveformRendererControl.StereoViewMode = WaveformRendererStereoViewMode.Mixed;
-                    break;
-            }
-
-            OptionManager.WaveformRendererViewMode = stereoViewMode;
-        }
-
-        /// <summary>
-        /// 波形レンダラの描画精度を設定し、UIやメニュー項目のチェック状態にも反映する。
-        /// </summary>
-        /// <param name="precision"></param>
-        private void SetWaveformRendererRenderingPrecision(WaveformRendererRenderingPrecision precision)
-        {
-            switch (precision)
-            {
-                case WaveformRendererRenderingPrecision.Lowest:
-                    this.LowestQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
-                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Lowest;
-                    break;
-                case WaveformRendererRenderingPrecision.Low:
-                    this.LowQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
-                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Low;
-                    break;
-                case WaveformRendererRenderingPrecision.Normal:
-                    this.NormalQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
-                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Normal;
-                    break;
-                case WaveformRendererRenderingPrecision.High:
-                    this.HighQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
-                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.High;
-                    break;
-                case WaveformRendererRenderingPrecision.Highest:
-                    this.HighestQualityWaveformRendererPrecisionMenuItem.CheckOnlyThisMenuItem();
-                    this.WaveformRendererControl.RenderingPrecision = WaveformRendererRenderingPrecision.Highest;
-                    break;
-            }
-
-            OptionManager.WaveformRendererRenderingPrecision = precision;
-        }
-
-        /// <summary>
         /// 設定を読み込む。
         /// </summary>
         private void LoadOptions()
@@ -800,9 +821,10 @@ namespace PulseTune
             SelectDevice(CreateAudioOutputDeviceFromApplicationOptions());
             UpdateAudioOutputDeviceMenuItems();
 
+            SetWaveformRendererVisible(OptionManager.WaveformRendererVisibility);
             SetWaveformRendererStereoViewMode(OptionManager.WaveformRendererViewMode);
             SetWaveformRendererRenderingPrecision(OptionManager.WaveformRendererRenderingPrecision);
-
+            
             this.TopMost = this.AlwaysTopMostViewMenuItem.Checked = OptionManager.MainWindowAlwaysTopMost;
         }
 
@@ -1429,6 +1451,11 @@ namespace PulseTune
             {
                 SetWaveformRendererRenderingPrecision(WaveformRendererRenderingPrecision.Highest);
             }
+        }
+
+        private void ShowWaveformRendererMenuItem_Click(object sender, EventArgs e)
+        {
+            SetWaveformRendererVisible(!this.ShowWaveformRendererMenuItem.Checked);
         }
     }
 }

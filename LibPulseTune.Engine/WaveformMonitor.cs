@@ -66,7 +66,7 @@ namespace LibPulseTune.Engine
                         Array.Clear(this.buffers[ch], 0, samplesPerCh);
                     }
                 }
-
+                
                 // チャンネルごとにサンプルを分離してバッファに格納する。
                 int index = offset;
                 for (int i = 0; i < samplesPerCh; ++i)
@@ -118,7 +118,7 @@ namespace LibPulseTune.Engine
                     for (int i = startIndex, j = 0; i < endIndex; ++i, ++j)
                     {
                         float sample = this.buffers[channel][i];
-                        float abs = Math.Abs(sample);
+                        float abs = Math.Abs(this.buffers[channel][i]);
 
                         this.waveforms[channel][j] = sample;
 
@@ -147,7 +147,12 @@ namespace LibPulseTune.Engine
             }
         }
 
-        public float GetMaximumInstantaneousDecibels(int channel)
+        /// <summary>
+        /// 読み込まれたデータから、指定されたチャンネルの最大振幅をデシベル単位で取得する。
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public float GetDecibels(int channel)
         {
             return ToDecibels(GetAmplitude(channel));
         }
@@ -176,6 +181,11 @@ namespace LibPulseTune.Engine
             }
         }
 
+        /// <summary>
+        /// 指定された振幅をデシベル単位に変換する。
+        /// </summary>
+        /// <param name="amplitude"></param>
+        /// <returns></returns>
         private float ToDecibels(float amplitude)
         {
             if (amplitude <= 0)

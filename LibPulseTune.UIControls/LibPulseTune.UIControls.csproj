@@ -139,7 +139,7 @@
     <Compile Include="TabPageEventArgs.cs" />
     <Compile Include="Utils\ProcessUtils.cs" />
     <Compile Include="Utils\WindowsFormsControlExtensions.cs" />
-    <Compile Include="BackendControls\VolumeMeterControl.cs">
+    <Compile Include="BackendControls\LevelMeterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="WaveformPanel.cs">

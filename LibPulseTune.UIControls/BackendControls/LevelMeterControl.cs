@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace LibPulseTune.UIControls.BackendControls
 {
-    internal class VolumeMeterControl : UserControl
+    internal class LevelMeterControl : UserControl
     {
         // 非公開定数
         private const float METER_SCALE_WIDTH = 4.0f;               // 目盛りの幅
@@ -17,7 +17,7 @@ namespace LibPulseTune.UIControls.BackendControls
         private float scaleSpacing;
 
         // コンストラクタ
-        public VolumeMeterControl()
+        public LevelMeterControl()
         {
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
@@ -91,15 +91,9 @@ namespace LibPulseTune.UIControls.BackendControls
             Refresh();
         }
 
-        /// <summary>
-        /// 目盛りを塗りつぶすブラシを取得する。
-        /// </summary>
-        /// <param name="scaleDb">点灯させる目盛りの基準デシベル値</param>
-        /// <param name="currentDb">現在のデシベル値</param>
-        /// <returns></returns>
-        private Brush GetScaleBrush(float scaleDb, float currentDb)
+        private Brush GetBrush(float scaleDb, float decibels)
         {
-            if (currentDb > scaleDb)
+            if (decibels > scaleDb)
             {
                 if (scaleDb >= -5.0f)
                 {
@@ -118,10 +112,8 @@ namespace LibPulseTune.UIControls.BackendControls
                     return Brushes.DarkGreen;
                 }
             }
-            else
-            {
-                return Brushes.LightGray;
-            }
+
+            return Brushes.LightGray;
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -153,7 +145,7 @@ namespace LibPulseTune.UIControls.BackendControls
                 }
 
                 // 目盛りを描画
-                e.Graphics.FillRectangle(GetScaleBrush(cur, db), x, y, w, h);
+                e.Graphics.FillRectangle(GetBrush(cur, db), x, y, w, h);
 
                 // 描画位置を更新
                 x += w;

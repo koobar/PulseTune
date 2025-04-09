@@ -180,6 +180,21 @@ namespace LibPulseTune.Options
             }
         }
 
+        /// <summary>
+        /// 波形レンダラの可視性
+        /// </summary>
+        public static bool WaveformRendererVisibility
+        {
+            set
+            {
+                applicationOptions.SetValue(nameof(WaveformRendererVisibility), value);
+            }
+            get
+            {
+                return applicationOptions.GetValue(nameof(WaveformRendererVisibility), true, typeof(bool));
+            }
+        }
+
         #endregion
 
         #region 再生設定

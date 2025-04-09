@@ -51,9 +51,11 @@ namespace PulseTune
             this.AlwaysTopMostViewMenuItem = new System.Windows.Forms.MenuItem();
             this.ViewMenuSeparator1 = new System.Windows.Forms.MenuItem();
             this.WaveformRendererViewModesMenuItem = new System.Windows.Forms.MenuItem();
+            this.ShowWaveformRendererMenuItem = new System.Windows.Forms.MenuItem();
+            this.menuItem12 = new System.Windows.Forms.MenuItem();
+            this.menuItem15 = new System.Windows.Forms.MenuItem();
             this.SeparateByChannelsWaveformRendererViewModeMenuItem = new System.Windows.Forms.MenuItem();
             this.MixedWaveformRendererViewModeMenuItem = new System.Windows.Forms.MenuItem();
-            this.menuItem12 = new System.Windows.Forms.MenuItem();
             this.menuItem14 = new System.Windows.Forms.MenuItem();
             this.HighestQualityWaveformRendererPrecisionMenuItem = new System.Windows.Forms.MenuItem();
             this.HighQualityWaveformRendererPrecisionMenuItem = new System.Windows.Forms.MenuItem();
@@ -237,11 +239,30 @@ namespace PulseTune
             // 
             this.WaveformRendererViewModesMenuItem.Index = 2;
             this.WaveformRendererViewModesMenuItem.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.SeparateByChannelsWaveformRendererViewModeMenuItem,
-            this.MixedWaveformRendererViewModeMenuItem,
+            this.ShowWaveformRendererMenuItem,
             this.menuItem12,
+            this.menuItem15,
             this.menuItem14});
             this.WaveformRendererViewModesMenuItem.Text = "波形表示モード";
+            // 
+            // ShowWaveformRendererMenuItem
+            // 
+            this.ShowWaveformRendererMenuItem.Index = 0;
+            this.ShowWaveformRendererMenuItem.Text = "波形を表示する（高負荷）";
+            this.ShowWaveformRendererMenuItem.Click += new System.EventHandler(this.ShowWaveformRendererMenuItem_Click);
+            // 
+            // menuItem12
+            // 
+            this.menuItem12.Index = 1;
+            this.menuItem12.Text = "-";
+            // 
+            // menuItem15
+            // 
+            this.menuItem15.Index = 2;
+            this.menuItem15.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.SeparateByChannelsWaveformRendererViewModeMenuItem,
+            this.MixedWaveformRendererViewModeMenuItem});
+            this.menuItem15.Text = "ステレオ分離モード";
             // 
             // SeparateByChannelsWaveformRendererViewModeMenuItem
             // 
@@ -254,11 +275,6 @@ namespace PulseTune
             this.MixedWaveformRendererViewModeMenuItem.Index = 1;
             this.MixedWaveformRendererViewModeMenuItem.Text = "チャンネルをミックスして表示";
             this.MixedWaveformRendererViewModeMenuItem.Click += new System.EventHandler(this.WaveformRendererViewModesMenuItem_Clicked);
-            // 
-            // menuItem12
-            // 
-            this.menuItem12.Index = 2;
-            this.menuItem12.Text = "-";
             // 
             // menuItem14
             // 
@@ -638,7 +654,6 @@ namespace PulseTune
         private System.Windows.Forms.MenuItem menuItem10;
         private System.Windows.Forms.MenuItem menuItem2;
         private System.Windows.Forms.MenuItem ShowWasapiAndMmcssOptionMenuItem;
-        private System.Windows.Forms.MenuItem menuItem12;
         private System.Windows.Forms.MenuItem menuItem14;
         private System.Windows.Forms.MenuItem HighestQualityWaveformRendererPrecisionMenuItem;
         private System.Windows.Forms.MenuItem HighQualityWaveformRendererPrecisionMenuItem;
@@ -650,5 +665,8 @@ namespace PulseTune
         private System.Windows.Forms.Panel panel1;
         private LibPulseTune.UIControls.WaveformPanel WaveformRendererControl;
         private LibPulseTune.UIControls.LevelMeterPanel LevelMeterControl;
+        private System.Windows.Forms.MenuItem menuItem15;
+        private System.Windows.Forms.MenuItem ShowWaveformRendererMenuItem;
+        private System.Windows.Forms.MenuItem menuItem12;
     }
 }
